@@ -1,8 +1,11 @@
 # PS-NITRO
 PowerShell Module for NITRO (REST API) communication with Citrix NetScaler (Automation DevOps)
 
-Unfortunately I have not been able to start my devops machine and upload the latest version of the code, including the samples shown during the Citrix Synergy presentation. So for now I could only upload an early version of the extended PowerShell Module.
+I have uploaded the latest version of my PowerShell Module code and the sample scripts used in the Citrix Synergy presentation. So YES I have my dev machine hooked on the internet again :-)
 
-Hopefully I'll be able to upload the latest version and sample scripts from the presentation by the end of the month (June).
+As I am still learning PowerShell every day I will work on creating new PowerShell module (learning all about manifest files now) that will use separate script files for the different NetScaler features. This will allow me to more easily work on separate parts of the code and cmdlets and really dig into the NetScaler NITRO configurations.
 
-Please feel free to contact me and ask for any clearifications of the code.
+So have fun with the code and I'm looking forward to any feedback and improvements for the code!
+
+Cheers,
+Esther
