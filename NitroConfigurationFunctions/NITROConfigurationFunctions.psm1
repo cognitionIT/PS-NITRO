@@ -4608,6 +4608,7 @@ Set-StrictMode -Version Latest
     
             $payload = @{servicegroupname=$Name}
             If ($CacheType)
+<<<<<<< HEAD
             {
                 If ($CacheType -eq "SERVER")
                 {
@@ -4624,6 +4625,24 @@ Set-StrictMode -Version Latest
             }
             If (!([string]::IsNullOrEmpty($AppflowLogging)))
             {
+=======
+            {
+                If ($CacheType -eq "SERVER")
+                {
+                    $payload.Add("cacheable", $Cacheable)
+                }
+                Else
+                {
+                    $payload.Add("cachetype", $CacheType)
+                }
+            }
+            If (!([string]::IsNullOrEmpty($HealthMonitoring)))
+            {
+                $payload.Add("healthmonitor",$HealthMonitoring)
+            }
+            If (!([string]::IsNullOrEmpty($AppflowLogging)))
+            {
+>>>>>>> origin/master
                 $payload.Add("appflowlog",$AppflowLogging)
             }
             If (!([string]::IsNullOrEmpty($Comment)))
@@ -5459,10 +5478,17 @@ Set-StrictMode -Version Latest
             if (-not [string]::IsNullOrEmpty($Comment)) {$payload.Add("comment",$Comment)}
 
             $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType lbvserver -Payload $payload 
+<<<<<<< HEAD
         }
         End {
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
         }
+=======
+        }
+        End {
+            Write-Verbose "$($MyInvocation.MyCommand): Exit"
+        }
+>>>>>>> origin/master
     }
 
     function Update-NSLBVServer {
@@ -5942,8 +5968,15 @@ Set-StrictMode -Version Latest
 
     #endregion
     #endregion
+<<<<<<< HEAD
     #region Traffic Management - Content Switching
     #endregion
+=======
+
+    #region Traffic Management - Content Switching
+    #endregion
+
+>>>>>>> origin/master
     #region Traffic Management - DNS
 
     # Add-NSDnsNameServer is part of the Citrix NITRO Module
@@ -6125,8 +6158,15 @@ Set-StrictMode -Version Latest
     # NOTE: Add DNS Records functions
 
     #endregion
+<<<<<<< HEAD
     #region Traffic Management - GSLB
     #endregion
+=======
+
+    #region Traffic Management - GSLB
+    #endregion
+
+>>>>>>> origin/master
     #region Traffic Management - SSL
 
     # Add-NSServerCertificate is part of the Citrix NITRO Module
@@ -6446,10 +6486,17 @@ Set-StrictMode -Version Latest
             }
 
             $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType sslcertreq -Payload $payload -Action create -Verbose:$VerbosePreference
+<<<<<<< HEAD
         }
         End {
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
         }
+=======
+        }
+        End {
+            Write-Verbose "$($MyInvocation.MyCommand): Exit"
+        }
+>>>>>>> origin/master
 
 
     }
@@ -6495,9 +6542,15 @@ Set-StrictMode -Version Latest
         )
 
         Write-Verbose "$($MyInvocation.MyCommand): Enter"
+<<<<<<< HEAD
 
         $ExpiryMonitorValue = if ($ExpiryMonitor) { "ENABLED" } else { "DISABLED" }
 
+=======
+
+        $ExpiryMonitorValue = if ($ExpiryMonitor) { "ENABLED" } else { "DISABLED" }
+
+>>>>>>> origin/master
         $payload = @{certkey=$CertKeyName;cert=$CertPath;inform=$CertKeyFormat;expirymonitor=$ExpiryMonitorValue}
         if ($NotificationPeriod) {
             $payload.Add("notificationperiod",$NotificationPeriod)
@@ -6505,10 +6558,17 @@ Set-StrictMode -Version Latest
         If (!([string]::IsNullOrEmpty($KeyPath)))
         {
             $payload.Add("key",$KeyPath)
+<<<<<<< HEAD
         }
         if ($CertKeyFormat -eq "PEM" -and $Password) {
             $payload.Add("passplain",$Password)
         }
+=======
+        }
+        if ($CertKeyFormat -eq "PEM" -and $Password) {
+            $payload.Add("passplain",$Password)
+        }
+>>>>>>> origin/master
         if ($CertKeyFormat -eq "PFX" -and $Password) {
             $payload.Add("passplain",$Password)
         }
