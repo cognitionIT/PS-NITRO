@@ -9,82 +9,7 @@
 # Sample code
 # Created with help from the original Citrix PowerShell Module, 
 #downloadable at https://www.citrix.com/blogs/2014/10/16/scripting-automating-netscaler-configurations-using-nitro-rest-api-and-powershell-part-5/
-<#
-    # Check out about_Functions_Advanced_Parameters: https://technet.microsoft.com/en-us/library/hh847743.aspx 
-    # Check out about_Functions_Advanced: https://technet.microsoft.com/en-us/library/hh847806.aspx
-    if (-not [string]::IsNullOrEmpty($MinPoll)) 
-    {
-       $payload.Add("minpoll",$MinPoll)
-    }
 
-    param (
-        [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-        [Parameter(Mandatory=$true,ValueFromPipeline=$true,ValueFromPipelineByPropertyName=$true)] [string]$DNSServerIPAddress,
-        [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$DNSProfileName
-    )
-
-    get (all)
-    ---------
-    URL:http://<NSIP>/nitro/v1/config/nshostname
-
-    Query-parameters:
-
-    filter     
-    http://<NSIP>/nitro/v1/config/nshostname?filter=property-name1:property-val1,property-name2:property-val2
-    Use this query-parameter to get the filtered set of nshostname resources configured on NetScaler.Filtering can be done on any of the properties of the resource.
-
-    view
-    http://<NS_IP>/nitro/v1/config/nshostname?view=summary
-    Use this query-parameter to get the summary output of nshostname resources configured on NetScaler.
-
-    pagesize=#no&pageno=#no
-    http://<NS_IP>/nitro/v1/config/nshostname?pagesize=#no&pageno=#no
-    Use this query-parameter to get the nshostname resources in chunks.
-
-    warning
-    http://<NS_IP>/nitro/v1/config/nshostname?warning=yes
-    Use this query parameter to get warnings in nitro response. If this field is set to YES, warning message will be sent in 'message' field and 'WARNING' value is set in severity field of the response in case there is a warning. Other possible values for severity are ERROR, INFO and NONE.
-
-    HTTP Method:GET
-    Response Payload:JSON
-
-    { "errorcode": 0, "message": "Done", "severity": <String_value>, "nshostname": [ {
-          "hostname":<String_value>,
-          "ownernode":<Double_value>
-
-    }]}
-
-    delete
-    ------
-    URL:http://<NSIP>/nitro/v1/config/nsip/ipaddress_value<String>
-
-    Query-parameters:
-    
-    args=
-          td:<Double_value>,
-
-    warning
-    http://<NS_IP>/nitro/v1/config/nsip/ipaddress_value<String>?warning=yes
-    Use this query parameter to get warnings in nitro response. If this field is set to YES, warning message will be sent in 'message' field and 'WARNING' value is set in severity field of the response in case there is a warning. Other possible values for severity are ERROR, INFO and NONE.
-
-    HTTP Method:DELETE
-    Response Payload:JSON
-
-    { "errorcode": 0, "message": "Done", "severity": <String_value> }
-
-# The builtin property is not set for user created policies. Only select objects that do not have the builtin property.
-return $response.responderpolicy | Where-Object {!($_.PSObject.Properties['builtin'])} -ErrorAction SilentlyContinue
-
-            [Parameter(Mandatory=$false)] [switch]$Preferred
-            $PreferredState = if ($Preferred) { "YES" } else { "NO" }
-
-            If (!([string]::IsNullOrEmpty($Comment)))
-            {
-                $payload.Add("comment",$Comment)
-            }
-
-
-#>
 # Enable default switches, like Verbose & Debug for script call
 [CmdletBinding()]
 # Declaring script parameters
@@ -284,7 +209,7 @@ Set-StrictMode -Version Latest
         .EXAMPLE
             Invoke NITRO REST API to add a DNS Server resource.
             $payload = @{ip="10.8.115.210"}
-            Invoke-NSNitroRestApi -NSSession $Session -OperationMethod POST -ResourceType dnsnameserver -Payload $payload -Action add
+            Invoke-NSNitroRestApi -NSSession $Session -OperationMethod POST -ResourceType dnsnameserver -Payload $payload 
         .OUTPUTS
             Only when the OperationMethod is GET:
             PSCustomObject that represents the JSON response content. This object can be manipulated using the ConvertTo-Json Cmdlet.
@@ -398,6 +323,7 @@ Set-StrictMode -Version Latest
 #region First Time setup
     # Set-NSHostName is part of the Citrix NITRO Module
     # Copied from Citrix's Module to ensure correct scoping of variables and functions
+    # Updated 20160809: Removed action parameter from Invoke-NSNitroRestApi call
     function Set-NSHostName {
         <#
         .SYNOPSIS
@@ -422,7 +348,7 @@ Set-StrictMode -Version Latest
         Write-Verbose "$($MyInvocation.MyCommand): Enter"
 
         $payload = @{hostname=$HostName}
-        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType nshostname -Payload $payload -Action update -Verbose:$VerbosePreference
+        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType nshostname -Payload $payload -Verbose:$VerbosePreference
 
         Write-Verbose "$($MyInvocation.MyCommand): Exit"
     }
@@ -741,6 +667,7 @@ Set-StrictMode -Version Latest
     # Send-NSLicense is part of the Citrix NITRO Module
     # Copied from Citrix's Module to ensure correct scoping of variables and functions
     function Send-NSLicense {    
+    # Updated 20160912: Removed Action parameter to avoid errors
         <#
         .SYNOPSIS
             Uploading the license file(s) to NetScaler Appliance
@@ -780,23 +707,23 @@ Set-StrictMode -Version Latest
             $licenseContentBase64 = [System.Convert]::ToBase64String($licenseContent)
 
             $payload = @{filename=$licenseFileName;filecontent=$licenseContentBase64;filelocation="/nsconfig/license/";fileencoding="BASE64"}
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType systemfile -Payload $payload -Action add
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType systemfile -Payload $payload 
         } 
         End {
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
         }   
     }
 
-    function Get-NSLicense {
+    function Get-NSLicenseInfo {
         <#
         .SYNOPSIS
-            Retrieve the NetScaler Licensed features
+            Retrieve the NetScaler License information
         .DESCRIPTION
-            Retrieve the NetScaler Licensed features
+            Retrieve the NetScaler License information
         .PARAMETER NSSession
             An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
         .EXAMPLE
-            Get-NSLicense -NSSession $Session
+            Get-NSLicenseInfo -NSSession $Session
         .NOTES
             Copyright (c) cognition IT. All rights reserved.
         #>
@@ -814,6 +741,7 @@ Set-StrictMode -Version Latest
     }
 
     #endregion
+
     #region DONE System - Settings
 
     # Enable-NSMode is part of the Citrix NITRO Module
@@ -1046,6 +974,7 @@ Set-StrictMode -Version Latest
 
     # Set-NSTimeZone is part of the Citrix NITRO Module
     # Copied from Citrix's Module to ensure correct scoping of variables and functions
+    # Updated 20160809: Removed Action parameter from Invoke-NSNitroRestApi call
     function Set-NSTimeZone {
         <#
         .SYNOPSIS
@@ -1077,7 +1006,7 @@ Set-StrictMode -Version Latest
         Write-Verbose "$($MyInvocation.MyCommand): Enter"
     
         $payload = @{timezone=$TimeZone}
-        $Job = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType nsconfig -Payload $payload -Action update 
+        $Job = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType nsconfig -Payload $payload 
 
         Write-Verbose "$($MyInvocation.MyCommand): Exit"
     }
@@ -1522,7 +1451,7 @@ Set-StrictMode -Version Latest
                 $payload.Add("autokey",$true)
             }
 
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType ntpserver -Payload $payload -Action add -Verbose:$VerbosePreference
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType ntpserver -Payload $payload  -Verbose:$VerbosePreference
         }
         End {
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
@@ -1835,7 +1764,7 @@ Set-StrictMode -Version Latest
             [Parameter(Mandatory=$true)] [PSObject]$NSSession,
             [Parameter(Mandatory=$true)] [string]$UserName,
             [Parameter(Mandatory=$true)] [string]$Password,
-            [Parameter(Mandatory=$false)] [switch]$ExternalAuth=$false,
+            [Parameter(Mandatory=$false)] [switch]$ExternalAuth,
             [Parameter(Mandatory=$false)] [string]$PromptString,
             [Parameter(Mandatory=$false)] [ValidateRange(0,100000000)][int]$Timeout=900,
             [Parameter(Mandatory=$false)] [switch]$Logging=$false
@@ -2555,7 +2484,7 @@ Set-StrictMode -Version Latest
         Write-Verbose "$($MyInvocation.MyCommand): Enter"
 
         $payload =  @{name=$LDAPActionName;serverip=$LDAPServerIP;ldapbase=$LDAPBaseDN;ldapbinddn=$LDAPBindDN;ldapbinddnpassword=$LDAPBindDNPassword;ldaploginname=$LDAPLoginName}
-        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType authenticationldapaction -Payload $payload -Action add 
+        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType authenticationldapaction -Payload $payload  
 
         Write-Verbose "$($MyInvocation.MyCommand): Exit"
     }
@@ -2621,7 +2550,7 @@ Set-StrictMode -Version Latest
            $payload.Add("ldaploginname",$LDAPLoginName)
         }
       
-        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType authenticationldapaction -ResourceName $LDAPActionName -Payload $payload -Verbose:$VerbosePreference -Action update 
+        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType authenticationldapaction -ResourceName $LDAPActionName -Payload $payload -Verbose:$VerbosePreference  
 
         Write-Verbose "$($MyInvocation.MyCommand): Exit"
     }
@@ -2726,7 +2655,7 @@ Set-StrictMode -Version Latest
         Write-Verbose "$($MyInvocation.MyCommand): Enter"
 
         $payload = @{reqaction=$Action;name=$Name;rule=$RuleExpression}
-        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType authenticationldappolicy -Payload $payload -Action add 
+        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType authenticationldappolicy -Payload $payload  
 
         Write-Verbose "$($MyInvocation.MyCommand): Exit"
     }
@@ -2761,7 +2690,7 @@ Set-StrictMode -Version Latest
         Write-Verbose "$($MyInvocation.MyCommand): Enter"
 
         $payload = @{name=$Name;rule=$RuleExpression;reqaction=$Action}
-        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType authenticationldappolicy -Payload $payload -Verbose:$VerbosePreference -Action update 
+        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType authenticationldappolicy -Payload $payload -Verbose:$VerbosePreference  
 
         Write-Verbose "$($MyInvocation.MyCommand): Exit"
     }
@@ -2962,7 +2891,7 @@ Set-StrictMode -Version Latest
             }
         
             $payload = @{ipaddress=$IPAddress;netmask=$SubnetMask;type=$Type;vserver=$vserverState;mgmtaccess=$mgmtAccessState}
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType nsip -Payload $payload -Action add
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType nsip -Payload $payload 
         }
         End {
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
@@ -3022,7 +2951,7 @@ Set-StrictMode -Version Latest
             }
         
             $payload = @{ipaddress=$IPAddress;netmask=$SubnetMask;vserver=$vserverState;mgmtaccess=$mgmtAccessState}
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType nsip -Payload $payload -Verbose:$VerbosePreference -Action update
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType nsip -Payload $payload -Verbose:$VerbosePreference 
         }
         End {
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
@@ -3177,14 +3106,14 @@ Set-StrictMode -Version Latest
         Process {
             $payload = @{name=$ActionName;type=$ActionType;target=$TargetExpression;stringbuilderexpr=$Expression}
 
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType rewriteaction -Payload $payload -Verbose:$VerbosePreference -Action add
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType rewriteaction -Payload $payload -Verbose:$VerbosePreference
         }
         End {
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
         }
     }
     function Import-NSRewriteActionTypes {
-        #Count is 30 time zones
+        #Count is 23 action types
         return @(
             'noop', 'delete',
             'insert_http_header','delete_http_header','corrupt_http_header',
@@ -3235,7 +3164,7 @@ Set-StrictMode -Version Latest
                 $payload.Add("comment",$Comment)
             }
 
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType rewriteaction -Payload $payload -Verbose:$VerbosePreference -Action update
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType rewriteaction -Payload $payload -Verbose:$VerbosePreference
         }
         End {
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
@@ -3368,7 +3297,7 @@ Set-StrictMode -Version Latest
                 $payload.Add("comment",$Comment)
             }
 
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType rewritepolicy -Payload $payload -Verbose:$VerbosePreference -Action add
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType rewritepolicy -Payload $payload -Verbose:$VerbosePreference
         }
         End {
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
@@ -3423,7 +3352,7 @@ Set-StrictMode -Version Latest
                 $payload.Add("comment",$Comment)
             }
 
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType rewritepolicy -Payload $payload -Verbose:$VerbosePreference -Action update
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType rewritepolicy -Payload $payload -Verbose:$VerbosePreference 
         }
     }
     function Remove-NSRewritePolicy {
@@ -3515,6 +3444,7 @@ Set-StrictMode -Version Latest
         }
     }
     #endregion
+
     #region DONE AppExpert - Responder
     function Add-NSResponderAction {
         <#
@@ -3591,14 +3521,14 @@ Set-StrictMode -Version Latest
                $payload.Add("reasonphrase",$ReasonPhrase)
             }
 
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType responderaction -Payload $payload -Verbose:$VerbosePreference -Action add
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType responderaction -Payload $payload -Verbose:$VerbosePreference 
         }
         End {
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
         }
     }
     function Import-NSResponderActionTypes {
-        #Count is 6 actions
+        #Count is 6 action types
         return @('noob', 'respondwith', 'redirect', 'respondwithhtmlpage', 'sqlresponse_ok','sqlresponse_error')
     }
     Set-Variable -Name NSResponderActionTypes -Value $(Import-NSResponderActionTypes) -Option Constant
@@ -3671,7 +3601,7 @@ Set-StrictMode -Version Latest
                $payload.Add("reasonphrase",$ReasonPhrase)
             }
 
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType responderaction -Payload $payload -Verbose:$VerbosePreference -Action update
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType responderaction -Payload $payload -Verbose:$VerbosePreference 
         }
         End {
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
@@ -3817,7 +3747,7 @@ Set-StrictMode -Version Latest
                 $payload.Add("appflowaction",$AppflowAction)
             }
 
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType responderpolicy -Payload $payload -Verbose:$VerbosePreference -Action add
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType responderpolicy -Payload $payload -Verbose:$VerbosePreference 
         }
         End {
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
@@ -3892,7 +3822,7 @@ Set-StrictMode -Version Latest
                 $payload.Add("appflowaction",$AppflowAction)
             }
 
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType responderpolicy -Payload $payload -Verbose:$VerbosePreference -Action update
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType responderpolicy -Payload $payload -Verbose:$VerbosePreference 
         }
         End {
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
@@ -3993,1315 +3923,1468 @@ Set-StrictMode -Version Latest
 
 #region Traffic Management
     #region Traffic Management - Load Balancing
-    #region Load Balancing - Servers
-    # Add-NSServer is part of the Citrix NITRO Module
-    # Copied from Citrix's Module to ensure correct scoping of variables and functions
-    function Add-NSServer {
-        <#
-        .SYNOPSIS
-            Add a new server resource
-        .DESCRIPTION
-            Add a new server resource
-        .PARAMETER NSSession
-            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER Name
-            Name of the server
-        .PARAMETER IPAddress
-            IPv4 or IPv6 address of the server
-            If this is not provided then the server name is used as its IP address
-        .EXAMPLE
-            Add-NSServer -NSSession $Session -ServerName "myServer" -ServerIPAddress "10.108.151.3"
-        .NOTES
-            Copyright (c) Citrix Systems, Inc. All rights reserved.
-        #>
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$false)] [string]$Name,
-            [Parameter(Mandatory=$true)] [string]$IPAddress
-        )
+        #region Load Balancing - Servers
+        # Add-NSServer is part of the Citrix NITRO Module
+        # Copied from Citrix's Module to ensure correct scoping of variables and functions
+        function Add-NSServer {
+            <#
+            .SYNOPSIS
+                Add a new server resource
+            .DESCRIPTION
+                Add a new server resource
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER Name
+                Name of the server
+            .PARAMETER IPAddress
+                IPv4 or IPv6 address of the server
+                If this is not provided then the server name is used as its IP address
+            .EXAMPLE
+                Add-NSServer -NSSession $Session -ServerName "myServer" -ServerIPAddress "10.108.151.3"
+            .NOTES
+                Copyright (c) Citrix Systems, Inc. All rights reserved.
+            #>
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$false)] [string]$Name,
+                [Parameter(Mandatory=$true)] [string]$IPAddress
+            )
 
-        Write-Verbose "$($MyInvocation.MyCommand): Enter"
+            Write-Verbose "$($MyInvocation.MyCommand): Enter"
 
-        if (-not $Name) {
-            $Name = $IPAddress
-        }
+            if (-not $Name) {
+                $Name = $IPAddress
+            }
 
-        Write-Verbose "Validating IP Address"
-        $IPAddressObj = New-Object -TypeName System.Net.IPAddress -ArgumentList 0
-        if (-not [System.Net.IPAddress]::TryParse($IPAddress,[ref]$IPAddressObj)) {
-            throw "'$IPAddress' is an invalid IP address"
-        }
-    
-        $ipv6Address = if ($IPAddressObj.AddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetworkV6) { "YES" } else { "NO" }
-        $payload = @{name=$Name;ipaddress=$IPAddress;ipv6address=$ipv6Address}
-        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType server -Payload $payload -Action add 
-   
-        Write-Verbose "$($MyInvocation.MyCommand): Exit"
-    }
-
-    function Update-NSServer {
-        <#
-        .SYNOPSIS
-            Update a server resource
-        .DESCRIPTION
-            Update a server resource
-        .PARAMETER NSSession
-            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER Name
-            Name of the server
-        .PARAMETER IPAddress
-            IPv4 or IPv6 address of the server. If you create an IP address based server, you can specify the name of the server, instead of its IP address, when creating a service. 
-            Note: If you do not create a server entry, the server IP address that you enter when you create a service becomes the name of the server.
-        .PARAMETER DomainResolveRetry
-            Time, in seconds, for which the NetScaler appliance must wait, after DNS resolution fails, before sending the next DNS query to resolve the domain name. Default value: 5. Minimum value = 5. Maximum value = 20939
-        .PARAMETER TranslationIP
-            IP address used to transform the server's DNS-resolved IP address.
-        .PARAMETER TranslationMask
-            The netmask of the translation ip.
-        .PARAMETER DomainResolveNow
-            Immediately send a DNS query to resolve the server's domain name.
-        .PARAMETER Comment
-            Any information about the server.
-        .EXAMPLE
-            Add-NSServer -NSSession $Session -ServerName "myServer" -ServerIPAddress "10.108.151.3"
-        .NOTES
-            Copyright (c) Citrix Systems, Inc. All rights reserved.
-        #>
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$true)] [ValidateNotNullOrEmpty()] [string]$Name,
-            [Parameter(Mandatory=$false)] [string]$IPAddress,
-            [Parameter(Mandatory=$false)][ValidateNotNullOrEmpty()] [string]$Comment
-    #        [Parameter(Mandatory=$false)] [string]$TranslationIP,
-    #        [Parameter(Mandatory=$false)][ValidateNotNullOrEmpty()] [string]$TranslationMask,
-    #        [Parameter(Mandatory=$false)][ValidateRange(5,20939)] [int]$DomainResolveRetry,
-    #        [Parameter(Mandatory=$false)] [switch]$DomainResolveNow
-        )
-
-    # NOTE: To Be Resolved ??
-        # Invoke-RestMethod : { "errorcode": 1092, "message": "Arguments cannot both be specified [domainResolveRetry, IPAddress]", "severity": "ERROR" }
-        # Invoke-RestMethod : { "errorcode": 2193, "message": "Resolve retry can be set only on domain based servers", "severity": "ERROR" }
-        # Invoke-RestMethod : { "errorcode": 1097, "message": "Invalid argument value [domainresolvenow]", "severity": "ERROR"}
-        # Invoke-RestMethod : { "errorcode": 1, "message": "[The translationIP\/Mask can be set only for domain based servers.]", "severity": "ERROR" }
-
-    # When a Server is added you can select IP Address (only enter an IP address, traffic domain and comment)
-    # Or Domain Name (enter FQDN, Traffic Domain, Translation IP Address, Translation Mask, Resolve Retry, IPv6 Domain, Enable after Creating and Comments)
-
-        Write-Verbose "$($MyInvocation.MyCommand): Enter"
-    #    $DomainResolveNowState = if ($DomainResolveNow) { "True" } else { "False" }
-
-    #    $payload = @{name=$Name;domainresolvenow=$DomainResolveNowState}
-        $payload = @{name=$Name}
-
-        If (!([string]::IsNullOrEmpty($IPAddress)))
-        {
             Write-Verbose "Validating IP Address"
             $IPAddressObj = New-Object -TypeName System.Net.IPAddress -ArgumentList 0
             if (-not [System.Net.IPAddress]::TryParse($IPAddress,[ref]$IPAddressObj)) {
                 throw "'$IPAddress' is an invalid IP address"
             }
-            $payload.Add("ipaddress",$IPAddress)
-        }
-    <#    If ($DomainResolveRetry)
-        {
-            $payload.Add("domainresolveretry",$DomainResolveRetry)
-        }
-        If (!([string]::IsNullOrEmpty($TranslationIP)))
-        {
-            Write-Verbose "Validating Translation IP Address"
-            $IPAddressObj = New-Object -TypeName System.Net.IPAddress -ArgumentList 0
-            if (-not [System.Net.IPAddress]::TryParse($TranslationIP,[ref]$IPAddressObj)) {
-                throw "'$TranslationIP' is an invalid IP address"
-            }
-            $payload.Add("translationip",$TranslationIP)
-        }
-        If (!([string]::IsNullOrEmpty($TranslationMask)))
-        {
-            $payload.Add("translationmask",$TranslationMask)
-        }
-    #>
-        If (!([string]::IsNullOrEmpty($Comment)))
-        {
-            $payload.Add("comment",$Comment)
-        }
     
-        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType server -Payload $payload -Verbose:$VerbosePreference -Action update 
+            $ipv6Address = if ($IPAddressObj.AddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetworkV6) { "YES" } else { "NO" }
+            $payload = @{name=$Name;ipaddress=$IPAddress;ipv6address=$ipv6Address}
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType server -Payload $payload  
    
-        Write-Verbose "$($MyInvocation.MyCommand): Exit"
-    }
-    function Remove-NSServer{
-        <#
-        .SYNOPSIS
-            Remove a NetScaler Server from the NetScalerConfiguration
-        .DESCRIPTION
-            Remove a NetScaler Server from the NetScalerConfiguration
-        .PARAMETER NSSession
-            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER Name
-            Name of the Server.
-        .EXAMPLE
-            Remove-NSServer -NSSession $Session -Name $ServerName
-        .NOTES
-            Copyright (c) cognition IT. All rights reserved.
-        #>
-
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name
-        )
-        Begin {
-            Write-Verbose "$($MyInvocation.MyCommand): Enter"
-        }
-        Process {
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod DELETE -ResourceType server -ResourceName $Name -Verbose:$VerbosePreference
-        }
-        End {
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
         }
-    }
-    function Get-NSServer {
-        <#
-        .SYNOPSIS
-            Retrieve a Server from the NetScalerConfiguration
-        .DESCRIPTION
-            Retrieve a Server from the NetScalerConfiguration
-        .PARAMETER NSSession
-            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER Name
-            Name for the server. Can be changed after the name is created. Minimum length = 1.
-        .PARAMETER Name
-            Name of the server. Can be changed after the name is created. Minimum length = 1.
-        .EXAMPLE
-            Get-NSServer -NSSession $Session -Name $ServerName
-        .EXAMPLE
-            Get-NSServer -NSSession $Session
-        .NOTES
-            Copyright (c) cognition IT. All rights reserved.
-        #>
 
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$false)][ValidateNotNullOrEmpty()] [string]$Name
-        )
-        Begin {
-            Write-Verbose "$($MyInvocation.MyCommand): Enter"
-        }
-        Process {
-            If ($Name) {
-                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType server -ResourceName $Name -Verbose
-            }
-            Else
-            {
-                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType server
-            }
-        }
-        End {
-            Write-Verbose "$($MyInvocation.MyCommand): Exit"
-            If ($response.PSObject.Properties['server'])
-            {
-                return $response.server
-            }
-            else
-            {
-                return $null
-            }
-        }
-
-    }
-
-    function Enable-NSServer {
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name
-        )
-        Begin {
-            Write-Verbose "$($MyInvocation.MyCommand): Enter"
-            $payload = @{name=$Name}
-        }
-        Process {
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType server -Payload $payload -Verbose:$VerbosePreference -Action enable
-        }
-        End {
-            Write-Verbose "$($MyInvocation.MyCommand): Exit"
-        }
-    }
-    function Disable-NSServer {
-        <#
-        .SYNOPSIS
-            Disable the NetScaler Server
-        .DESCRIPTION
-            Disable the NetScaler Server
-        .PARAMETER NSSession
-            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER Name
-            Name of the server. Can be changed after the name is created. Minimum length = 1.
-        .PARAMETER Delay
-            Time, in seconds, after which all the services configured on the server are disabled.
-        .PARAMETER Graceful
-            Shut down gracefully, without accepting any new connections, and disabling each service when all of its connections are closed. Default value: NO. Possible values = YES, NO
-        .EXAMPLE
-            Disable-NSServer -NSSession $Session -Name $ServerName
-        .NOTES
-            Copyright (c) cognition IT. All rights reserved.
-        #>
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name,
-            [Parameter(Mandatory=$false)][int]$Delay,
-            [Parameter(Mandatory=$false)] [switch]$Graceful
-        )
-        Begin {
-            Write-Verbose "$($MyInvocation.MyCommand): Enter"
+        function Update-NSServer {
             <#
-            disable
-
-            URL:http://<NSIP>/nitro/v1/config/
-
-            HTTP Method:POST
-
-            Request Payload:JSON
-
-            object={
-            "params":{
-                  "warning":<String_value>,
-                  "onerror":<String_value>,
-                  "action":"disable"
-            },
-            "sessionid":"##sessionid",
-            "server":{
-                  "name":<String_value>,
-            }}
-
-            Response Payload:JSON
-
-            { "errorcode": 0, "message": "Done", "severity": <String_value> }            
+            .SYNOPSIS
+                Update a server resource
+            .DESCRIPTION
+                Update a server resource
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER Name
+                Name of the server
+            .PARAMETER IPAddress
+                IPv4 or IPv6 address of the server. If you create an IP address based server, you can specify the name of the server, instead of its IP address, when creating a service. 
+                Note: If you do not create a server entry, the server IP address that you enter when you create a service becomes the name of the server.
+            .PARAMETER DomainResolveRetry
+                Time, in seconds, for which the NetScaler appliance must wait, after DNS resolution fails, before sending the next DNS query to resolve the domain name. Default value: 5. Minimum value = 5. Maximum value = 20939
+            .PARAMETER TranslationIP
+                IP address used to transform the server's DNS-resolved IP address.
+            .PARAMETER TranslationMask
+                The netmask of the translation ip.
+            .PARAMETER DomainResolveNow
+                Immediately send a DNS query to resolve the server's domain name.
+            .PARAMETER Comment
+                Any information about the server.
+            .EXAMPLE
+                Add-NSServer -NSSession $Session -ServerName "myServer" -ServerIPAddress "10.108.151.3"
+            .NOTES
+                Copyright (c) Citrix Systems, Inc. All rights reserved.
             #>
-            $GracefulState = if ($Graceful) { "YES" } else { "NO" }
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)] [ValidateNotNullOrEmpty()] [string]$Name,
+                [Parameter(Mandatory=$false)] [string]$IPAddress,
+                [Parameter(Mandatory=$false)][ValidateNotNullOrEmpty()] [string]$Comment
+        #        [Parameter(Mandatory=$false)] [string]$TranslationIP,
+        #        [Parameter(Mandatory=$false)][ValidateNotNullOrEmpty()] [string]$TranslationMask,
+        #        [Parameter(Mandatory=$false)][ValidateRange(5,20939)] [int]$DomainResolveRetry,
+        #        [Parameter(Mandatory=$false)] [switch]$DomainResolveNow
+            )
 
-            $payload = @{name=$Name;graceful=$GracefulState}
-            If ($Delay)
-            {
-                $payload.Add("delay", $Delay)
-            }
-        }
-        Process {
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType server -Payload $payload -Verbose:$VerbosePreference -Action disable
-        }
-        End {
-            Write-Verbose "$($MyInvocation.MyCommand): Exit"
-        }
-    }
-    #endregion
-    #region Load Balancing - Services
-    # UPDATED Add-NSService is part of the Citrix NITRO Module
-    # Copied from Citrix's Module to ensure correct scoping of variables and functions
-    function Add-NSService {
-        <#
-        .SYNOPSIS
-            Add a new service resource
-        .DESCRIPTION
-            Add a new service resource
-        .PARAMETER NSSession
-            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER Name
-            Name for the service
-        .PARAMETER ServerName
-            Name of the server that hosts the service
-        .PARAMETER ServerIPAddress
-            IPv4 or IPv6 address of the server that hosts the service
-            By providing this parameter, it attempts to create a server resource for you that's named the same as the IP address provided
-        .PARAMETER Protocol
-            Protocol in which data is exchanged with the service
-        .PARAMETER Port
-            Port number of the service
-        .PARAMETER InsertClientIPHeader
-            Before forwarding a request to the service, insert an HTTP header with the client's IPv4 or IPv6 address as its value
-            Used if the server needs the client's IP address for security, accounting, or other purposes, and setting the Use Source IP parameter is not a viable option
-        .PARAMETER ClientIPHeader
-            Name for the HTTP header whose value must be set to the IP address of the client
-            Used with the Client IP parameter
-            If you set the Client IP parameter, and you do not specify a name for the header, the appliance uses the header name specified for the global Client IP Header parameter
-            If the global Client IP Header parameter is not specified, the appliance inserts a header with the name "client-ip."
-        .EXAMPLE
-            Add-NSService -NSSession $Session -Name "Server1_Service" -ServerName "Server1" -ServerIPAddress "10.108.151.3" -Type "HTTP" -Port 80
-        .NOTES
-            Copyright (c) Citrix Systems, Inc. All rights reserved.
-        #>
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$true)] [string]$Name,
-            [Parameter(Mandatory=$true,ParameterSetName='By Name')] [string]$ServerName,
-            [Parameter(Mandatory=$true,ParameterSetName='By Address')] [string]$ServerIPAddress,
-            [Parameter(Mandatory=$true)] [ValidateSet(
-            "HTTP","FTP","TCP","UDP","SSL","SSL_BRIDGE","SSL_TCP","DTLS","NNTP","RPCSVR","DNS","ADNS","SNMP","RTSP","DHCPRA",
-            "ANY","SIP_UDP","DNS_TCP","ADNS_TCP","MYSQL","MSSQL","ORACLE","RADIUS","RDP","DIAMETER","SSL_DIAMETER","TFTP"
-            )] [string]$Protocol,
-            [Parameter(Mandatory=$true)] [ValidateRange(1,65535)] [int]$Port,
-            [Parameter(Mandatory=$false)] [switch]$InsertClientIPHeader,
-            [Parameter(Mandatory=$false)] [string]$ClientIPHeader
-        )
+        # NOTE: To Be Resolved ??
+            # Invoke-RestMethod : { "errorcode": 1092, "message": "Arguments cannot both be specified [domainResolveRetry, IPAddress]", "severity": "ERROR" }
+            # Invoke-RestMethod : { "errorcode": 2193, "message": "Resolve retry can be set only on domain based servers", "severity": "ERROR" }
+            # Invoke-RestMethod : { "errorcode": 1097, "message": "Invalid argument value [domainresolvenow]", "severity": "ERROR"}
+            # Invoke-RestMethod : { "errorcode": 1, "message": "[The translationIP\/Mask can be set only for domain based servers.]", "severity": "ERROR" }
 
-        Write-Verbose "$($MyInvocation.MyCommand): Enter"
-    
-        $cip = if ($InsertClientIPHeader) { "ENABLED" } else { "DISABLED" }
-        $payload = @{name=$Name;servicetype=$Protocol;port=$Port;cip=$cip}
-        if ($ClientIPHeader) {
-            $payload.Add("cipheader",$ClientIPHeader)
-        }
-        if ($PSCmdlet.ParameterSetName -eq 'By Name') {
-            $payload.Add("servername",$ServerName)
-        } elseif ($PSCmdlet.ParameterSetName -eq 'By Address') {
-            Write-Verbose "Validating IP Address"
-            $IPAddressObj = New-Object -TypeName System.Net.IPAddress -ArgumentList 0
-            if (-not [System.Net.IPAddress]::TryParse($ServerIPAddress,[ref]$IPAddressObj)) {
-                throw "'$ServerIPAddress' is an invalid IP address"
-            }
-            $payload.Add("ip",$ServerIPAddress)
-        }
+        # When a Server is added you can select IP Address (only enter an IP address, traffic domain and comment)
+        # Or Domain Name (enter FQDN, Traffic Domain, Translation IP Address, Translation Mask, Resolve Retry, IPv6 Domain, Enable after Creating and Comments)
 
-        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType service -Payload $payload -Action add -Verbose:$VerbosePreference
-   
-        Write-Verbose "$($MyInvocation.MyCommand): Exit"
-    }
-
-    function Update-NSService{
-        <#
-        .SYNOPSIS
-            Update a service resource
-        .DESCRIPTION
-            Update a service resource
-        .PARAMETER NSSession
-            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER Name
-            Name for the service
-        .PARAMETER ServerName
-            Name of the server that hosts the service
-        .PARAMETER ServerIPAddress
-            IPv4 or IPv6 address of the server that hosts the service
-            By providing this parameter, it attempts to create a server resource for you that's named the same as the IP address provided
-        .PARAMETER Protocol
-            Protocol in which data is exchanged with the service
-        .PARAMETER Port
-            Port number of the service
-        .PARAMETER InsertClientIPHeader
-            Before forwarding a request to the service, insert an HTTP header with the client's IPv4 or IPv6 address as its value
-            Used if the server needs the client's IP address for security, accounting, or other purposes, and setting the Use Source IP parameter is not a viable option
-        .PARAMETER ClientIPHeader
-            Name for the HTTP header whose value must be set to the IP address of the client
-            Used with the Client IP parameter
-            If you set the Client IP parameter, and you do not specify a name for the header, the appliance uses the header name specified for the global Client IP Header parameter
-            If the global Client IP Header parameter is not specified, the appliance inserts a header with the name "client-ip."
-        .EXAMPLE
-            Add-NSService -NSSession $Session -Name "Server1_Service" -ServerName "Server1" -ServerIPAddress "10.108.151.3" -Type "HTTP" -Port 80
-        .NOTES
-            Copyright (c) Citrix Systems, Inc. All rights reserved.
-        #>
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$true)] [string]$Name,
-            [Parameter(Mandatory=$false,ParameterSetName='By Address')] [string]$ServerIPAddress,
-            [Parameter(Mandatory=$false)] [switch]$InsertClientIPHeader,
-            [Parameter(Mandatory=$false)] [string]$ClientIPHeader,
-            [Parameter(Mandatory=$false)][ValidateNotNullOrEmpty()] [string]$Comment
-        )
-
-        Write-Verbose "$($MyInvocation.MyCommand): Enter"
-    
-        $cip = if ($InsertClientIPHeader) { "ENABLED" } else { "DISABLED" }
-        $payload = @{name=$Name;cip=$cip}
-        if ($ClientIPHeader) {
-            $payload.Add("cipheader",$ClientIPHeader)
-        }
-        if ($PSCmdlet.ParameterSetName -eq 'By Name') {
-            $payload.Add("servername",$ServerName)
-        } elseif ($PSCmdlet.ParameterSetName -eq 'By Address') {
-            Write-Verbose "Validating IP Address"
-            $IPAddressObj = New-Object -TypeName System.Net.IPAddress -ArgumentList 0
-            if (-not [System.Net.IPAddress]::TryParse($ServerIPAddress,[ref]$IPAddressObj)) {
-                throw "'$ServerIPAddress' is an invalid IP address"
-            }
-            $payload.Add("ip",$ServerIPAddress)
-        }
-        If (!([string]::IsNullOrEmpty($Comment)))
-        {
-            $payload.Add("comment",$Comment)
-        }
-
-        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType service -Payload $payload -Action update -Verbose:$VerbosePreference
-   
-        Write-Verbose "$($MyInvocation.MyCommand): Exit"
-    
-    }
-    function Remove-NSService{
-        <#
-        .SYNOPSIS
-            Remove a NetScaler Service from the NetScalerConfiguration
-        .DESCRIPTION
-            Remove a NetScaler Service from the NetScalerConfiguration
-        .PARAMETER NSSession
-            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER Name
-            Name of the Service.
-        .EXAMPLE
-            Remove-NSServer -NSSession $Session -Name $ServerName
-        .NOTES
-            Copyright (c) cognition IT. All rights reserved.
-        #>
-
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name
-        )
-        Begin {
             Write-Verbose "$($MyInvocation.MyCommand): Enter"
-        }
-        Process {
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod DELETE -ResourceType service -ResourceName $Name -Verbose:$VerbosePreference
-        }
-        End {
-            Write-Verbose "$($MyInvocation.MyCommand): Exit"
-        }
-    
-    }
-    function Get-NSService{
-        <#
-        .SYNOPSIS
-            Retrieve a Service from the NetScalerConfiguration
-        .DESCRIPTION
-            Retrieve a Service from the NetScalerConfiguration
-        .PARAMETER NSSession
-            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER Name
-            Name for the service. Can be changed after the name is created. Minimum length = 1.
-        .EXAMPLE
-            Get-NSService -NSSession $Session -Name $ServiceName
-        .EXAMPLE
-            Get-NSService -NSSession $Session
-        .NOTES
-            Copyright (c) cognition IT. All rights reserved.
-        #>
+        #    $DomainResolveNowState = if ($DomainResolveNow) { "True" } else { "False" }
 
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$false)][ValidateNotNullOrEmpty()] [string]$Name
-        )
-        Begin {
-            Write-Verbose "$($MyInvocation.MyCommand): Enter"
-        }
-        Process {
-            If ($Name) {
-                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType service -ResourceName $Name -Verbose:$VerbosePreference
-            }
-            Else
-            {
-                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType service -Verbose:$VerbosePreference
-            }
-        }
-        End {
-            Write-Verbose "$($MyInvocation.MyCommand): Exit"
-            If ($response.PSObject.Properties['service'])
-            {
-                return $response.service
-            }
-            else
-            {
-                return $null
-            }
-        }
-
-    
-    }
-
-    function Enable-NSService {
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name
-        )
-        Begin {
-            Write-Verbose "$($MyInvocation.MyCommand): Enter"
+        #    $payload = @{name=$Name;domainresolvenow=$DomainResolveNowState}
             $payload = @{name=$Name}
-        }
-        Process {
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType service -Payload $payload -Verbose:$VerbosePreference -Action enable
-        }
-        End {
+
+            If (!([string]::IsNullOrEmpty($IPAddress)))
+            {
+                Write-Verbose "Validating IP Address"
+                $IPAddressObj = New-Object -TypeName System.Net.IPAddress -ArgumentList 0
+                if (-not [System.Net.IPAddress]::TryParse($IPAddress,[ref]$IPAddressObj)) {
+                    throw "'$IPAddress' is an invalid IP address"
+                }
+                $payload.Add("ipaddress",$IPAddress)
+            }
+        <#    If ($DomainResolveRetry)
+            {
+                $payload.Add("domainresolveretry",$DomainResolveRetry)
+            }
+            If (!([string]::IsNullOrEmpty($TranslationIP)))
+            {
+                Write-Verbose "Validating Translation IP Address"
+                $IPAddressObj = New-Object -TypeName System.Net.IPAddress -ArgumentList 0
+                if (-not [System.Net.IPAddress]::TryParse($TranslationIP,[ref]$IPAddressObj)) {
+                    throw "'$TranslationIP' is an invalid IP address"
+                }
+                $payload.Add("translationip",$TranslationIP)
+            }
+            If (!([string]::IsNullOrEmpty($TranslationMask)))
+            {
+                $payload.Add("translationmask",$TranslationMask)
+            }
+        #>
+            If (!([string]::IsNullOrEmpty($Comment)))
+            {
+                $payload.Add("comment",$Comment)
+            }
+    
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType server -Payload $payload -Verbose:$VerbosePreference  
+   
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
         }
-    }
-# SOLVED: Disable-NSService renders the NetScaler unresponsive (stupid me bound the service to localhost on HTTP 80 (same as REST Web services) DOH!)
-    function Disable-NSService {
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name,
-            [Parameter(Mandatory=$false,ParameterSetName='Graceful')] [switch]$Graceful,
-            [Parameter(Mandatory=$false,ParameterSetName='Graceful')][double]$Delay
-        )
-        Begin {
-            Write-Verbose "$($MyInvocation.MyCommand): Enter"
-            $GracefulState = if ($Graceful) { "YES" } else { "NO" }
+        function Remove-NSServer{
+            <#
+            .SYNOPSIS
+                Remove a NetScaler Server from the NetScalerConfiguration
+            .DESCRIPTION
+                Remove a NetScaler Server from the NetScalerConfiguration
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER Name
+                Name of the Server.
+            .EXAMPLE
+                Remove-NSServer -NSSession $Session -Name $ServerName
+            .NOTES
+                Copyright (c) cognition IT. All rights reserved.
+            #>
 
-            $payload = @{name=$Name;graceful=$GracefulState}
-            if ($PSCmdlet.ParameterSetName -eq 'Graceful') {
-                Write-Verbose "Graceful shutdown requested for service"
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name
+            )
+            Begin {
+                Write-Verbose "$($MyInvocation.MyCommand): Enter"
+            }
+            Process {
+                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod DELETE -ResourceType server -ResourceName $Name -Verbose:$VerbosePreference
+            }
+            End {
+                Write-Verbose "$($MyInvocation.MyCommand): Exit"
+            }
+        }
+        function Get-NSServer {
+            <#
+            .SYNOPSIS
+                Retrieve a Server from the NetScalerConfiguration
+            .DESCRIPTION
+                Retrieve a Server from the NetScalerConfiguration
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER Name
+                Name for the server. Can be changed after the name is created. Minimum length = 1.
+            .PARAMETER Name
+                Name of the server. Can be changed after the name is created. Minimum length = 1.
+            .EXAMPLE
+                Get-NSServer -NSSession $Session -Name $ServerName
+            .EXAMPLE
+                Get-NSServer -NSSession $Session
+            .NOTES
+                Copyright (c) cognition IT. All rights reserved.
+            #>
+
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$false)][ValidateNotNullOrEmpty()] [string]$Name
+            )
+            Begin {
+                Write-Verbose "$($MyInvocation.MyCommand): Enter"
+            }
+            Process {
+                If ($Name) {
+                    $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType server -ResourceName $Name -Verbose
+                }
+                Else
+                {
+                    $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType server
+                }
+            }
+            End {
+                Write-Verbose "$($MyInvocation.MyCommand): Exit"
+                If ($response.PSObject.Properties['server'])
+                {
+                    return $response.server
+                }
+                else
+                {
+                    return $null
+                }
+            }
+
+        }
+
+        function Enable-NSServer {
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name
+            )
+            Begin {
+                Write-Verbose "$($MyInvocation.MyCommand): Enter"
+                $payload = @{name=$Name}
+            }
+            Process {
+                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType server -Payload $payload -Verbose:$VerbosePreference -Action enable
+            }
+            End {
+                Write-Verbose "$($MyInvocation.MyCommand): Exit"
+            }
+        }
+        function Disable-NSServer {
+            <#
+            .SYNOPSIS
+                Disable the NetScaler Server
+            .DESCRIPTION
+                Disable the NetScaler Server
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER Name
+                Name of the server. Can be changed after the name is created. Minimum length = 1.
+            .PARAMETER Delay
+                Time, in seconds, after which all the services configured on the server are disabled.
+            .PARAMETER Graceful
+                Shut down gracefully, without accepting any new connections, and disabling each service when all of its connections are closed. Default value: NO. Possible values = YES, NO
+            .EXAMPLE
+                Disable-NSServer -NSSession $Session -Name $ServerName
+            .NOTES
+                Copyright (c) cognition IT. All rights reserved.
+            #>
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name,
+                [Parameter(Mandatory=$false)][int]$Delay,
+                [Parameter(Mandatory=$false)] [switch]$Graceful
+            )
+            Begin {
+                Write-Verbose "$($MyInvocation.MyCommand): Enter"
+                <#
+                disable
+
+                URL:http://<NSIP>/nitro/v1/config/
+
+                HTTP Method:POST
+
+                Request Payload:JSON
+
+                object={
+                "params":{
+                      "warning":<String_value>,
+                      "onerror":<String_value>,
+                      "action":"disable"
+                },
+                "sessionid":"##sessionid",
+                "server":{
+                      "name":<String_value>,
+                }}
+
+                Response Payload:JSON
+
+                { "errorcode": 0, "message": "Done", "severity": <String_value> }            
+                #>
+                $GracefulState = if ($Graceful) { "YES" } else { "NO" }
+
+                $payload = @{name=$Name;graceful=$GracefulState}
                 If ($Delay)
                 {
                     $payload.Add("delay", $Delay)
                 }
             }
+            Process {
+                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType server -Payload $payload -Verbose:$VerbosePreference -Action disable
+            }
+            End {
+                Write-Verbose "$($MyInvocation.MyCommand): Exit"
+            }
         }
-        Process {
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType service -Payload $payload -Verbose:$VerbosePreference -Action disable
-        }
-        End {
+        #endregion
+
+        #region Load Balancing - Services
+        # UPDATED Add-NSService is part of the Citrix NITRO Module
+        # Copied from Citrix's Module to ensure correct scoping of variables and functions
+        function Add-NSService {
+            <#
+            .SYNOPSIS
+                Add a new service resource
+            .DESCRIPTION
+                Add a new service resource
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER Name
+                Name for the service
+            .PARAMETER ServerName
+                Name of the server that hosts the service
+            .PARAMETER ServerIPAddress
+                IPv4 or IPv6 address of the server that hosts the service
+                By providing this parameter, it attempts to create a server resource for you that's named the same as the IP address provided
+            .PARAMETER Protocol
+                Protocol in which data is exchanged with the service
+            .PARAMETER Port
+                Port number of the service
+            .PARAMETER InsertClientIPHeader
+                Before forwarding a request to the service, insert an HTTP header with the client's IPv4 or IPv6 address as its value
+                Used if the server needs the client's IP address for security, accounting, or other purposes, and setting the Use Source IP parameter is not a viable option
+            .PARAMETER ClientIPHeader
+                Name for the HTTP header whose value must be set to the IP address of the client
+                Used with the Client IP parameter
+                If you set the Client IP parameter, and you do not specify a name for the header, the appliance uses the header name specified for the global Client IP Header parameter
+                If the global Client IP Header parameter is not specified, the appliance inserts a header with the name "client-ip."
+            .EXAMPLE
+                Add-NSService -NSSession $Session -Name "Server1_Service" -ServerName "Server1" -ServerIPAddress "10.108.151.3" -Type "HTTP" -Port 80
+            .NOTES
+                Copyright (c) Citrix Systems, Inc. All rights reserved.
+            #>
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)] [string]$Name,
+                [Parameter(Mandatory=$true,ParameterSetName='By Name')] [string]$ServerName,
+                [Parameter(Mandatory=$true,ParameterSetName='By Address')] [string]$ServerIPAddress,
+                [Parameter(Mandatory=$true)] [ValidateSet(
+                "HTTP","FTP","TCP","UDP","SSL","SSL_BRIDGE","SSL_TCP","DTLS","NNTP","RPCSVR","DNS","ADNS","SNMP","RTSP","DHCPRA",
+                "ANY","SIP_UDP","DNS_TCP","ADNS_TCP","MYSQL","MSSQL","ORACLE","RADIUS","RDP","DIAMETER","SSL_DIAMETER","TFTP"
+                )] [string]$Protocol,
+                [Parameter(Mandatory=$true)] [ValidateRange(1,65535)] [int]$Port,
+                [Parameter(Mandatory=$false)] [switch]$InsertClientIPHeader,
+                [Parameter(Mandatory=$false)] [string]$ClientIPHeader
+            )
+
+            Write-Verbose "$($MyInvocation.MyCommand): Enter"
+    
+            $cip = if ($InsertClientIPHeader) { "ENABLED" } else { "DISABLED" }
+            $payload = @{name=$Name;servicetype=$Protocol;port=$Port;cip=$cip}
+            if ($ClientIPHeader) {
+                $payload.Add("cipheader",$ClientIPHeader)
+            }
+            if ($PSCmdlet.ParameterSetName -eq 'By Name') {
+                $payload.Add("servername",$ServerName)
+            } elseif ($PSCmdlet.ParameterSetName -eq 'By Address') {
+                Write-Verbose "Validating IP Address"
+                $IPAddressObj = New-Object -TypeName System.Net.IPAddress -ArgumentList 0
+                if (-not [System.Net.IPAddress]::TryParse($ServerIPAddress,[ref]$IPAddressObj)) {
+                    throw "'$ServerIPAddress' is an invalid IP address"
+                }
+                $payload.Add("ip",$ServerIPAddress)
+            }
+
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType service -Payload $payload  -Verbose:$VerbosePreference
+   
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
         }
-    }
 
-    #endregion
-    #region Load Balancing - ServiceGroups
-    function Add-NSServiceGroup {
-        <#
-        .SYNOPSIS
-            Add a new service group
-        .DESCRIPTION
-            Add a new service group
-        .PARAMETER NSSession
-            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER Name
-            Name for the service
-        .PARAMETER Protocol
-            Protocol in which data is exchanged with the service
-        .PARAMETER CacheType
-            Cache type supported by the cache server. Possible values = TRANSPARENT, REVERSE, FORWARD
-        .PARAMETER AutoscaleMode
-            Auto scale option for a servicegroup. Default value: DISABLED. Possible values = DISABLED, DNS, POLICY
-        .PARAMETER Cacheable
-            Use the transparent cache redirection virtual server to forward the request to the cache server. Note: Do not set this parameter if you set the Cache Type. Default value: NO. Possible values = YES, NO
-        .SWITCH Disabled
-            DisablesInitial state of the service group. Default value: ENABLED. Possible values = ENABLED, DISABLED
-        .PARAMETER HealthMonitoring
-            Monitor the health of this service. Available settings function as follows: YES - Send probes to check the health of the service. NO - Do not send probes to check the health of the service. With the NO option, the appliance shows the service as UP at all times. Default value: YES. Possible values = YES, NO
-        .PARAMETER ApplfowLogging
-            Enable logging of AppFlow information for the specified service group. Default value: ENABLED. Possible values = ENABLED, DISABLED
-        .EXAMPLE
-            Add-NSServiceGroup -NSSession $Session -Name "svcgrp" -Protocol "HTTP" -CacheType SERVER -AutoscaleMode "DISABLED" 
-        .NOTES
-            Copyright (c) Citrix Systems, Inc. All rights reserved.
-        #>
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$true)] [string]$Name,
-            [Parameter(Mandatory=$true)] [ValidateSet(
-            "HTTP","FTP","TCP","UDP","SSL","SSL_BRIDGE","SSL_TCP","DTLS","NNTP","RPCSVR","DNS","ADNS","SNMP","RTSP","DHCPRA",
-            "ANY","SIP_UDP","DNS_TCP","ADNS_TCP","MYSQL","MSSQL","ORACLE","RADIUS","RDP","DIAMETER","SSL_DIAMETER","TFTP"
-            )] [string]$Protocol,
-            [Parameter(Mandatory=$true)] [ValidateSet("SERVER", "TRANSPARENT", "REVERSE", "FORWARD")] [string]$CacheType,
-            [Parameter(Mandatory=$true)] [ValidateSet("DISABLED", "DNS", "POLICY")] [string]$AutoscaleMode,
-            [Parameter(Mandatory=$false)] [ValidateScript({($CacheType -eq "SERVER")})][switch]$Cacheable,
-            [Parameter(Mandatory=$false)] [ValidateSet("ENABLED", "DISABLED")] [string]$State="ENABLED",
-            [Parameter(Mandatory=$false)] [switch]$HealthMonitoring,
-            [Parameter(Mandatory=$false)] [switch]$AppflowLogging
-        )
+        function Update-NSService{
+            <#
+            .SYNOPSIS
+                Update a service resource
+            .DESCRIPTION
+                Update a service resource
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER Name
+                Name for the service
+            .PARAMETER ServerName
+                Name of the server that hosts the service
+            .PARAMETER ServerIPAddress
+                IPv4 or IPv6 address of the server that hosts the service
+                By providing this parameter, it attempts to create a server resource for you that's named the same as the IP address provided
+            .PARAMETER Protocol
+                Protocol in which data is exchanged with the service
+            .PARAMETER Port
+                Port number of the service
+            .PARAMETER InsertClientIPHeader
+                Before forwarding a request to the service, insert an HTTP header with the client's IPv4 or IPv6 address as its value
+                Used if the server needs the client's IP address for security, accounting, or other purposes, and setting the Use Source IP parameter is not a viable option
+            .PARAMETER ClientIPHeader
+                Name for the HTTP header whose value must be set to the IP address of the client
+                Used with the Client IP parameter
+                If you set the Client IP parameter, and you do not specify a name for the header, the appliance uses the header name specified for the global Client IP Header parameter
+                If the global Client IP Header parameter is not specified, the appliance inserts a header with the name "client-ip."
+            .EXAMPLE
+                Add-NSService -NSSession $Session -Name "Server1_Service" -ServerName "Server1" -ServerIPAddress "10.108.151.3" -Type "HTTP" -Port 80
+            .NOTES
+                Copyright (c) Citrix Systems, Inc. All rights reserved.
+            #>
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)] [string]$Name,
+                [Parameter(Mandatory=$false,ParameterSetName='By Address')] [string]$ServerIPAddress,
+                [Parameter(Mandatory=$false)] [switch]$InsertClientIPHeader,
+                [Parameter(Mandatory=$false)] [string]$ClientIPHeader,
+                [Parameter(Mandatory=$false)][ValidateNotNullOrEmpty()] [string]$Comment
+            )
 
-        Write-Verbose "$($MyInvocation.MyCommand): Enter"
+            Write-Verbose "$($MyInvocation.MyCommand): Enter"
     
-        $CacheableValue = if ($Cacheable) { "YES" } else { "NO" }
-        $HealthMonValue = if ($HealthMonitoring) { "YES" } else { "NO" }
-        $AppflowLogValue = if ($AppflowLogging) { "ENABLED" } else { "DISABLED" }
+            $cip = if ($InsertClientIPHeader) { "ENABLED" } else { "DISABLED" }
+            $payload = @{name=$Name;cip=$cip}
+            if ($ClientIPHeader) {
+                $payload.Add("cipheader",$ClientIPHeader)
+            }
+            if ($PSCmdlet.ParameterSetName -eq 'By Name') {
+                $payload.Add("servername",$ServerName)
+            } elseif ($PSCmdlet.ParameterSetName -eq 'By Address') {
+                Write-Verbose "Validating IP Address"
+                $IPAddressObj = New-Object -TypeName System.Net.IPAddress -ArgumentList 0
+                if (-not [System.Net.IPAddress]::TryParse($ServerIPAddress,[ref]$IPAddressObj)) {
+                    throw "'$ServerIPAddress' is an invalid IP address"
+                }
+                $payload.Add("ip",$ServerIPAddress)
+            }
+            If (!([string]::IsNullOrEmpty($Comment)))
+            {
+                $payload.Add("comment",$Comment)
+            }
 
-        $payload = @{servicegroupname=$Name;servicetype=$Protocol;state=$State;healthmonitor=$HealthMonValue;appflowlog=$AppflowLogValue}
-        If ($CacheType -eq "SERVER")
-        {
-            $payload.Add("cacheable", $CacheableValue)
-        }
-        Else
-        {
-            $payload.Add("cachetype", $CacheType)
-        }
-        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType servicegroup -Payload $payload -Action add -Verbose:$VerbosePreference
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType service -Payload $payload  -Verbose:$VerbosePreference
    
-        Write-Verbose "$($MyInvocation.MyCommand): Exit"
-    }
-    function Update-NSServiceGroup {
-        <#
-        .SYNOPSIS
-            Update a service group
-        .DESCRIPTION
-            Update a service group
-        .PARAMETER NSSession
-            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER Name
-            Name for the service
-        .PARAMETER Protocol
-            Protocol in which data is exchanged with the service
-        .PARAMETER CacheType
-            Cache type supported by the cache server. Possible values = TRANSPARENT, REVERSE, FORWARD
-        .PARAMETER Cacheable
-            Use the transparent cache redirection virtual server to forward the request to the cache server. Note: Do not set this parameter if you set the Cache Type. Default value: NO. Possible values = YES, NO
-        .SWITCH Disabled
-            DisablesInitial state of the service group. Default value: ENABLED. Possible values = ENABLED, DISABLED
-        .PARAMETER HealthMonitoring
-            Monitor the health of this service. Available settings function as follows: YES - Send probes to check the health of the service. NO - Do not send probes to check the health of the service. With the NO option, the appliance shows the service as UP at all times. Default value: YES. Possible values = YES, NO
-        .PARAMETER ApplfowLogging
-            Enable logging of AppFlow information for the specified service group. Default value: ENABLED. Possible values = ENABLED, DISABLED
-        .EXAMPLE
-            Add-NSServiceGroup -NSSession $Session -Name "svcgrp" -Protocol "HTTP" -CacheType SERVER -AutoscaleMode "DISABLED" 
-        .NOTES
-            Copyright (c) cognition IT. All rights reserved.
-        #>
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$true)] [string]$Name,
-            [Parameter(Mandatory=$false)] [ValidateSet("SERVER", "TRANSPARENT", "REVERSE", "FORWARD")] [string]$CacheType,
-            [Parameter(Mandatory=$false)] [ValidateSet("YES", "NO")] [string] $Cacheable,
-            [Parameter(Mandatory=$false)] [ValidateSet("YES", "NO")] [string]$HealthMonitoring,
-            [Parameter(Mandatory=$false)] [ValidateSet("ENABLED", "DISABLED")] [string]$AppflowLogging,
-            [Parameter(Mandatory=$false)][ValidateNotNullOrEmpty()] [string]$Comment
-        )
-
-        Write-Verbose "$($MyInvocation.MyCommand): Enter"
+            Write-Verbose "$($MyInvocation.MyCommand): Exit"
     
-        $payload = @{servicegroupname=$Name}
-        If ($CacheType)
-        {
+        }
+        function Remove-NSService{
+            <#
+            .SYNOPSIS
+                Remove a NetScaler Service from the NetScalerConfiguration
+            .DESCRIPTION
+                Remove a NetScaler Service from the NetScalerConfiguration
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER Name
+                Name of the Service.
+            .EXAMPLE
+                Remove-NSServer -NSSession $Session -Name $ServerName
+            .NOTES
+                Copyright (c) cognition IT. All rights reserved.
+            #>
+
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name
+            )
+            Begin {
+                Write-Verbose "$($MyInvocation.MyCommand): Enter"
+            }
+            Process {
+                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod DELETE -ResourceType service -ResourceName $Name -Verbose:$VerbosePreference
+            }
+            End {
+                Write-Verbose "$($MyInvocation.MyCommand): Exit"
+            }
+    
+        }
+        function Get-NSService{
+            <#
+            .SYNOPSIS
+                Retrieve a Service from the NetScalerConfiguration
+            .DESCRIPTION
+                Retrieve a Service from the NetScalerConfiguration
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER Name
+                Name for the service. Can be changed after the name is created. Minimum length = 1.
+            .EXAMPLE
+                Get-NSService -NSSession $Session -Name $ServiceName
+            .EXAMPLE
+                Get-NSService -NSSession $Session
+            .NOTES
+                Copyright (c) cognition IT. All rights reserved.
+            #>
+
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$false)][ValidateNotNullOrEmpty()] [string]$Name
+            )
+            Begin {
+                Write-Verbose "$($MyInvocation.MyCommand): Enter"
+            }
+            Process {
+                If ($Name) {
+                    $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType service -ResourceName $Name -Verbose:$VerbosePreference
+                }
+                Else
+                {
+                    $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType service -Verbose:$VerbosePreference
+                }
+            }
+            End {
+                Write-Verbose "$($MyInvocation.MyCommand): Exit"
+                If ($response.PSObject.Properties['service'])
+                {
+                    return $response.service
+                }
+                else
+                {
+                    return $null
+                }
+            }
+
+    
+        }
+
+        function Enable-NSService {
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name
+            )
+            Begin {
+                Write-Verbose "$($MyInvocation.MyCommand): Enter"
+                $payload = @{name=$Name}
+            }
+            Process {
+                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType service -Payload $payload -Verbose:$VerbosePreference -Action enable
+            }
+            End {
+                Write-Verbose "$($MyInvocation.MyCommand): Exit"
+            }
+        }
+    # SOLVED: Disable-NSService renders the NetScaler unresponsive (stupid me bound the service to localhost on HTTP 80 (same as REST Web services) DOH!)
+        function Disable-NSService {
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name,
+                [Parameter(Mandatory=$false,ParameterSetName='Graceful')] [switch]$Graceful,
+                [Parameter(Mandatory=$false,ParameterSetName='Graceful')][double]$Delay
+            )
+            Begin {
+                Write-Verbose "$($MyInvocation.MyCommand): Enter"
+                $GracefulState = if ($Graceful) { "YES" } else { "NO" }
+
+                $payload = @{name=$Name;graceful=$GracefulState}
+                if ($PSCmdlet.ParameterSetName -eq 'Graceful') {
+                    Write-Verbose "Graceful shutdown requested for service"
+                    If ($Delay)
+                    {
+                        $payload.Add("delay", $Delay)
+                    }
+                }
+            }
+            Process {
+                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType service -Payload $payload -Verbose:$VerbosePreference -Action disable
+            }
+            End {
+                Write-Verbose "$($MyInvocation.MyCommand): Exit"
+            }
+        }
+
+        #endregion
+        #region Load Balancing - ServiceGroups
+        function Add-NSServiceGroup {
+            <#
+            .SYNOPSIS
+                Add a new service group
+            .DESCRIPTION
+                Add a new service group
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER Name
+                Name for the service
+            .PARAMETER Protocol
+                Protocol in which data is exchanged with the service
+            .PARAMETER CacheType
+                Cache type supported by the cache server. Possible values = TRANSPARENT, REVERSE, FORWARD
+            .PARAMETER AutoscaleMode
+                Auto scale option for a servicegroup. Default value: DISABLED. Possible values = DISABLED, DNS, POLICY
+            .PARAMETER Cacheable
+                Use the transparent cache redirection virtual server to forward the request to the cache server. Note: Do not set this parameter if you set the Cache Type. Default value: NO. Possible values = YES, NO
+            .SWITCH Disabled
+                DisablesInitial state of the service group. Default value: ENABLED. Possible values = ENABLED, DISABLED
+            .PARAMETER HealthMonitoring
+                Monitor the health of this service. Available settings function as follows: YES - Send probes to check the health of the service. NO - Do not send probes to check the health of the service. With the NO option, the appliance shows the service as UP at all times. Default value: YES. Possible values = YES, NO
+            .PARAMETER ApplfowLogging
+                Enable logging of AppFlow information for the specified service group. Default value: ENABLED. Possible values = ENABLED, DISABLED
+            .EXAMPLE
+                Add-NSServiceGroup -NSSession $Session -Name "svcgrp" -Protocol "HTTP" -CacheType SERVER -AutoscaleMode "DISABLED" 
+            .NOTES
+                Copyright (c) Citrix Systems, Inc. All rights reserved.
+            #>
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)] [string]$Name,
+                [Parameter(Mandatory=$true)] [ValidateSet(
+                "HTTP","FTP","TCP","UDP","SSL","SSL_BRIDGE","SSL_TCP","DTLS","NNTP","RPCSVR","DNS","ADNS","SNMP","RTSP","DHCPRA",
+                "ANY","SIP_UDP","DNS_TCP","ADNS_TCP","MYSQL","MSSQL","ORACLE","RADIUS","RDP","DIAMETER","SSL_DIAMETER","TFTP"
+                )] [string]$Protocol,
+                [Parameter(Mandatory=$true)] [ValidateSet("SERVER", "TRANSPARENT", "REVERSE", "FORWARD")] [string]$CacheType,
+                [Parameter(Mandatory=$true)] [ValidateSet("DISABLED", "DNS", "POLICY")] [string]$AutoscaleMode,
+                [Parameter(Mandatory=$false)] [ValidateScript({($CacheType -eq "SERVER")})][switch]$Cacheable,
+                [Parameter(Mandatory=$false)] [ValidateSet("ENABLED", "DISABLED")] [string]$State="ENABLED",
+                [Parameter(Mandatory=$false)] [switch]$HealthMonitoring,
+                [Parameter(Mandatory=$false)] [switch]$AppflowLogging
+            )
+
+            Write-Verbose "$($MyInvocation.MyCommand): Enter"
+    
+            $CacheableValue = if ($Cacheable) { "YES" } else { "NO" }
+            $HealthMonValue = if ($HealthMonitoring) { "YES" } else { "NO" }
+            $AppflowLogValue = if ($AppflowLogging) { "ENABLED" } else { "DISABLED" }
+
+            $payload = @{servicegroupname=$Name;servicetype=$Protocol;state=$State;healthmonitor=$HealthMonValue;appflowlog=$AppflowLogValue}
             If ($CacheType -eq "SERVER")
             {
-                $payload.Add("cacheable", $Cacheable)
+                $payload.Add("cacheable", $CacheableValue)
             }
             Else
             {
                 $payload.Add("cachetype", $CacheType)
             }
-        }
-        If (!([string]::IsNullOrEmpty($HealthMonitoring)))
-        {
-            $payload.Add("healthmonitor",$HealthMonitoring)
-        }
-        If (!([string]::IsNullOrEmpty($AppflowLogging)))
-        {
-            $payload.Add("appflowlog",$AppflowLogging)
-        }
-        If (!([string]::IsNullOrEmpty($Comment)))
-        {
-            $payload.Add("comment",$Comment)
-        }
-
-        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType servicegroup -Payload $payload -Action update -Verbose:$VerbosePreference
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType servicegroup -Payload $payload  -Verbose:$VerbosePreference
    
-        Write-Verbose "$($MyInvocation.MyCommand): Exit"
-    }
-    function Remove-NSServiceGroup {
-        <#
-        .SYNOPSIS
-            Remove a NetScaler ServiceGroup from the NetScalerConfiguration
-        .DESCRIPTION
-            Remove a NetScaler ServiceGroup from the NetScalerConfiguration
-        .PARAMETER NSSession
-            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER Name
-            Name of the Service.
-        .EXAMPLE
-            Remove-NSServer -NSSession $Session -Name $ServerName
-        .NOTES
-            Copyright (c) cognition IT. All rights reserved.
-        #>
-
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name
-        )
-        Begin {
-            Write-Verbose "$($MyInvocation.MyCommand): Enter"
-        }
-        Process {
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod DELETE -ResourceType servicegroup -ResourceName $Name -Verbose:$VerbosePreference
-        }
-        End {
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
         }
-    }
-    function Get-NSServiceGroup {
-        <#
-        .SYNOPSIS
-            Retrieve a Service from the NetScalerConfiguration
-        .DESCRIPTION
-            Retrieve a Service from the NetScalerConfiguration
-        .PARAMETER NSSession
-            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER Name
-            Name for the service. Can be changed after the name is created. Minimum length = 1.
-        .EXAMPLE
-            Get-NSService -NSSession $Session -Name $ServiceName
-        .EXAMPLE
-            Get-NSService -NSSession $Session
-        .NOTES
-            Copyright (c) cognition IT. All rights reserved.
-        #>
+        function Update-NSServiceGroup {
+            <#
+            .SYNOPSIS
+                Update a service group
+            .DESCRIPTION
+                Update a service group
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER Name
+                Name for the service
+            .PARAMETER Protocol
+                Protocol in which data is exchanged with the service
+            .PARAMETER CacheType
+                Cache type supported by the cache server. Possible values = TRANSPARENT, REVERSE, FORWARD
+            .PARAMETER Cacheable
+                Use the transparent cache redirection virtual server to forward the request to the cache server. Note: Do not set this parameter if you set the Cache Type. Default value: NO. Possible values = YES, NO
+            .SWITCH Disabled
+                DisablesInitial state of the service group. Default value: ENABLED. Possible values = ENABLED, DISABLED
+            .PARAMETER HealthMonitoring
+                Monitor the health of this service. Available settings function as follows: YES - Send probes to check the health of the service. NO - Do not send probes to check the health of the service. With the NO option, the appliance shows the service as UP at all times. Default value: YES. Possible values = YES, NO
+            .PARAMETER ApplfowLogging
+                Enable logging of AppFlow information for the specified service group. Default value: ENABLED. Possible values = ENABLED, DISABLED
+            .EXAMPLE
+                Add-NSServiceGroup -NSSession $Session -Name "svcgrp" -Protocol "HTTP" -CacheType SERVER -AutoscaleMode "DISABLED" 
+            .NOTES
+                Copyright (c) cognition IT. All rights reserved.
+            #>
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)] [string]$Name,
+                [Parameter(Mandatory=$false)] [ValidateSet("SERVER", "TRANSPARENT", "REVERSE", "FORWARD")] [string]$CacheType,
+                [Parameter(Mandatory=$false)] [ValidateSet("YES", "NO")] [string] $Cacheable,
+                [Parameter(Mandatory=$false)] [ValidateSet("YES", "NO")] [string]$HealthMonitoring,
+                [Parameter(Mandatory=$false)] [ValidateSet("ENABLED", "DISABLED")] [string]$AppflowLogging,
+                [Parameter(Mandatory=$false)][ValidateNotNullOrEmpty()] [string]$Comment
+            )
 
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$false)][ValidateNotNullOrEmpty()] [string]$Name
-        )
-        Begin {
             Write-Verbose "$($MyInvocation.MyCommand): Enter"
-        }
-        Process {
-            If ($Name) {
-                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType servicegroup -ResourceName $Name -Verbose:$VerbosePreference
-            }
-            Else {
-                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType servicegroup
-            }
-        }
-        End {
-            Write-Verbose "$($MyInvocation.MyCommand): Exit"
-            If ($response.PSObject.Properties['servicegroup'])
-            {
-                return $response.servicegroup
-            }
-            else
-            {
-                return $null
-            }
-        }
-    }
-
-    function Enable-NSServiceGroup {
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name
-        )
-        Begin {
-            Write-Verbose "$($MyInvocation.MyCommand): Enter"
+    
             $payload = @{servicegroupname=$Name}
-        }
-        Process {
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType servicegroup -Payload $payload -Verbose:$VerbosePreference -Action enable
-        }
-        End {
-            Write-Verbose "$($MyInvocation.MyCommand): Exit"
-        }
-    }
-    function Disable-NSServiceGroup {
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name,
-            [Parameter(Mandatory=$false)][int]$Delay,
-            [Parameter(Mandatory=$false)] [switch]$Graceful
-        )
-        Begin {
-            Write-Verbose "$($MyInvocation.MyCommand): Enter"
-            $GracefulState = if ($Graceful) { "YES" } else { "NO" }
-
-            $payload = @{servicegroupname=$Name;graceful=$GracefulState}
-            If ($Delay)
+            If ($CacheType)
             {
-                $payload.Add("delay", $Delay)
+                If ($CacheType -eq "SERVER")
+                {
+                    $payload.Add("cacheable", $Cacheable)
+                }
+                Else
+                {
+                    $payload.Add("cachetype", $CacheType)
+                }
             }
-        }
-        Process {
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType servicegroup -Payload $payload -Verbose:$VerbosePreference -Action disable
-        }
-        End {
-            Write-Verbose "$($MyInvocation.MyCommand): Exit"
-        }
-    }
-
-    function Get-NSServiceGroupBinding {
-        <#
-        .SYNOPSIS
-            Retrieve a Service from the NetScalerConfiguration
-        .DESCRIPTION
-            Retrieve a Service from the NetScalerConfiguration
-        .PARAMETER NSSession
-            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER Name
-            Name for the service. Can be changed after the name is created. Minimum length = 1.
-        .EXAMPLE
-            Get-NSService -NSSession $Session -Name $ServiceName
-        .EXAMPLE
-            Get-NSService -NSSession $Session
-        .NOTES
-            Copyright (c) cognition IT. All rights reserved.
-        #>
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name
-        )
-        Begin {
-            Write-Verbose "$($MyInvocation.MyCommand): Enter"
-        }
-        Process {
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType servicegroup_binding -ResourceName $Name -Verbose:$VerbosePreference
-        }
-        End {
-            Write-Verbose "$($MyInvocation.MyCommand): Exit"
-            If ($response.PSObject.Properties['servicegroup_binding'])
+            If (!([string]::IsNullOrEmpty($HealthMonitoring)))
             {
-                return $response.servicegroup_binding
+                $payload.Add("healthmonitor",$HealthMonitoring)
             }
-            else
+            If (!([string]::IsNullOrEmpty($AppflowLogging)))
             {
-                return $null
+                $payload.Add("appflowlog",$AppflowLogging)
             }
-        }
-    }
-
-    function New-NSServicegroupServicegroupmemberBinding {
-        <#
-        .SYNOPSIS
-            Retrieve a Service from the NetScalerConfiguration
-        .DESCRIPTION
-            Retrieve a Service from the NetScalerConfiguration
-        .PARAMETER NSSession
-            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER Name
-            Name of the service group. Minimum length = 1
-        .PARAMETER IP
-            IP Address.
-        .PARAMETER ServerName
-            Name of the server to which to bind the service group. Minimum length = 1
-        .PARAMETER Weight
-            Weight to assign to the servers in the service group. Specifies the capacity of the servers relative to the other servers in the load balancing configuration. The higher the weight, the higher the percentage of requests sent to the service. Minimum value = 1. Maximum value = 100
-        .PARAMETER port
-            server port number. Range 1 - 65535
-        .PARAMETER CustomserverId
-            The identifier for this IP:Port pair. Used when the persistency type is set to Custom Server ID. Default value: "None"
-        .PARAMETER ServerId
-            The identifier for the service. This is used when the persistency type is set to Custom Server ID.
-        .PARAMETER State
-            Initial state of the service group. Default value: ENABLED. Possible values = ENABLED, DISABLED
-        .PARAMETER hashid
-            The hash identifier for the service. This must be unique for each service. This parameter is used by hash based load balancing methods. Minimum value = 1
-        .EXAMPLE
-            Get-NSService -NSSession $Session -Name $ServiceName
-        .EXAMPLE
-            Get-NSService -NSSession $Session
-        .NOTES
-            Copyright (c) cognition IT. All rights reserved.
-        #>
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name,
-            [Parameter(Mandatory=$true,ParameterSetName='By Name')] [string]$ServerName,
-            [Parameter(Mandatory=$true,ParameterSetName='By Address')] [string]$IPAddress,
-            [Parameter(Mandatory=$false)][ValidateRange(1,100)] [double]$Weight,
-            [Parameter(Mandatory=$true)] [ValidateRange(1,65535)] [int]$Port,
-#            [Parameter(Mandatory=$false)][ValidateNotNullOrEmpty()] [string]$CustomServerId,
-            [Parameter(Mandatory=$false)] [double]$ServerId,
-            [Parameter(Mandatory=$true)][ValidateSet("ENABLED", "DISABLED")] [string]$State="ENABLED",
-            [Parameter(Mandatory=$false)] [double]$HashId
-        )
-        
-        Write-Verbose "$($MyInvocation.MyCommand): Enter"
-
-        $payload = @{servicegroupname=$Name;port=$Port;state=$State}
-
-        If ($ServerId) {$payload.Add("serverid",$ServerId)}
-        If ($HashId) {$payload.Add("hashid",$HashId)}
-        If ($Weight) {$payload.Add("weight",$Weight)}
-
-        if ($PSCmdlet.ParameterSetName -eq 'By Name') {
-            $payload.Add("servername",$ServerName)
-        } elseif ($PSCmdlet.ParameterSetName -eq 'By Address') {
-            Write-Verbose "Validating IP Address"
-            $IPAddressObj = New-Object -TypeName System.Net.IPAddress -ArgumentList 0
-            if (-not [System.Net.IPAddress]::TryParse($IPAddress,[ref]$IPAddressObj)) {
-                throw "'$IPAddress' is an invalid IP address"
+            If (!([string]::IsNullOrEmpty($Comment)))
+            {
+                $payload.Add("comment",$Comment)
             }
-            $payload.Add("ip",$IPAddress)
-        }
 
-        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType servicegroup_servicegroupmember_binding -Payload $payload -Action add -Verbose:$VerbosePreference
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType servicegroup -Payload $payload  -Verbose:$VerbosePreference
    
-        Write-Verbose "$($MyInvocation.MyCommand): Exit"
-    }
-    function Remove-NSServicegroupServicegroupmemberBinding {
-        <#
-        .SYNOPSIS
-            Remove a NetScaler ServiceGroup from the NetScalerConfiguration
-        .DESCRIPTION
-            Remove a NetScaler ServiceGroup from the NetScalerConfiguration
-        .PARAMETER NSSession
-            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER Name
-            Name of the Service.
-        .EXAMPLE
-            Remove-NSServer -NSSession $Session -Name $ServerName
-        .NOTES
-            Copyright (c) cognition IT. All rights reserved.
-        #>
+            Write-Verbose "$($MyInvocation.MyCommand): Exit"
+        }
+        function Remove-NSServiceGroup {
+            <#
+            .SYNOPSIS
+                Remove a NetScaler ServiceGroup from the NetScalerConfiguration
+            .DESCRIPTION
+                Remove a NetScaler ServiceGroup from the NetScalerConfiguration
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER Name
+                Name of the Service.
+            .EXAMPLE
+                Remove-NSServer -NSSession $Session -Name $ServerName
+            .NOTES
+                Copyright (c) cognition IT. All rights reserved.
+            #>
 
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name,
-            [Parameter(Mandatory=$true,ParameterSetName='By Name')] [string]$ServerName,
-            [Parameter(Mandatory=$true,ParameterSetName='By Address')] [string]$IPAddress,
-            [Parameter(Mandatory=$false)] [ValidateRange(1,65535)] [int]$Port
-        )
-        Begin {
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name
+            )
+            Begin {
+                Write-Verbose "$($MyInvocation.MyCommand): Enter"
+            }
+            Process {
+                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod DELETE -ResourceType servicegroup -ResourceName $Name -Verbose:$VerbosePreference
+            }
+            End {
+                Write-Verbose "$($MyInvocation.MyCommand): Exit"
+            }
+        }
+        function Get-NSServiceGroup {
+            <#
+            .SYNOPSIS
+                Retrieve a Service from the NetScalerConfiguration
+            .DESCRIPTION
+                Retrieve a Service from the NetScalerConfiguration
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER Name
+                Name for the service. Can be changed after the name is created. Minimum length = 1.
+            .EXAMPLE
+                Get-NSService -NSSession $Session -Name $ServiceName
+            .EXAMPLE
+                Get-NSService -NSSession $Session
+            .NOTES
+                Copyright (c) cognition IT. All rights reserved.
+            #>
+
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$false)][ValidateNotNullOrEmpty()] [string]$Name
+            )
+            Begin {
+                Write-Verbose "$($MyInvocation.MyCommand): Enter"
+            }
+            Process {
+                If ($Name) {
+                    $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType servicegroup -ResourceName $Name -Verbose:$VerbosePreference
+                }
+                Else {
+                    $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType servicegroup
+                }
+            }
+            End {
+                Write-Verbose "$($MyInvocation.MyCommand): Exit"
+                If ($response.PSObject.Properties['servicegroup'])
+                {
+                    return $response.servicegroup
+                }
+                else
+                {
+                    return $null
+                }
+            }
+        }
+
+        function Enable-NSServiceGroup {
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name
+            )
+            Begin {
+                Write-Verbose "$($MyInvocation.MyCommand): Enter"
+                $payload = @{servicegroupname=$Name}
+            }
+            Process {
+                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType servicegroup -Payload $payload -Verbose:$VerbosePreference -Action enable
+            }
+            End {
+                Write-Verbose "$($MyInvocation.MyCommand): Exit"
+            }
+        }
+        function Disable-NSServiceGroup {
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name,
+                [Parameter(Mandatory=$false)][int]$Delay,
+                [Parameter(Mandatory=$false)] [switch]$Graceful
+            )
+            Begin {
+                Write-Verbose "$($MyInvocation.MyCommand): Enter"
+                $GracefulState = if ($Graceful) { "YES" } else { "NO" }
+
+                $payload = @{servicegroupname=$Name;graceful=$GracefulState}
+                If ($Delay)
+                {
+                    $payload.Add("delay", $Delay)
+                }
+            }
+            Process {
+                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType servicegroup -Payload $payload -Verbose:$VerbosePreference -Action disable
+            }
+            End {
+                Write-Verbose "$($MyInvocation.MyCommand): Exit"
+            }
+        }
+
+        function Get-NSServiceGroupBinding {
+            <#
+            .SYNOPSIS
+                Retrieve a Service from the NetScalerConfiguration
+            .DESCRIPTION
+                Retrieve a Service from the NetScalerConfiguration
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER Name
+                Name for the service. Can be changed after the name is created. Minimum length = 1.
+            .EXAMPLE
+                Get-NSService -NSSession $Session -Name $ServiceName
+            .EXAMPLE
+                Get-NSService -NSSession $Session
+            .NOTES
+                Copyright (c) cognition IT. All rights reserved.
+            #>
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name
+            )
+            Begin {
+                Write-Verbose "$($MyInvocation.MyCommand): Enter"
+            }
+            Process {
+                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType servicegroup_binding -ResourceName $Name -Verbose:$VerbosePreference
+            }
+            End {
+                Write-Verbose "$($MyInvocation.MyCommand): Exit"
+                If ($response.PSObject.Properties['servicegroup_binding'])
+                {
+                    return $response.servicegroup_binding
+                }
+                else
+                {
+                    return $null
+                }
+            }
+        }
+
+        function New-NSServicegroupServicegroupmemberBinding {
+        #Updated 20160824: Removed unknown Action parameter
+            <#
+            .SYNOPSIS
+                Retrieve a Service from the NetScalerConfiguration
+            .DESCRIPTION
+                Retrieve a Service from the NetScalerConfiguration
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER Name
+                Name of the service group. Minimum length = 1
+            .PARAMETER IP
+                IP Address.
+            .PARAMETER ServerName
+                Name of the server to which to bind the service group. Minimum length = 1
+            .PARAMETER Weight
+                Weight to assign to the servers in the service group. Specifies the capacity of the servers relative to the other servers in the load balancing configuration. The higher the weight, the higher the percentage of requests sent to the service. Minimum value = 1. Maximum value = 100
+            .PARAMETER port
+                server port number. Range 1 - 65535
+            .PARAMETER CustomserverId
+                The identifier for this IP:Port pair. Used when the persistency type is set to Custom Server ID. Default value: "None"
+            .PARAMETER ServerId
+                The identifier for the service. This is used when the persistency type is set to Custom Server ID.
+            .PARAMETER State
+                Initial state of the service group. Default value: ENABLED. Possible values = ENABLED, DISABLED
+            .PARAMETER hashid
+                The hash identifier for the service. This must be unique for each service. This parameter is used by hash based load balancing methods. Minimum value = 1
+            .EXAMPLE
+                Get-NSService -NSSession $Session -Name $ServiceName
+            .EXAMPLE
+                Get-NSService -NSSession $Session
+            .NOTES
+                Copyright (c) cognition IT. All rights reserved.
+            #>
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name,
+                [Parameter(Mandatory=$true,ParameterSetName='By Name')] [string]$ServerName,
+                [Parameter(Mandatory=$true,ParameterSetName='By Address')] [string]$IPAddress,
+                [Parameter(Mandatory=$false)][ValidateRange(1,100)] [double]$Weight,
+                [Parameter(Mandatory=$true)] [ValidateRange(1,65535)] [int]$Port,
+    #            [Parameter(Mandatory=$false)][ValidateNotNullOrEmpty()] [string]$CustomServerId,
+                [Parameter(Mandatory=$false)] [double]$ServerId,
+                [Parameter(Mandatory=$true)][ValidateSet("ENABLED", "DISABLED")] [string]$State="ENABLED",
+                [Parameter(Mandatory=$false)] [double]$HashId
+            )
+        
             Write-Verbose "$($MyInvocation.MyCommand): Enter"
 
-            $args = @{port=$Port}
+            $payload = @{servicegroupname=$Name;port=$Port;state=$State}
+
+            If ($ServerId) {$payload.Add("serverid",$ServerId)}
+            If ($HashId) {$payload.Add("hashid",$HashId)}
+            If ($Weight) {$payload.Add("weight",$Weight)}
+
             if ($PSCmdlet.ParameterSetName -eq 'By Name') {
-                $args.Add("servername",$ServerName)
+                $payload.Add("servername",$ServerName)
             } elseif ($PSCmdlet.ParameterSetName -eq 'By Address') {
                 Write-Verbose "Validating IP Address"
                 $IPAddressObj = New-Object -TypeName System.Net.IPAddress -ArgumentList 0
                 if (-not [System.Net.IPAddress]::TryParse($IPAddress,[ref]$IPAddressObj)) {
                     throw "'$IPAddress' is an invalid IP address"
                 }
-                $args.Add("ip",$IPAddress)
+                $payload.Add("ip",$IPAddress)
             }
-        }
-        Process {
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod DELETE -ResourceType servicegroup_servicegroupmember_binding -ResourceName $Name -Arguments $args -Verbose:$VerbosePreference
-        }
-        End {
+
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType servicegroup_servicegroupmember_binding -Payload $payload -Verbose:$VerbosePreference
+   
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
         }
-    }
-    function Get-NSServicegroupServicegroupmemberBinding {
-        <#
-        .SYNOPSIS
-            Retrieve a Service from the NetScalerConfiguration
-        .DESCRIPTION
-            Retrieve a Service from the NetScalerConfiguration
-        .PARAMETER NSSession
-            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER Name
-            Name for the service. Can be changed after the name is created. Minimum length = 1.
-        .EXAMPLE
-            Get-NSService -NSSession $Session -Name $ServiceName
-        .EXAMPLE
-            Get-NSService -NSSession $Session
-        .NOTES
-            Copyright (c) cognition IT. All rights reserved.
-        #>
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name
-        )
-        Begin {
+        function Remove-NSServicegroupServicegroupmemberBinding {
+            <#
+            .SYNOPSIS
+                Remove a NetScaler ServiceGroup from the NetScalerConfiguration
+            .DESCRIPTION
+                Remove a NetScaler ServiceGroup from the NetScalerConfiguration
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER Name
+                Name of the Service.
+            .EXAMPLE
+                Remove-NSServer -NSSession $Session -Name $ServerName
+            .NOTES
+                Copyright (c) cognition IT. All rights reserved.
+            #>
+
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name,
+                [Parameter(Mandatory=$true,ParameterSetName='By Name')] [string]$ServerName,
+                [Parameter(Mandatory=$true,ParameterSetName='By Address')] [string]$IPAddress,
+                [Parameter(Mandatory=$false)] [ValidateRange(1,65535)] [int]$Port
+            )
+            Begin {
+                Write-Verbose "$($MyInvocation.MyCommand): Enter"
+
+                $args = @{port=$Port}
+                if ($PSCmdlet.ParameterSetName -eq 'By Name') {
+                    $args.Add("servername",$ServerName)
+                } elseif ($PSCmdlet.ParameterSetName -eq 'By Address') {
+                    Write-Verbose "Validating IP Address"
+                    $IPAddressObj = New-Object -TypeName System.Net.IPAddress -ArgumentList 0
+                    if (-not [System.Net.IPAddress]::TryParse($IPAddress,[ref]$IPAddressObj)) {
+                        throw "'$IPAddress' is an invalid IP address"
+                    }
+                    $args.Add("ip",$IPAddress)
+                }
+            }
+            Process {
+                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod DELETE -ResourceType servicegroup_servicegroupmember_binding -ResourceName $Name -Arguments $args -Verbose:$VerbosePreference
+            }
+            End {
+                Write-Verbose "$($MyInvocation.MyCommand): Exit"
+            }
+        }
+        function Get-NSServicegroupServicegroupmemberBinding {
+            <#
+            .SYNOPSIS
+                Retrieve a Service from the NetScalerConfiguration
+            .DESCRIPTION
+                Retrieve a Service from the NetScalerConfiguration
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER Name
+                Name for the service. Can be changed after the name is created. Minimum length = 1.
+            .EXAMPLE
+                Get-NSService -NSSession $Session -Name $ServiceName
+            .EXAMPLE
+                Get-NSService -NSSession $Session
+            .NOTES
+                Copyright (c) cognition IT. All rights reserved.
+            #>
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name
+            )
+            Begin {
+                Write-Verbose "$($MyInvocation.MyCommand): Enter"
+            }
+            Process {
+                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType servicegroup_servicegroupmember_binding -ResourceName $Name -Verbose:$VerbosePreference
+            }
+            End {
+                Write-Verbose "$($MyInvocation.MyCommand): Exit"
+                If ($response.PSObject.Properties['servicegroup_servicegroupmember_binding'])
+                {
+                    return $response.servicegroup_servicegroupmember_binding
+                }
+                else
+                {
+                    return $null
+                }
+            }
+        }
+        #endregion
+
+        #region Load Balancing - Monitors
+        # Add-NSLBMonitor is part of the Citrix NITRO Module
+        # Copied from Citrix's Module to ensure correct scoping of variables and functions
+        # UPDATED with additional parameters
+        function Add-NSLBMonitor {
+            <#
+            .SYNOPSIS
+                Create LB StoreFront monitor resource
+            .DESCRIPTION
+                Create LB StoreFront monitor resource
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER Name
+                Name for the monitor
+            .PARAMETER Type
+                Type of monitor that you want to create
+            .PARAMETER ScriptName
+                Path and name of the script to execute. The script must be available on the NetScaler appliance, in the /nsconfig/monitors/ directory
+            .PARAMETER LRTM
+                Calculate the least response times for bound services. If this parameter is not enabled, the appliance does not learn the response times of the bound services. Also used for LRTM load balancing. Possible values = ENABLED, DISABLED
+            .PARAMETER DestinationIPAddress
+                IP address of the service to which to send probes. If the parameter is set to 0, the IP address of the server to which the monitor is bound is considered the destination IP address
+            .PARAMETER StoreName
+                Store Name. For monitors of type STOREFRONT, STORENAME is an optional argument defining storefront service store name. Applicable to STOREFRONT monitors
+            .PARAMETER Reverse
+                Mark a service as DOWN, instead of UP, when probe criteria are satisfied, and as UP instead of DOWN when probe criteria are not satisfied. Default value: NO. Possible values = YES, NO
+            .EXAMPLE
+                Add-NSLBMonitor -NSSession $Session -Name "Server1_Monitor" -Type "HTTP"
+            .NOTES
+                Copyright (c) Citrix Systems, Inc. All rights reserved.
+                Copyright (c) cognition IT. All rights reserved.
+            #>
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)] [string]$Name,
+                [Parameter(Mandatory=$true)] [ValidateSet(
+                "PING","TCP","HTTP","TCP-ECV","HTTP-ECV","UDP-ECV","DNS","FTP","LDNS-PING","LDNS-TCP","LDNS-DNS","RADIUS","USER","HTTP-INLINE","SIP-UDP","LOAD","FTP-EXTENDED",
+                "SMTP","SNMP","NNTP","MYSQL","MYSQL-ECV","MSSQL-ECV","ORACLE-ECV","LDAP","POP3","CITRIX-XML-SERVICE","CITRIX-WEB-INTERFACE","DNS-TCP","RTSP","ARP","CITRIX-AG",
+                "CITRIX-AAC-LOGINPAGE","CITRIX-AAC-LAS","CITRIX-XD-DDC","ND6","CITRIX-WI-EXTENDED","DIAMETER","RADIUS_ACCOUNTING","STOREFRONT","APPC","CITRIX-XNC-ECV","CITRIX-XDM"
+                )] [string]$Type,
+                [Parameter(Mandatory=$false)] [string]$ScriptName,
+                [Parameter(Mandatory=$false)] [switch]$LRTM,
+                [Parameter(Mandatory=$false)] [string]$DestinationIPAddress,
+                [Parameter(Mandatory=$false)] [string]$StoreName,
+                [Parameter(Mandatory=$false)] [ValidateSet("Enabled", "Disabled")] [string]$State="Enabled",
+                [Parameter(Mandatory=$false)] [switch]$Reverse
+            )
+
             Write-Verbose "$($MyInvocation.MyCommand): Enter"
-        }
-        Process {
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType servicegroup_servicegroupmember_binding -ResourceName $Name -Verbose:$VerbosePreference
-        }
-        End {
+            $ReverseValue = if ($Reverse) { "YES" } else { "NO" }
+            $lrtmSetting = if ($LRTM) { "ENABLED" } else { "DISABLED" }
+
+            $payload = @{
+                monitorname = $Name
+                type = $Type
+                lrtm = $lrtmSetting
+                reverse = $ReverseValue
+                state = $State
+            }
+            if (-not [string]::IsNullOrEmpty($ScriptName)) {
+                $payload.Add("scriptname",$ScriptName)
+            }
+            if (-not [string]::IsNullOrEmpty($StoreName)) {
+                $payload.Add("storename",$StoreName)
+            }
+            if (-not [string]::IsNullOrEmpty($DestinationIPAddress)) {        
+                Write-Verbose "Validating IP Address"
+                $IPAddressObj = New-Object -TypeName System.Net.IPAddress -ArgumentList 0
+                if (-not [System.Net.IPAddress]::TryParse($DestinationIPAddress,[ref]$IPAddressObj)) {
+                    throw "'$DestinationIPAddress' is an invalid IP address"
+                }
+                $payload.Add("destip",$DestinationIPAddress)
+            }
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType lbmonitor -Payload $payload  
+
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
-            If ($response.PSObject.Properties['servicegroup_servicegroupmember_binding'])
-            {
-                return $response.servicegroup_servicegroupmember_binding
-            }
-            else
-            {
-                return $null
-            }
         }
-    }
-    #endregion
-    #region Load Balancing - Monitors
-    # Add-NSLBMonitor is part of the Citrix NITRO Module
-    # Copied from Citrix's Module to ensure correct scoping of variables and functions
-    # UPDATED with additional parameters
-    function Add-NSLBMonitor {
-        <#
-        .SYNOPSIS
-            Create LB StoreFront monitor resource
-        .DESCRIPTION
-            Create LB StoreFront monitor resource
-        .PARAMETER NSSession
-            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER Name
-            Name for the monitor
-        .PARAMETER Type
-            Type of monitor that you want to create
-        .PARAMETER ScriptName
-            Path and name of the script to execute. The script must be available on the NetScaler appliance, in the /nsconfig/monitors/ directory
-        .PARAMETER LRTM
-            Calculate the least response times for bound services. If this parameter is not enabled, the appliance does not learn the response times of the bound services. Also used for LRTM load balancing. Possible values = ENABLED, DISABLED
-        .PARAMETER DestinationIPAddress
-            IP address of the service to which to send probes. If the parameter is set to 0, the IP address of the server to which the monitor is bound is considered the destination IP address
-        .PARAMETER StoreName
-            Store Name. For monitors of type STOREFRONT, STORENAME is an optional argument defining storefront service store name. Applicable to STOREFRONT monitors
-        .PARAMETER Reverse
-            Mark a service as DOWN, instead of UP, when probe criteria are satisfied, and as UP instead of DOWN when probe criteria are not satisfied. Default value: NO. Possible values = YES, NO
-        .EXAMPLE
-            Add-NSLBMonitor -NSSession $Session -Name "Server1_Monitor" -Type "HTTP"
-        .NOTES
-            Copyright (c) Citrix Systems, Inc. All rights reserved.
-            Copyright (c) cognition IT. All rights reserved.
-        #>
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$true)] [string]$Name,
-            [Parameter(Mandatory=$true)] [ValidateSet(
-            "PING","TCP","HTTP","TCP-ECV","HTTP-ECV","UDP-ECV","DNS","FTP","LDNS-PING","LDNS-TCP","LDNS-DNS","RADIUS","USER","HTTP-INLINE","SIP-UDP","LOAD","FTP-EXTENDED",
-            "SMTP","SNMP","NNTP","MYSQL","MYSQL-ECV","MSSQL-ECV","ORACLE-ECV","LDAP","POP3","CITRIX-XML-SERVICE","CITRIX-WEB-INTERFACE","DNS-TCP","RTSP","ARP","CITRIX-AG",
-            "CITRIX-AAC-LOGINPAGE","CITRIX-AAC-LAS","CITRIX-XD-DDC","ND6","CITRIX-WI-EXTENDED","DIAMETER","RADIUS_ACCOUNTING","STOREFRONT","APPC","CITRIX-XNC-ECV","CITRIX-XDM"
-            )] [string]$Type,
-            [Parameter(Mandatory=$false)] [string]$ScriptName,
-            [Parameter(Mandatory=$false)] [switch]$LRTM,
-            [Parameter(Mandatory=$false)] [string]$DestinationIPAddress,
-            [Parameter(Mandatory=$false)] [string]$StoreName,
-            [Parameter(Mandatory=$false)] [ValidateSet("Enabled", "Disabled")] [string]$State="Enabled",
-            [Parameter(Mandatory=$false)] [switch]$Reverse
-        )
 
-        Write-Verbose "$($MyInvocation.MyCommand): Enter"
-        $ReverseValue = if ($Reverse) { "YES" } else { "NO" }
-        $lrtmSetting = if ($LRTM) { "ENABLED" } else { "DISABLED" }
+        function Update-NSLBMonitor {
+            <#
+            .SYNOPSIS
+                Update LB StoreFront monitor resource
+            .DESCRIPTION
+                Update LB StoreFront monitor resource
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER Name
+                Name for the monitor
+            .PARAMETER Type
+                Type of monitor that you want to create
+            .PARAMETER ScriptName
+                Path and name of the script to execute. The script must be available on the NetScaler appliance, in the /nsconfig/monitors/ directory
+            .PARAMETER LRTM
+                Calculate the least response times for bound services. If this parameter is not enabled, the appliance does not learn the response times of the bound services. Also used for LRTM load balancing. Possible values = ENABLED, DISABLED
+            .PARAMETER DestinationIPAddress
+                IP address of the service to which to send probes. If the parameter is set to 0, the IP address of the server to which the monitor is bound is considered the destination IP address
+            .PARAMETER StoreName
+                Store Name. For monitors of type STOREFRONT, STORENAME is an optional argument defining storefront service store name. Applicable to STOREFRONT monitors
+            .PARAMETER Reverse
+                Mark a service as DOWN, instead of UP, when probe criteria are satisfied, and as UP instead of DOWN when probe criteria are not satisfied. Default value: NO. Possible values = YES, NO
+            .EXAMPLE
+                Update-NSLBMonitor -NSSession $Session -Name "Server1_Monitor" -Type "HTTP"
+            .NOTES
+                Copyright (c) cognition IT. All rights reserved.
+            #>
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)] [string]$Name,
+                [Parameter(Mandatory=$true)] [ValidateSet(
+                "PING","TCP","HTTP","TCP-ECV","HTTP-ECV","UDP-ECV","DNS","FTP","LDNS-PING","LDNS-TCP","LDNS-DNS","RADIUS","USER","HTTP-INLINE","SIP-UDP","LOAD","FTP-EXTENDED",
+                "SMTP","SNMP","NNTP","MYSQL","MYSQL-ECV","MSSQL-ECV","ORACLE-ECV","LDAP","POP3","CITRIX-XML-SERVICE","CITRIX-WEB-INTERFACE","DNS-TCP","RTSP","ARP","CITRIX-AG",
+                "CITRIX-AAC-LOGINPAGE","CITRIX-AAC-LAS","CITRIX-XD-DDC","ND6","CITRIX-WI-EXTENDED","DIAMETER","RADIUS_ACCOUNTING","STOREFRONT","APPC","CITRIX-XNC-ECV","CITRIX-XDM"
+                )] [string]$Type,
+                [Parameter(Mandatory=$false)] [string]$ScriptName,
+                [Parameter(Mandatory=$false)] [switch]$LRTM,
+                [Parameter(Mandatory=$false)] [string]$DestinationIPAddress,
+                [Parameter(Mandatory=$false)] [string]$StoreName,
+                [Parameter(Mandatory=$false)] [ValidateSet("Enabled", "Disabled")] [string]$State="Enabled",
+                [Parameter(Mandatory=$false)] [switch]$Reverse
+            )
 
-        $payload = @{
-            monitorname = $Name
-            type = $Type
-            lrtm = $lrtmSetting
-            reverse = $ReverseValue
-            state = $State
-        }
-        if (-not [string]::IsNullOrEmpty($ScriptName)) {
-            $payload.Add("scriptname",$ScriptName)
-        }
-        if (-not [string]::IsNullOrEmpty($StoreName)) {
-            $payload.Add("storename",$StoreName)
-        }
-        if (-not [string]::IsNullOrEmpty($DestinationIPAddress)) {        
-            Write-Verbose "Validating IP Address"
-            $IPAddressObj = New-Object -TypeName System.Net.IPAddress -ArgumentList 0
-            if (-not [System.Net.IPAddress]::TryParse($DestinationIPAddress,[ref]$IPAddressObj)) {
-                throw "'$DestinationIPAddress' is an invalid IP address"
-            }
-            $payload.Add("destip",$DestinationIPAddress)
-        }
-        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType lbmonitor -Payload $payload -Action add 
-
-        Write-Verbose "$($MyInvocation.MyCommand): Exit"
-    }
-
-    function Update-NSLBMonitor {
-        <#
-        .SYNOPSIS
-            Update LB StoreFront monitor resource
-        .DESCRIPTION
-            Update LB StoreFront monitor resource
-        .PARAMETER NSSession
-            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER Name
-            Name for the monitor
-        .PARAMETER Type
-            Type of monitor that you want to create
-        .PARAMETER ScriptName
-            Path and name of the script to execute. The script must be available on the NetScaler appliance, in the /nsconfig/monitors/ directory
-        .PARAMETER LRTM
-            Calculate the least response times for bound services. If this parameter is not enabled, the appliance does not learn the response times of the bound services. Also used for LRTM load balancing. Possible values = ENABLED, DISABLED
-        .PARAMETER DestinationIPAddress
-            IP address of the service to which to send probes. If the parameter is set to 0, the IP address of the server to which the monitor is bound is considered the destination IP address
-        .PARAMETER StoreName
-            Store Name. For monitors of type STOREFRONT, STORENAME is an optional argument defining storefront service store name. Applicable to STOREFRONT monitors
-        .PARAMETER Reverse
-            Mark a service as DOWN, instead of UP, when probe criteria are satisfied, and as UP instead of DOWN when probe criteria are not satisfied. Default value: NO. Possible values = YES, NO
-        .EXAMPLE
-            Update-NSLBMonitor -NSSession $Session -Name "Server1_Monitor" -Type "HTTP"
-        .NOTES
-            Copyright (c) cognition IT. All rights reserved.
-        #>
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$true)] [string]$Name,
-            [Parameter(Mandatory=$true)] [ValidateSet(
-            "PING","TCP","HTTP","TCP-ECV","HTTP-ECV","UDP-ECV","DNS","FTP","LDNS-PING","LDNS-TCP","LDNS-DNS","RADIUS","USER","HTTP-INLINE","SIP-UDP","LOAD","FTP-EXTENDED",
-            "SMTP","SNMP","NNTP","MYSQL","MYSQL-ECV","MSSQL-ECV","ORACLE-ECV","LDAP","POP3","CITRIX-XML-SERVICE","CITRIX-WEB-INTERFACE","DNS-TCP","RTSP","ARP","CITRIX-AG",
-            "CITRIX-AAC-LOGINPAGE","CITRIX-AAC-LAS","CITRIX-XD-DDC","ND6","CITRIX-WI-EXTENDED","DIAMETER","RADIUS_ACCOUNTING","STOREFRONT","APPC","CITRIX-XNC-ECV","CITRIX-XDM"
-            )] [string]$Type,
-            [Parameter(Mandatory=$false)] [string]$ScriptName,
-            [Parameter(Mandatory=$false)] [switch]$LRTM,
-            [Parameter(Mandatory=$false)] [string]$DestinationIPAddress,
-            [Parameter(Mandatory=$false)] [string]$StoreName,
-            [Parameter(Mandatory=$false)] [ValidateSet("Enabled", "Disabled")] [string]$State="Enabled",
-            [Parameter(Mandatory=$false)] [switch]$Reverse
-        )
-
-        Write-Verbose "$($MyInvocation.MyCommand): Enter"
-        $ReverseValue = if ($Reverse) { "YES" } else { "NO" }
-        $lrtmSetting = if ($LRTM) { "ENABLED" } else { "DISABLED" }
-
-        $payload = @{
-            monitorname = $Name
-            type = $Type
-            lrtm = $lrtmSetting
-            reverse = $ReverseValue
-            state = $State
-        }
-        if (-not [string]::IsNullOrEmpty($ScriptName)) {
-            $payload.Add("scriptname",$ScriptName)
-        }
-        if (-not [string]::IsNullOrEmpty($StoreName)) {
-            $payload.Add("storename",$StoreName)
-        }
-        if (-not [string]::IsNullOrEmpty($DestinationIPAddress)) {        
-            Write-Verbose "Validating IP Address"
-            $IPAddressObj = New-Object -TypeName System.Net.IPAddress -ArgumentList 0
-            if (-not [System.Net.IPAddress]::TryParse($DestinationIPAddress,[ref]$IPAddressObj)) {
-                throw "'$DestinationIPAddress' is an invalid IP address"
-            }
-            $payload.Add("destip",$DestinationIPAddress)
-        }
-        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType lbmonitor -Payload $payload -Action add 
-
-        Write-Verbose "$($MyInvocation.MyCommand): Exit"
-    }
-    function Remove-NSLBMonitor{
-        <#
-        .SYNOPSIS
-            Remove a NetScaler Monitor from the NetScalerConfiguration
-        .DESCRIPTION
-            Remove a NetScaler Monitor from the NetScalerConfiguration
-        .PARAMETER NSSession
-            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER Name
-            Name of the Monitor.
-        .EXAMPLE
-            Remove-NSLBMonitor -NSSession $Session -Name $MonitorName
-        .NOTES
-            Copyright (c) cognition IT. All rights reserved.
-        #>
-
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name,
-            [Parameter(Mandatory=$true)] [ValidateSet(
-            "PING","TCP","HTTP","TCP-ECV","HTTP-ECV","UDP-ECV","DNS","FTP","LDNS-PING","LDNS-TCP","LDNS-DNS","RADIUS","USER","HTTP-INLINE","SIP-UDP","LOAD","FTP-EXTENDED",
-            "SMTP","SNMP","NNTP","MYSQL","MYSQL-ECV","MSSQL-ECV","ORACLE-ECV","LDAP","POP3","CITRIX-XML-SERVICE","CITRIX-WEB-INTERFACE","DNS-TCP","RTSP","ARP","CITRIX-AG",
-            "CITRIX-AAC-LOGINPAGE","CITRIX-AAC-LAS","CITRIX-XD-DDC","ND6","CITRIX-WI-EXTENDED","DIAMETER","RADIUS_ACCOUNTING","STOREFRONT","APPC","CITRIX-XNC-ECV","CITRIX-XDM"
-            )] [string]$Type
-        )
-        Begin {
             Write-Verbose "$($MyInvocation.MyCommand): Enter"
-            $args=@{type=$Type}
-        }
-        Process {
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod DELETE -ResourceType lbmonitor -ResourceName $Name -Arguments $args -Verbose:$VerbosePreference
-        }
-        End {
+            $ReverseValue = if ($Reverse) { "YES" } else { "NO" }
+            $lrtmSetting = if ($LRTM) { "ENABLED" } else { "DISABLED" }
+
+            $payload = @{
+                monitorname = $Name
+                type = $Type
+                lrtm = $lrtmSetting
+                reverse = $ReverseValue
+                state = $State
+            }
+            if (-not [string]::IsNullOrEmpty($ScriptName)) {
+                $payload.Add("scriptname",$ScriptName)
+            }
+            if (-not [string]::IsNullOrEmpty($StoreName)) {
+                $payload.Add("storename",$StoreName)
+            }
+            if (-not [string]::IsNullOrEmpty($DestinationIPAddress)) {        
+                Write-Verbose "Validating IP Address"
+                $IPAddressObj = New-Object -TypeName System.Net.IPAddress -ArgumentList 0
+                if (-not [System.Net.IPAddress]::TryParse($DestinationIPAddress,[ref]$IPAddressObj)) {
+                    throw "'$DestinationIPAddress' is an invalid IP address"
+                }
+                $payload.Add("destip",$DestinationIPAddress)
+            }
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType lbmonitor -Payload $payload  
+
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
         }
-    }
-    function Get-NSLBMonitor{
-        <#
-        .SYNOPSIS
-            Retrieve a Monitor from the NetScalerConfiguration
-        .DESCRIPTION
-            Retrieve a Monitor from the NetScalerConfiguration
-        .PARAMETER NSSession
-            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER Name
-            Name for the service. Can be changed after the name is created. Minimum length = 1.
-        .EXAMPLE
-            Get-NSLBMonitor -NSSession $Session -Name $MonitorName
-        .EXAMPLE
-            Get-NSLBMonitor -NSSession $Session
-        .NOTES
-            Copyright (c) cognition IT. All rights reserved.
-        #>
+        function Remove-NSLBMonitor{
+            <#
+            .SYNOPSIS
+                Remove a NetScaler Monitor from the NetScalerConfiguration
+            .DESCRIPTION
+                Remove a NetScaler Monitor from the NetScalerConfiguration
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER Name
+                Name of the Monitor.
+            .EXAMPLE
+                Remove-NSLBMonitor -NSSession $Session -Name $MonitorName
+            .NOTES
+                Copyright (c) cognition IT. All rights reserved.
+            #>
 
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$false)][ValidateNotNullOrEmpty()] [string]$Name
-        )
-        Begin {
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name,
+                [Parameter(Mandatory=$true)] [ValidateSet(
+                "PING","TCP","HTTP","TCP-ECV","HTTP-ECV","UDP-ECV","DNS","FTP","LDNS-PING","LDNS-TCP","LDNS-DNS","RADIUS","USER","HTTP-INLINE","SIP-UDP","LOAD","FTP-EXTENDED",
+                "SMTP","SNMP","NNTP","MYSQL","MYSQL-ECV","MSSQL-ECV","ORACLE-ECV","LDAP","POP3","CITRIX-XML-SERVICE","CITRIX-WEB-INTERFACE","DNS-TCP","RTSP","ARP","CITRIX-AG",
+                "CITRIX-AAC-LOGINPAGE","CITRIX-AAC-LAS","CITRIX-XD-DDC","ND6","CITRIX-WI-EXTENDED","DIAMETER","RADIUS_ACCOUNTING","STOREFRONT","APPC","CITRIX-XNC-ECV","CITRIX-XDM"
+                )] [string]$Type
+            )
+            Begin {
+                Write-Verbose "$($MyInvocation.MyCommand): Enter"
+                $args=@{type=$Type}
+            }
+            Process {
+                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod DELETE -ResourceType lbmonitor -ResourceName $Name -Arguments $args -Verbose:$VerbosePreference
+            }
+            End {
+                Write-Verbose "$($MyInvocation.MyCommand): Exit"
+            }
+        }
+        function Get-NSLBMonitor{
+            <#
+            .SYNOPSIS
+                Retrieve a Monitor from the NetScalerConfiguration
+            .DESCRIPTION
+                Retrieve a Monitor from the NetScalerConfiguration
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER Name
+                Name for the service. Can be changed after the name is created. Minimum length = 1.
+            .EXAMPLE
+                Get-NSLBMonitor -NSSession $Session -Name $MonitorName
+            .EXAMPLE
+                Get-NSLBMonitor -NSSession $Session
+            .NOTES
+                Copyright (c) cognition IT. All rights reserved.
+            #>
+
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$false)][ValidateNotNullOrEmpty()] [string]$Name
+            )
+            Begin {
+                Write-Verbose "$($MyInvocation.MyCommand): Enter"
+            }
+            Process {
+                If ($Name) {
+                    $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType lbmonitor -ResourceName $Name -Verbose:$VerbosePreference
+                }
+                Else {
+                    $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType lbmonitor
+                }
+            }
+            End {
+                Write-Verbose "$($MyInvocation.MyCommand): Exit"
+                If ($response.PSObject.Properties['lbmonitor'])
+                {
+                    return $response.lbmonitor
+                }
+                else
+                {
+                    return $null
+                }
+            }
+        }
+
+    # NOTE: LBMonitor functions not complete yet!!
+
+        function New-NSServicegroupLBMonitorBinding {
+        # Created: 20160825
+            <#
+            .SYNOPSIS
+                Bind monitor to servicegroup
+            .DESCRIPTION
+                Bind monitor to servicegroup
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER ServiceName
+                Name of the servicegroup to which to bind monitor
+            .PARAMETER MonitorName
+                The monitor name
+            .EXAMPLE
+                New-NSServicegroupLBMonitorBinding -NSSession $Session -ServicegroupName "Server1_Service" -MonitorName "Server1_Monitor"
+            .NOTES
+                Copyright (c) Citrix Systems, Inc. All rights reserved.
+            #>
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)] [string]$ServicegroupName,
+                [Parameter(Mandatory=$true)] [string]$MonitorName
+            )
+
             Write-Verbose "$($MyInvocation.MyCommand): Enter"
-        }
-        Process {
-            If ($Name) {
-                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType lbmonitor -ResourceName $Name -Verbose:$VerbosePreference
-            }
-            Else {
-                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType lbmonitor
-            }
-        }
-        End {
+
+            $payload = @{servicegroupname=$ServicegroupName;monitor_name=$MonitorName}
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType servicegroup_lbmonitor_binding -Payload $payload -Verbose:$VerbosePreference 
+
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
-            If ($response.PSObject.Properties['lbmonitor'])
-            {
-                return $response.lbmonitor
+        }
+        function Remove-NSServicegroupLBMonitorBinding{
+        # Created: 20160825
+            <#
+            .SYNOPSIS
+                Remove a NetScaler Monitor Binding from a Servicegroup
+            .DESCRIPTION
+                Remove a NetScaler Monitor Binding from a Servicegroup
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER ServicegroupName
+                Name of the servicegroup.
+            .PARAMETER MonitorName
+                Name of the monitor bound to the servicegroup.
+            .EXAMPLE
+                Remove-NSServicegroupLBMonitorBinding -NSSession $Session -ServicegroupName $ServicegroupName -MonitorName $MonitorName
+            .NOTES
+                Copyright (c) cognition IT. All rights reserved.
+            #>
+
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$ServicegroupName,
+                [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$MonitorName
+            )
+            Begin {
+                Write-Verbose "$($MyInvocation.MyCommand): Enter"
+                $args=@{monitor_name=$MonitorName}
             }
-            else
-            {
-                return $null
+            Process {
+                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod DELETE -ResourceType servicegroup_lbmonitor_binding -ResourceName $ServicegroupName -Arguments $args -Verbose:$VerbosePreference
+            }
+            End {
+                Write-Verbose "$($MyInvocation.MyCommand): Exit"
             }
         }
-    }
 
-# NOTE: LBMonitor functions not complete yet!!
+        function Get-NSServicegroupLBMonitorBinding{
+        # Created: 20160825
+            <#
+            .SYNOPSIS
+                Retrieve a Monitor binding for a given Servicegroup
+            .DESCRIPTION
+                Retrieve a Monitor binding for a given Servicegroup
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER Name
+                Name of the service
+            .EXAMPLE
+                Get-NSServicegroupLBMonitorBinding -NSSession $Session -Name $Name
+            .NOTES
+                Copyright (c) cognition IT. All rights reserved.
+            #>
 
-    function New-NSLBMonitorServiceBinding {}
-    function New-NSLBMonitorServicegroupBinding {}
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name
+            )
+            Begin {
+                Write-Verbose "$($MyInvocation.MyCommand): Enter"
+            }
+            Process {
+                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType servicegroup_lbmonitor_binding -ResourceName $Name -Verbose:$VerbosePreference
+            }
+            End {
+                Write-Verbose "$($MyInvocation.MyCommand): Exit"
+                If ($response.PSObject.Properties['servicegroup_lbmonitor_binding'])
+                {
+                    return $response.servicegroup_lbmonitor_binding
+                }
+                else
+                {
+                    return $null
+                }
+            }
+        }
+    
 
-    # Add-NSLBSFMonitor is part of the Citrix NITRO Module
+        # Add-NSLBSFMonitor is part of the Citrix NITRO Module
 
-    # New-NSServiceLBMonitorBinding is part of the Citrix NITRO Module
-    # Copied from Citrix's Module to ensure correct scoping of variables and functions
-    function New-NSServiceLBMonitorBinding {
-        <#
-        .SYNOPSIS
-            Bind monitor to service
-        .DESCRIPTION
-            Bind monitor to service
-        .PARAMETER NSSession
-            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER ServiceName
-            Name of the service to which to bind monitor
-        .PARAMETER MonitorName
-            The monitor name
-        .EXAMPLE
-            New-NSServiceLBMonitorBinding -NSSession $Session -ServiceName "Server1_Service" -MonitorName "Server1_Monitor"
-        .NOTES
-            Copyright (c) Citrix Systems, Inc. All rights reserved.
-        #>
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            [Parameter(Mandatory=$true)] [string]$ServiceName,
-            [Parameter(Mandatory=$true)] [string]$MonitorName
-        )
+        # New-NSServiceLBMonitorBinding is part of the Citrix NITRO Module
+        # Copied from Citrix's Module to ensure correct scoping of variables and functions
+        function New-NSServiceLBMonitorBinding {
+            <#
+            .SYNOPSIS
+                Bind monitor to service
+            .DESCRIPTION
+                Bind monitor to service
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER ServiceName
+                Name of the service to which to bind monitor
+            .PARAMETER MonitorName
+                The monitor name
+            .EXAMPLE
+                New-NSServiceLBMonitorBinding -NSSession $Session -ServiceName "Server1_Service" -MonitorName "Server1_Monitor"
+            .NOTES
+                Copyright (c) Citrix Systems, Inc. All rights reserved.
+            #>
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)] [ValidateNotNullOrEmpty()] [string]$ServiceName,
+                [Parameter(Mandatory=$true)] [ValidateNotNullOrEmpty()] [string]$MonitorName,
+                [Parameter(Mandatory=$false)] [string]$State,
+                [Parameter(Mandatory=$false)] [int]$Weight,
+                [Parameter(Mandatory=$false)] [switch]$Passive
+            )
 
-        Write-Verbose "$($MyInvocation.MyCommand): Enter"
+            Write-Verbose "$($MyInvocation.MyCommand): Enter"
 
-        $payload = @{name=$ServiceName;monitor_name=$MonitorName}
-        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType service_lbmonitor_binding -Payload $payload -Action add 
+            $payload = @{name=$ServiceName;monitor_name=$MonitorName}
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType service_lbmonitor_binding -Payload $payload -Verbose:$VerbosePreference 
 
-        Write-Verbose "$($MyInvocation.MyCommand): Exit"
-    }
+            Write-Verbose "$($MyInvocation.MyCommand): Exit"
+        }
 
-    function Get-NSServiceLBMonitorBinding{}
-    #endregion
+        function Get-NSServiceLBMonitorBinding{
+        # Created: 20160825
+            <#
+            .SYNOPSIS
+                Retrieve a Monitor binding for a given Service
+            .DESCRIPTION
+                Retrieve a Monitor binding for a given Service
+            .PARAMETER NSSession
+                An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+            .PARAMETER Name
+                Name of the service
+            .EXAMPLE
+                Get-NSServiceLBMonitorBinding -NSSession $Session -Name $ServiceName
+            .NOTES
+                Copyright (c) cognition IT. All rights reserved.
+            #>
+
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+                [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name
+            )
+            Begin {
+                Write-Verbose "$($MyInvocation.MyCommand): Enter"
+            }
+            Process {
+                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType service_lbmonitor_binding -ResourceName $Name -Verbose:$VerbosePreference
+            }
+            End {
+                Write-Verbose "$($MyInvocation.MyCommand): Exit"
+                If ($response.PSObject.Properties['service_lbmonitor_binding'])
+                {
+                    return $response.service_lbmonitor_binding
+                }
+                else
+                {
+                    return $null
+                }
+            }
+        }
+        #endregion
 
     #region Load Balancing - vServers
     # Add-NSLBVServer is part of the Citrix NITRO Module
@@ -5375,7 +5458,7 @@ Set-StrictMode -Version Latest
             if (-not [string]::IsNullOrEmpty($LBMethod)) {$payload.Add("lbmethod",$LBMethod)}
             if (-not [string]::IsNullOrEmpty($Comment)) {$payload.Add("comment",$Comment)}
 
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType lbvserver -Payload $payload -Action add
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType lbvserver -Payload $payload 
         }
         End {
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
@@ -5419,7 +5502,7 @@ Set-StrictMode -Version Latest
             if (-not [string]::IsNullOrEmpty($PersistenceType)) {$payload.Add("persistencetype",$PersistenceType)}
             if (-not [string]::IsNullOrEmpty($LBMethod)) {$payload.Add("lbmethod",$LBMethod)}
             if (-not [string]::IsNullOrEmpty($Comment)) {$payload.Add("comment",$Comment)}
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType lbvserver -Payload $payload -Action update
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType lbvserver -Payload $payload 
         }
 
         End {
@@ -5528,6 +5611,7 @@ Set-StrictMode -Version Latest
     }
 
     function New-NSLBVServerServicegroupBinding {
+    # Updated: 20160824 - Removed unknown Action parameter
         [CmdletBinding()]
         param (
             [Parameter(Mandatory=$true)] [PSObject]$NSSession,
@@ -5548,7 +5632,7 @@ Set-StrictMode -Version Latest
             if (-not [string]::IsNullOrEmpty($ServiceGroupName)) {$payload.Add("servicegroupname",$ServiceGroupName)}
 #            if (-not [string]::IsNullOrEmpty($ServiceName)) {$payload.Add("servicename",$ServiceName)}
 #            if ($Weight) {$payload.Add("weight",$Weight)}
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType lbvserver_servicegroup_binding -Payload $payload -Action add
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType lbvserver_servicegroup_binding -Payload $payload
         }
         End {
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
@@ -5607,6 +5691,7 @@ Set-StrictMode -Version Latest
     # Copied from Citrix's Module to ensure correct scoping of variables and functions
     # CHANGED
     function New-NSLBVServerServiceBinding {
+    # Updated: 20160824 - Removed unknown Action parameter
         <#
         .SYNOPSIS
             Bind service to VPN virtual server
@@ -5641,7 +5726,7 @@ Set-StrictMode -Version Latest
         Process {
             if (-not [string]::IsNullOrEmpty($ServiceName)) {$payload.Add("servicename",$ServiceName)}
             if ($Weight) {$payload.Add("weight",$Weight)}
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType lbvserver_servicegroup_binding -Payload $payload -Action add
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType lbvserver_servicegroup_binding -Payload $payload
         }
         End {
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
@@ -5697,6 +5782,7 @@ Set-StrictMode -Version Latest
     }
 
     function New-NSLBVServerResponderPolicyBinding {
+    # Updated: 20160824 - Removed unknown Action parameter
         [CmdletBinding()]
         param (
             [Parameter(Mandatory=$true)] [PSObject]$NSSession,
@@ -5720,7 +5806,7 @@ Set-StrictMode -Version Latest
             if (-not [string]::IsNullOrEmpty($GotoPriorityExpression)) {$payload.Add("gotopriorityexpression",$GotoPriorityExpression)}
             if (-not [string]::IsNullOrEmpty($InvokeLabelType)) {$payload.Add("labeltype",$InvokeLabelType)}
 
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType lbvserver_responderpolicy_binding -Payload $payload -Action add -Verbose:$VerbosePreference
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType lbvserver_responderpolicy_binding -Payload $payload -Verbose:$VerbosePreference
         }
         End {
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
@@ -5775,6 +5861,7 @@ Set-StrictMode -Version Latest
     }
 
     function New-NSLBVServerRewritePolicyBinding {
+    # Updated: 20160824 - Removed unknown Action parameter
         [CmdletBinding()]
         param (
             [Parameter(Mandatory=$true)] [PSObject]$NSSession,
@@ -5799,7 +5886,7 @@ Set-StrictMode -Version Latest
             if (-not [string]::IsNullOrEmpty($GotoPriorityExpression)) {$payload.Add("gotopriorityexpression",$GotoPriorityExpression)}
             if (-not [string]::IsNullOrEmpty($InvokeLabelType)) {$payload.Add("labeltype",$InvokeLabelType)}
 
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType lbvserver_rewritepolicy_binding -Payload $payload -Action add -Verbose:$VerbosePreference
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType lbvserver_rewritepolicy_binding -Payload $payload -Verbose:$VerbosePreference
         }
         End {
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
@@ -5854,15 +5941,15 @@ Set-StrictMode -Version Latest
     }
 
     #endregion
-
+    #endregion
     #region Traffic Management - Content Switching
     #endregion
-
     #region Traffic Management - DNS
 
     # Add-NSDnsNameServer is part of the Citrix NITRO Module
     # Copied from Citrix's Module to ensure correct scoping of variables and functions
     function Add-NSDnsNameServer {
+    # Updated: 20160824 - Removed unknown Action parameter
         <#
         .SYNOPSIS
             Add domain name server resource
@@ -5894,7 +5981,7 @@ Set-StrictMode -Version Latest
             }
 
             $payload = @{ip=$DNSServerIPAddress}
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType dnsnameserver -Payload $payload -Action add
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType dnsnameserver -Payload $payload
         }
         End {
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
@@ -5903,6 +5990,7 @@ Set-StrictMode -Version Latest
     }
 
     function Update-NSDnsNameServer {
+    # Updated: 20160824 - Removed unknown Action parameter
         <#
         .SYNOPSIS
             Update domain name server resource
@@ -5936,7 +6024,7 @@ Set-StrictMode -Version Latest
             }
 
             $payload = @{ip=$DNSServerIPAddress;dnsprofilename=$DNSProfileName}
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType dnsnameserver -Payload $payload -Verbose:$VerbosePreference -ResourceName $DNSServerIPAddress -Action update
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType dnsnameserver -Payload $payload -Verbose:$VerbosePreference -ResourceName $DNSServerIPAddress
         }
         End {
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
@@ -5945,6 +6033,7 @@ Set-StrictMode -Version Latest
     }
     # NOTE: Update gives error that DNS Profile does not exist, better make it a New-DNSServerDNSProfileBinding function
     function Remove-NSDnsNameServer {
+    # Updated: 20160824 - Removed unknown Action parameter
         <#
         .SYNOPSIS
             Remove domain name server resource
@@ -5974,7 +6063,7 @@ Set-StrictMode -Version Latest
                 throw "'$DNSServerIPAddress' is an invalid IP address"
             }
 
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod DELETE -ResourceType dnsnameserver -ResourceName $DNSServerIPAddress -Action update
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod DELETE -ResourceType dnsnameserver -ResourceName $DNSServerIPAddress
         }
         End {
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
@@ -6036,16 +6125,826 @@ Set-StrictMode -Version Latest
     # NOTE: Add DNS Records functions
 
     #endregion
-
     #region Traffic Management - GSLB
     #endregion
-
     #region Traffic Management - SSL
 
     # Add-NSServerCertificate is part of the Citrix NITRO Module
     # Add-NSCertKeyPair is part of the Citrix NITRO Module
+    function Add-NSServerCertificate {
+        <#
+        .SYNOPSIS
+            Add NetScaler Appliance Server Certificate
+        .DESCRIPTION
+            Add NetScaler Appliance Server Certificate by:
+            -Creating the private RSA key
+            -Creating the CSR
+            -Downloading the CSR
+            -Requesting the certificate
+            -Uploading the certificate
+            -Created the cert/key pair
+
+            This requires the Nitro Rest API version 10.5 or higher.
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER CAName
+            The FQDN of the Certification Authority host and Certification Authority name in the form CAHostNameFQDN\CAName
+        .PARAMETER CommonName
+            Fully qualified domain name for the company or web site.
+            The common name must match the name used by DNS servers to do a DNS lookup of your server.
+            Most browsers use this information for authenticating the server's certificate during the SSL handshake.
+            If the server name in the URL does not match the common name as given in the server certificate, the browser terminates the SSL handshake or prompts the user with a warning message.
+            Do not use wildcard characters, such as asterisk (*) or question mark (?), and do not use an IP address as the common name.
+            The common name must not contain the protocol specifier or .
+        .PARAMETER OrganizationName
+            Name of the organization that will use this certificate.
+            The organization name (corporation, limited partnership, university, or government agency) must be registered with some authority at the national, state, or city level.
+            Use the legal name under which the organization is registered.
+            Do not abbreviate the organization name and do not use the following characters in the name: Angle brackets (< >) tilde (~), exclamation mark, at (@), pound (#), zero (0), caret (^), asterisk (*), forward slash (/), square brackets ([ ]), question mark (?).
+        .PARAMETER CountryName
+            Two letter ISO code for your country. For example, US for United States.
+        .PARAMETER StateName
+            Full name of the state or province where your organization is located. Do not abbreviate.
+        .PARAMETER KeyFileBits
+            Size, in bits, of the private key.
+        .EXAMPLE
+             Add-NSServerCertificate -NSSession $Session
+        .NOTES
+            Copyright (c) Citrix Systems, Inc. All rights reserved.
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+            [Parameter(Mandatory=$true)] [string]$CAName,
+            [Parameter(Mandatory=$true)] [ValidateLength(1,63)] [string]$CommonName,
+            [Parameter(Mandatory=$true)] [ValidateLength(1,63)] [string]$OrganizationName,
+            [Parameter(Mandatory=$true)] [ValidateLength(2,2)] [string]$CountryName,
+            [Parameter(Mandatory=$true)] [ValidateLength(1,127)] [string]$StateName,
+            [Parameter(Mandatory=$false)] [ValidateRange(512,4096)] [int]$KeyFileBits=2048
+        )
+
+        Write-Verbose "$($MyInvocation.MyCommand): Enter"
+
+        $fileName = $CommonName -replace "\*","wildcard"
+    
+        $certKeyFileName= "$($fileName).key"
+        $certReqFileName = "$($fileName).req"
+        $certFileName = "$($fileName).cert"
+    
+        $certReqFileFull = "$($env:TEMP)\$certReqFileName"
+        $certFileFull = "$($env:TEMP)\$certFileName"
+    
+        try {
+            Write-Verbose "Creating RSA key file"
+            $payload = @{keyfile=$certKeyFileName;bits=$KeyFileBits}
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType sslrsakey -Payload $payload -Action create
+
+            Write-Verbose "Creating certificate request"
+            $payload = @{reqfile=$certReqFileName;keyfile=$certKeyFileName;commonname=$CommonName;organizationname=$OrganizationName;countryname=$CountryName;statename=$StateName}
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType sslcertreq -Payload $payload -Action create
+    
+            Write-Verbose "Downloading certificate request"
+            $arguments = @{filelocation="/nsconfig/ssl"}
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType systemfile -ResourceName $certReqFileName -Arguments $arguments
+    
+            if (-not [String]::IsNullOrEmpty($response.systemfile.filecontent)) {
+                $certReqContentBase64 = $response.systemfile.filecontent
+            } else {
+                throw "Certificate request file content returned empty"
+            }
+            $certReqContent = [System.Convert]::FromBase64String($certReqContentBase64)
+            $certReqContent | Set-Content $certReqFileFull -Encoding Byte
+    
+            Write-Verbose "Requesting certificate"
+            certreq.exe -Submit -q -attrib "CertificateTemplate:webserver" -config $CAName $certReqFileFull $certFileFull
+    
+            if (-not $? -or $LASTEXITCODE -ne 0) {
+                throw "certreq.exe failed to request certificate"
+            }
+
+            Write-Verbose "Uploading certificate"
+            if (Test-Path $certFileFull) {
+                $certContent = Get-Content $certFileFull -Encoding "Byte"
+                $certContentBase64 = [System.Convert]::ToBase64String($certContent)
+
+                $payload = @{filename=$certFileName;filecontent=$certContentBase64;filelocation="/nsconfig/ssl/";fileencoding="BASE64"}
+                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType systemfile -Payload $payload 
+            } else {
+                throw "Cert file '$certFileFull' not found."
+            }
+
+            Write-Verbose "Creating certificate request"
+            Add-NSCertKeyPair -NSSession $NSSession -CertKeyName $fileName -CertPath $certFileName -KeyPath $certKeyFileName
+        }
+        finally {
+            Write-Verbose "Cleaning up local temp files"
+            Remove-Item -Path "$env:TEMP\$CommonName.*" -Force
+        }
+
+        Write-Verbose "$($MyInvocation.MyCommand): Exit"
+    }
+
+    function Add-NSCertKeyPair {
+        <#
+        .SYNOPSIS
+            Add SSL certificate and private key pair
+        .DESCRIPTION
+            Add SSL certificate and private key  pair
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER CertKeyName
+            Name for the certificate and private-key pair
+        .PARAMETER CertPath
+            Path to the X509 certificate file that is used to form the certificate-key pair
+        .PARAMETER KeyPath
+            path to the private-key file that is used to form the certificate-key pair
+        .PARAMETER CertKeyFormat
+            Input format of the certificate and the private-key files, allowed values are "PEM" and "DER", default to "PEM"
+        .PARAMETER Passcrypt
+            Pass phrase used to encrypt the private-key. Required when adding an encrypted private-key in PEM format
+        .EXAMPLE
+            Add-NSCertKeyPair -NSSession $Session -CertKeyName "*.xd.local" -CertPath "/nsconfig/ssl/ns.cert" -KeyPath "/nsconfig/ssl/ns.key" -CertKeyFormat PEM -Passcrypt "luVJAUxtmUY="
+        .NOTES
+            Copyright (c) Citrix Systems, Inc. All rights reserved.
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+            [Parameter(Mandatory=$true)] [string]$CertKeyName,
+            [Parameter(Mandatory=$true)] [string]$CertPath,
+            [Parameter(Mandatory=$true)] [string]$KeyPath,
+            [Parameter(Mandatory=$false)] [ValidateSet("PEM","DER")] [string]$CertKeyFormat="PEM",
+            [Parameter(Mandatory=$false)] [string]$Passcrypt
+        )
+
+        Write-Verbose "$($MyInvocation.MyCommand): Enter"
+
+        $payload = @{certkey=$CertKeyName;cert=$CertPath;key=$KeyPath;inform=$CertKeyFormat}
+        if ($CertKeyFormat -eq "PEM" -and $Passcrypt) {
+            $payload.Add("passcrypt",$Passcrypt)
+        }
+        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType sslcertkey -Payload $payload  
+
+        Write-Verbose "$($MyInvocation.MyCommand): Exit"
+    }
 
     # New-NSSSLVServerCertKeyBinding is part of the Citrix NITRO Module
+    function New-NSSSLVServerCertKeyBinding {
+        <#
+        .SYNOPSIS
+            Bind a SSL certificate-key pair to a virtual server
+        .DESCRIPTION
+            Bind a SSL certificate-key pair to a virtual server
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER CertKeyName
+            Name of the certificate key pair
+        .PARAMETER VirtualServerName
+            Name of the virtual server
+        .EXAMPLE
+            New-NSVPNVServerSSLCertKeyBinding -NSSession $Session -CertKeyName "*.xd.local" -VServerName myvs -WebSession $Session
+        .NOTES
+            Copyright (c) Citrix Systems, Inc. All rights reserved.
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+            [Parameter(Mandatory=$true)] [string]$CertKeyName,
+            [Parameter(Mandatory=$true)] [string]$VirtualServerName
+        )
+
+        Write-Verbose "$($MyInvocation.MyCommand): Enter"
+
+        $payload =  @{certkeyname=$CertKeyName;vservername=$VirtualServerName}
+        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType sslvserver_sslcertkey_binding -Payload $payload  
+
+        Write-Verbose "$($MyInvocation.MyCommand): Exit"
+    }
+
+    function New-NSSSLRSAKey {
+    # Created: 20160829
+        <#
+        .SYNOPSIS
+            Create a SSL RSAkey
+        .DESCRIPTION
+            Create a SSL RSAkey
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER DNSServerIPAddress
+            IP address of an external name server
+        .EXAMPLE
+            [string[]]$DNSServers = @("10.8.115.210","10.8.115.211")
+            $DNSServers | Add-NSDnsNameServer -NSSession $Session 
+        .NOTES
+            Copyright (c) cognition IT. All rights reserved.
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+            [Parameter(Mandatory=$true)] [ValidateNotNullOrEmpty()] [string]$KeyFileName,
+            [Parameter(Mandatory=$true)] [ValidateRange(512,4096)] [int]$KeySize=1024,
+            [Parameter(Mandatory=$false)] [ValidateSet("3","F4")] [string]$PublicExponent="F4",
+            [Parameter(Mandatory=$false)] [ValidateSet("PEM","DER")] [string]$KeyFormat,
+            [Parameter(Mandatory=$false)] [ValidateSet("DES","DES3","None")] [string]$PEMEncodingAlgorithm,
+            [Parameter(Mandatory=$false)] [ValidateNotNullOrEmpty()] [string]$PEMPassphrase
+        )
+        Begin {
+            Write-Verbose "$($MyInvocation.MyCommand): Enter"
+        }
+        Process {
+            Write-Verbose "$($MyInvocation.MyCommand): Enter"
+            $payload = @{keyfile=$KeyFileName;bits=$KeySize}
+
+            if ($PublicExponent) {
+                $payload.Add("exponent",$PublicExponent)
+            }
+            if ($KeyFormat) {
+                $payload.Add("keyform",$KeyFormat)
+            }
+            if ($PEMPassphrase) {
+                $payload.Add("password",$PEMPassphrase)
+            }
+            If ($PEMEncodingAlgorithm -eq "DES")
+            {
+                $payload.Add("des",$true)
+            }
+            If ($PEMEncodingAlgorithm -eq "DES3")
+            {
+                $payload.Add("des3",$true)
+            }
+
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType sslrsakey -Payload $payload -Action create -Verbose:$VerbosePreference
+        }
+        End {
+            Write-Verbose "$($MyInvocation.MyCommand): Exit"
+        }
+
+
+    }
+    function New-NSSSLCertificateSigningRequest {
+    # Created: 20160829
+        <#
+        .SYNOPSIS
+            Create a Certificate Signing Request (CSR)
+        .DESCRIPTION
+            Create a Certificate Signing Request (CSR)
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER DNSServerIPAddress
+            IP address of an external name server
+        .EXAMPLE
+            [string[]]$DNSServers = @("10.8.115.210","10.8.115.211")
+            $DNSServers | Add-NSDnsNameServer -NSSession $Session 
+        .NOTES
+            Copyright (c) cognition IT. All rights reserved.
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+            [Parameter(Mandatory=$true)] [ValidateNotNullOrEmpty()] [string]$RequestFileName,
+            [Parameter(Mandatory=$false)] [ValidateNotNullOrEmpty()] [string]$KeyFile,
+            [Parameter(Mandatory=$false)] [ValidateNotNullOrEmpty()] [string]$FipsKeyName,
+            [Parameter(Mandatory=$false)] [ValidateSet("PEM","DER")] [string]$KeyFormat,
+            [Parameter(Mandatory=$false)] [ValidateNotNullOrEmpty()] [string]$PEMPassphrase,
+            [Parameter(Mandatory=$true)] [ValidateNotNullOrEmpty()] [string]$CountryName,
+            [Parameter(Mandatory=$true)] [ValidateNotNullOrEmpty()] [string]$StateName,
+            [Parameter(Mandatory=$true)] [ValidateNotNullOrEmpty()] [string]$OrganizationName,
+            [Parameter(Mandatory=$false)] [ValidateNotNullOrEmpty()] [string]$OrganizationUnitName,
+            [Parameter(Mandatory=$false)] [ValidateNotNullOrEmpty()] [string]$LocalityName,
+            [Parameter(Mandatory=$false)] [ValidateNotNullOrEmpty()] [string]$CommonName,
+            [Parameter(Mandatory=$false)] [ValidateNotNullOrEmpty()] [string]$EmailAddress,
+            [Parameter(Mandatory=$false)] [ValidateNotNullOrEmpty()] [string]$ChallengePassword,
+            [Parameter(Mandatory=$false)] [ValidateNotNullOrEmpty()] [string]$CompanyName,
+            [Parameter(Mandatory=$false)] [ValidateSet("SHA1","SHA256")] [string]$DigestMethod
+        )
+        Begin {
+            Write-Verbose "$($MyInvocation.MyCommand): Enter"
+        }
+        Process {
+            Write-Verbose "$($MyInvocation.MyCommand): Enter"
+            $payload = @{reqfile=$RequestFileName;countryname=$CountryName;statename=$StateName;organizationname=$OrganizationName}
+
+            if ($KeyFile) {
+                $payload.Add("keyfile",$KeyFile)
+            }
+            if ($FipsKeyName) {
+                $payload.Add("fipskeyname",$FipsKeyName)
+            }
+            if ($KeyFormat) {
+                $payload.Add("keyform",$KeyFormat)
+            }
+            if ($OrganizationUnitName) {
+                $payload.Add("organizationunitname",$OrganizationUnitName)
+            }
+            If ($DigestMethod)
+            {
+                $payload.Add("digestmethod",$DigestMethod)
+            }
+            If ($PEMPassphrase)
+            {
+                $payload.Add("pempassphrase",$PEMPassphrase)
+            }
+
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType sslcertreq -Payload $payload -Action create -Verbose:$VerbosePreference
+        }
+        End {
+            Write-Verbose "$($MyInvocation.MyCommand): Exit"
+        }
+
+
+    }
+
+    function Add-NSSSLCertKey {
+    # Created: 20160829
+        <#
+        .SYNOPSIS
+            Install a SSL certificate key pair
+        .DESCRIPTION
+            Install a SSL certificate key pair
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER CertKeyName
+            Name for the certificate and private-key pair
+        .PARAMETER CertPath
+            Path to the X509 certificate file that is used to form the certificate-key pair
+        .PARAMETER KeyPath
+            path to the optional private-key file that is used to form the certificate-key pair
+        .PARAMETER CertKeyFormat
+            Input format of the certificate and the private-key files, allowed values are "PEM" and "DER", default to "PEM"
+        .PARAMETER Password
+            Pass phrase used to encrypt the private-key. Required when adding an encrypted private-key in PEM format
+        .SWITCH ExpiryMonitor
+            Determines whether the expiration of a certificate needs to be monitored
+        .PARAMETER NotificationPeriod
+            How many days before the certificate is expiring a notification is shown
+        .EXAMPLE
+            Add-NSCertKeyPair -NSSession $Session -CertKeyName "*.xd.local" -CertPath "/nsconfig/ssl/ns.cert" -KeyPath "/nsconfig/ssl/ns.key" -CertKeyFormat PEM -Password "luVJAUxtmUY=" -ExpiryMonitor -NotificationPeriod 25
+        .NOTES
+            Copyright (c) cognition IT. All rights reserved.
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+            [Parameter(Mandatory=$true)] [string]$CertKeyName,
+            [Parameter(Mandatory=$true)] [string]$CertPath,
+            [Parameter(Mandatory=$false)] [string]$KeyPath,
+            [Parameter(Mandatory=$true)] [ValidateSet("PEM","DER","PFX")] [string]$CertKeyFormat="PEM",
+            [Parameter(Mandatory=$false)] [string]$Password,
+            [Parameter(Mandatory=$false)] [switch]$ExpiryMonitor,
+            [Parameter(Mandatory=$false)] [ValidateRange(10,100)][int]$NotificationPeriod=30
+        )
+
+        Write-Verbose "$($MyInvocation.MyCommand): Enter"
+
+        $ExpiryMonitorValue = if ($ExpiryMonitor) { "ENABLED" } else { "DISABLED" }
+
+        $payload = @{certkey=$CertKeyName;cert=$CertPath;inform=$CertKeyFormat;expirymonitor=$ExpiryMonitorValue}
+        if ($NotificationPeriod) {
+            $payload.Add("notificationperiod",$NotificationPeriod)
+        }
+        If (!([string]::IsNullOrEmpty($KeyPath)))
+        {
+            $payload.Add("key",$KeyPath)
+        }
+        if ($CertKeyFormat -eq "PEM" -and $Password) {
+            $payload.Add("passplain",$Password)
+        }
+        if ($CertKeyFormat -eq "PFX" -and $Password) {
+            $payload.Add("passplain",$Password)
+        }
+        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType sslcertkey -Payload $payload -Verbose:$VerbosePreference
+
+        Write-Verbose "$($MyInvocation.MyCommand): Exit"
+    }
+    function Remove-NSSSLCertKey {
+    # Created: 20160906
+        <#
+        .SYNOPSIS
+            Remove a SSL Cert Key pair
+        .DESCRIPTION
+            Remove a SSL Cert Key pair
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER CertKeyName
+            Name for the certificate and private-key pair
+        .EXAMPLE
+            Remove-NSSSLCertKey -NSSession $Session -CertKeyName "*.xd.local"
+        .NOTES
+            Copyright (c) cognition IT. All rights reserved.
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+            [Parameter(Mandatory=$true)] [string]$CertKeyName
+        )
+
+        Write-Verbose "$($MyInvocation.MyCommand): Enter"
+
+        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod DELETE -ResourceType sslcertkey -ResourceName $CertKeyName -Verbose:$VerbosePreference
+
+        Write-Verbose "$($MyInvocation.MyCommand): Exit"
+    }
+    function Get-NSSSLCertKey {
+    # Created: 20160905
+        <#
+        .SYNOPSIS
+            Retrieve certificate key resource(s) from the NetScaler configuration
+        .DESCRIPTION
+            Retrieve certificate key resource(s) from the NetScaler configuration
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER CertName
+            Name of the certificate key resource to retrieve. Minimum length = 1
+        .EXAMPLE
+            Get-NSSSLCertKey -NSSession $Session -CertName $certname
+        .EXAMPLE
+            Get-NSSSLCertKey -NSSession $Session
+        .NOTES
+            Copyright (c) cognition IT. All rights reserved.
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+            [Parameter(Mandatory=$false)] [string]$CertName
+        )
+
+        Write-Verbose "$($MyInvocation.MyCommand): Enter" 
+
+        If (-not [string]::IsNullOrEmpty($CertName)) {
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType sslcertkey -ResourceName $CertName -Verbose:$VerbosePreference
+        }
+        Else {
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType sslcertkey -Verbose:$VerbosePreference
+        }
+        Write-Verbose "$($MyInvocation.MyCommand): Exit"
+        If ($response.PSObject.Properties['sslcertkey'])
+        {
+            return $response.sslcertkey
+        }
+        else
+        {
+            return $null
+        }
+    }
+
+    function Add-NSSSLCertKeyLink {
+    # Created: 20160829
+        <#
+        .SYNOPSIS
+            Link a SSL certificate to another SSL certificate
+        .DESCRIPTION
+            Link a SSL certificate to another SSL certificate
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER CertKeyName
+            Name for the certificate and private-key pair
+        .PARAMETER LinkCertKeyName
+            Name for the Linked certificate and private-key pair
+        .EXAMPLE
+            Add-NSCertKeyPair -NSSession $Session -CertKeyName "wildcard" -LinkCertKeyName "rootCA"
+        .NOTES
+            Copyright (c) cognition IT. All rights reserved.
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+            [Parameter(Mandatory=$true)] [string]$CertKeyName,
+            [Parameter(Mandatory=$true)] [string]$LinkCertKeyName
+        )
+
+        Write-Verbose "$($MyInvocation.MyCommand): Enter"
+
+        $payload = @{certkey=$CertKeyName;linkcertkeyname=$LinkCertKeyName}
+        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType sslcertkey -Payload $payload -Action link -Verbose:$VerbosePreference
+
+        Write-Verbose "$($MyInvocation.MyCommand): Exit"
+    }
+    function Remove-NSSSLCertKeyLink {
+    # Created: 20160829
+        <#
+        .SYNOPSIS
+            Remove the cert link for a SSL certificate
+        .DESCRIPTION
+            Remove the cert link for a SSL certificate
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER CertKeyName
+            Name for the certificate and private-key pair
+        .EXAMPLE
+            Add-NSCertKeyPair -NSSession $Session -CertKeyName "wildcard"
+        .NOTES
+            Copyright (c) cognition IT. All rights reserved.
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+            [Parameter(Mandatory=$true)] [string]$CertKeyName
+        )
+
+        Write-Verbose "$($MyInvocation.MyCommand): Enter"
+
+        $payload = @{certkey=$CertKeyName}
+        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType sslcertkey -Payload $payload -Action unlink -Verbose:$VerbosePreference
+
+        Write-Verbose "$($MyInvocation.MyCommand): Exit"
+    }
+    function Get-NSSSLCertKeyLink {
+    # Created: 20160906
+        <#
+        .SYNOPSIS
+            Retrieve certificate links
+        .DESCRIPTION
+            Retrieve certificate links
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER CertKeyName
+            Name of the file to retrieve. Minimum length = 1
+        .EXAMPLE
+            Get-NSSSLCertKeyLink -NSSession $Session -CertKeyName $name
+        .EXAMPLE
+            Get-NSSSLCertKeyLink -NSSession $Session
+        .NOTES
+            Copyright (c) cognition IT. All rights reserved.
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+            [Parameter(Mandatory=$false)] [string]$CertKeyName
+        )
+
+        Write-Verbose "$($MyInvocation.MyCommand): Enter" 
+
+#        If (-not [string]::IsNullOrEmpty($CertKeyName)) {
+#            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType sslcertlink -ResourceName $CertKeyName -Verbose:$VerbosePreference
+#        }
+#        Else {
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType sslcertlink -Verbose:$VerbosePreference
+#        }
+        Write-Verbose "$($MyInvocation.MyCommand): Exit"
+        If ($response.PSObject.Properties['sslcertlink'])
+        {
+            return $response.sslcertlink
+        }
+        else
+        {
+            return $null
+        }
+    }
+
+    function Add-NSSystemFile {    
+    # Created: 20160905
+<#
+        .SYNOPSIS
+            Uploading a file to the NetScaler Appliance
+        .DESCRIPTION
+            Uploading a file to the provided folder on the NetScaler Appliance. Destination file names are the same as source file names.
+            N.B. This requires the Nitro Rest API version 10.5 or higher.
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER PathToFile
+            Full path to the the file
+        .PARAMETER NetScalerFolder
+            Full path to the folder on the NetScaler Appliance to upload the file to
+        .EXAMPLE
+            Send two lfiles to NetScaler appliance
+            $licfiles = @("C:\NSLicense\CAG_Enterprise_VPX_2012.lic","C:\NSLicense\CAGU-Hostname_10000CCU_sslvpn-sg.lic")
+            $licfiles | Send-NSLicense -NSSession $session -NetScalerFolder "/nsconfig/license"
+        .NOTES
+            Copyright (c) cognition IT. All rights reserved.
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true)] [PSObject]$NSSession, 
+            [Parameter(Mandatory=$true,ValueFromPipeline=$true,ValueFromPipelineByPropertyName=$true)] [string]$PathToFile,
+            [Parameter(Mandatory=$true)] [ValidateNotNullOrEmpty()] [string]$NetScalerFolder
+
+        )
+        Begin {        
+            Write-Verbose "$($MyInvocation.MyCommand): Enter"
+        }
+        Process {
+            Write-Verbose "Upload file '$PathToFile' to NetScaler '$($NSSession.Endpoint)$NetScalerFolder'"
+            $FileName = Split-Path -Path $PathToFile -Leaf
+            # Parameter explained: -Leaf     => Indicates that this cmdlet returns only the last item or container in the path. For example, in the path C:\Test\Logs\Pass1.log, it returns only Pass1.log.
+        
+            $FileContent = Get-Content $PathToFile -Encoding "Byte"
+            $FileContentBase64 = [System.Convert]::ToBase64String($FileContent)
+
+            $payload = @{filename=$FileName;filecontent=$FileContentBase64;filelocation=$NetScalerFolder;fileencoding="BASE64"}
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType systemfile -Payload $payload
+        } 
+        End {
+            Write-Verbose "$($MyInvocation.MyCommand): Exit"
+        }   
+    }
+    function Remove-NSSystemFile {
+    # Created: 20160905
+        <#
+        .SYNOPSIS
+            Delete a file from a NetScaler Appliance
+        .DESCRIPTION
+            Delete a file from a NetScaler Appliance
+        .PARAMETER NetScalerFolder
+            Full path of the folder that hosts the file to be removed from the NetScaler Appliance
+        .PARAMETER FileName
+            Name of the file to be removed from the NetScaler Appliance
+        .EXAMPLE
+            Remove-NSSystemFile -NSSession $session -NetScalerFolder "/nsconfig/license/" -FileName $filename
+        .NOTES
+            Copyright (c) cognition IT. All rights reserved.
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true)] [PSObject]$NSSession, 
+            [Parameter(Mandatory=$true)] [ValidateNotNullOrEmpty()] [string]$NetScalerFolder,
+            [Parameter(Mandatory=$true)] [ValidateNotNullOrEmpty()] [string]$FileName
+        )
+        Begin {
+            Write-Verbose "$($MyInvocation.MyCommand): Enter"
+        }
+        Process {
+            $args = @{filelocation=$NetScalerFolder}
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod DELETE -ResourceType systemfile -ResourceName $FileName -Arguments $args -Verbose:$VerbosePreference
+        }
+        End {
+            Write-Verbose "$($MyInvocation.MyCommand): Exit"
+        }
+    }
+    function Get-NSSystemFile {
+    # Created: 20160905
+        <#
+        .SYNOPSIS
+            Retrieve system file resource(s) from the NetScaler configuration
+        .DESCRIPTION
+            Retrieve system file resource(s) from the NetScaler configuration
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER FileName
+            Name of the file to retrieve. Minimum length = 1
+        .EXAMPLE
+            Get-NSSystemFile -NSSession $Session -NetScalerFolder $folder -FileName $filename
+        .EXAMPLE
+            Get-NSSystemGroup -NSSession $Session -NetScalerFolder $folder
+        .NOTES
+            Copyright (c) cognition IT. All rights reserved.
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+            [Parameter(Mandatory=$true)] [ValidateNotNullOrEmpty()] [string]$NetScalerFolder,
+            [Parameter(Mandatory=$false)] [string]$FileName
+        )
+
+        Write-Verbose "$($MyInvocation.MyCommand): Enter" 
+
+        $args = @{filelocation=$NetScalerFolder}
+
+        If (-not [string]::IsNullOrEmpty($FileName)) {
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType systemfile -ResourceName $FileName -Arguments $args -Verbose:$VerbosePreference
+        }
+        Else {
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType systemfile -Arguments $args  -Verbose:$VerbosePreference
+        }
+        Write-Verbose "$($MyInvocation.MyCommand): Exit"
+        If ($response.PSObject.Properties['systemfile'])
+        {
+            return $response.systemfile
+        }
+        else
+        {
+            return $null
+        }
+    }
+
+    function Add-NSSSLVServerCertKeyBinding {
+    # Created: 20160912
+        <#
+        .SYNOPSIS
+            Bind a SSL certificate to a NetScaler vServer
+        .DESCRIPTION
+            Bind a SSL certificate to a NetScaler vServer
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER vServerName
+            Name of the NetScaler vServer to bind the certificate to
+        .PARAMETER CertKeyName
+            Name of the certificate-key pair to bind to the vServer
+        .EXAMPLE
+            Add-NSSSLVServerCertKeyBinding -NSSession $Session -VServerName $name -CertKeyName "wildcard"
+        .NOTES
+            Copyright (c) cognition IT. All rights reserved.
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+            [Parameter(Mandatory=$true)] [string]$VServerName,
+            [Parameter(Mandatory=$true)] [string]$CertKeyName,
+            [Parameter(Mandatory=$false)] [ValidateSet("Mandatory","Optional")] [string]$CRLCheck,
+            [Parameter(Mandatory=$false)] [ValidateSet("Mandatory","Optional")] [string]$OCSPCheck,
+            [Parameter(Mandatory=$false)] [switch]$CA,
+            [Parameter(Mandatory=$false)] [switch]$SkipCAName,
+            [Parameter(Mandatory=$false)] [switch]$SNICert
+        )
+
+        Write-Verbose "$($MyInvocation.MyCommand): Enter"
+        $CAValue = if ($CA) { "true" } else { "false" }
+        $SkipCANameValue = if ($SkipCAName) { "true" } else { "false" }
+        $SNICertValue = if ($SNICert) { "true" } else { "false" }
+
+        $payload = @{vservername=$VServerName;certkeyname=$CertKeyName;ca=$CAValue;skipcaname=$SkipCANameValue;snicert=$SNICertValue}
+
+        If (!([string]::IsNullOrEmpty($CRLCheck)))
+        {
+            $payload.Add("crlcheck",$CRLCheck)
+        }
+        If (!([string]::IsNullOrEmpty($OCSPCheck)))
+        {
+            $payload.Add("ocspcheck",$OCSPCheck)
+        }
+
+        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType sslvserver_sslcertkey_binding -Payload $payload -Verbose:$VerbosePreference
+
+        Write-Verbose "$($MyInvocation.MyCommand): Exit"
+    }
+    function Remove-NSSSLVServerCertKeyBinding {
+    # Created: 20160912
+        <#
+        .SYNOPSIS
+            Unbind a SSL certificate to a NetScaler vServer
+        .DESCRIPTION
+            Unbind a SSL certificate to a NetScaler vServer
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER vServerName
+            Name of the NetScaler vServer to bind the certificate to
+        .PARAMETER CertKeyName
+            Name of the certificate-key pair to bind to the vServer
+        .EXAMPLE
+            Remove-NSSSLVServerCertKeyBinding -NSSession $Session -VServerName $name -CertKeyName "wildcard"
+        .NOTES
+            Copyright (c) cognition IT. All rights reserved.
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+            [Parameter(Mandatory=$true)] [string]$VServerName,
+            [Parameter(Mandatory=$false)] [string]$CertKeyName
+        )
+
+        Write-Verbose "$($MyInvocation.MyCommand): Enter"
+
+        $args = @{}
+        If (!([string]::IsNullOrEmpty($CertKeyName)))
+        {
+        $args.Add("certkeyname",$CertKeyName)
+        }
+
+        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod DELETE -ResourceType sslvserver_sslcertkey_binding -ResourceName $VServerName -Arguments $args -Verbose:$VerbosePreference
+
+        Write-Verbose "$($MyInvocation.MyCommand): Exit"
+    }
+    function Get-NSSSLVServerCertKeyBinding {
+    # Created: 20160912
+        <#
+        .SYNOPSIS
+            Retrieve certificate links
+        .DESCRIPTION
+            Retrieve certificate links
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER CertKeyName
+            Name of the file to retrieve. Minimum length = 1
+        .EXAMPLE
+            Get-NSSSLCertKeyLink -NSSession $Session -CertKeyName $name
+        .EXAMPLE
+            Get-NSSSLCertKeyLink -NSSession $Session
+        .NOTES
+            Copyright (c) cognition IT. All rights reserved.
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+            [Parameter(Mandatory=$false)] [string]$VServerName
+        )
+
+        Write-Verbose "$($MyInvocation.MyCommand): Enter" 
+
+        If (-not [string]::IsNullOrEmpty($VServerName)) {
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType sslvserver_sslcertkey_binding -ResourceName $VServerName -Verbose:$VerbosePreference
+        }
+        Else {
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType sslvserver_sslcertkey_binding -Verbose:$VerbosePreference
+        }
+        Write-Verbose "$($MyInvocation.MyCommand): Exit"
+        If ($response.PSObject.Properties['sslvserver_sslcertkey_binding'])
+        {
+            return $response.sslvserver_sslcertkey_binding
+        }
+        else
+        {
+            return $null
+        }
+    }
 
     #endregion
 #endregion
@@ -6062,9 +6961,6 @@ Set-StrictMode -Version Latest
     # Set-NSSFStore is part of the Citrix NITRO Module
 
 #endregion
-
-
-
 
 #endregion
 
