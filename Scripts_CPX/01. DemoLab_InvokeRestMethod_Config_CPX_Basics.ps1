@@ -3,7 +3,8 @@
 
 #region NITRO settings
     $ContentType = "application/json"
-    $NSIP = "192.168.0.51:32768"
+#    $NSIP = "192.168.0.51:32768"
+    $NSIP = "192.168.59.101:32779"
     # Prompt for credentials
 #    $MyCreds =  Get-Credential
     # Build my own credentials variable, based on password string
@@ -16,16 +17,18 @@
 
     $strDate = Get-Date -Format yyyyMMddHHmmss
 
+<#
     # Store original VerbosePreference setting for later
     Write-Host ("Original Verbose Preference is: " + $VerbosePreference) -ForegroundColor Cyan
     $VerbosePrefOriginal = $VerbosePreference
     $VerbosePreference = [System.Management.Automation.ActionPreference]::SilentlyContinue
     Write-Host ("Verbose Preference is changed to: " + $VerbosePreference) -ForegroundColor Cyan
+#>
 #endregion NITRO settings
 
-Write-Host "------------------------------------------------------------------ " -ForegroundColor Yellow
-Write-Host "| Pushing the first Logon configuration to NetScaler with NITRO: | " -ForegroundColor Yellow
-Write-Host "------------------------------------------------------------------ " -ForegroundColor Yellow
+Write-Host "------------------------------------------------------------- " -ForegroundColor Yellow
+Write-Host "| Pushing the LB configuration to NetScaler CPX with NITRO: | " -ForegroundColor Yellow
+Write-Host "------------------------------------------------------------- " -ForegroundColor Yellow
 
     #region !! Adding a presentation demo break !!
     # ********************************************
@@ -42,344 +45,91 @@ Write-Host "------------------------------------------------------------------ "
     $dummy = Invoke-RestMethod -Uri "http://$NSIP/nitro/v1/config/login" -Body $Login -Method POST -SessionVariable NetScalerSession -ContentType $ContentType -Verbose:$VerbosePreference -ErrorAction SilentlyContinue
 #endregion Start NetScaler NITRO Session
 
-# -------------------------------
-# | First Logon (Wizard) config |
-# -------------------------------
-
-#region First GUI logon to NetScaler Management Console asks for:
-
-    # Get hostname
-    # Specifying the correct URL 
-    $strURI = "http://$NSIP/nitro/v1/config/nshostname"
-
-    # Creating the right payload formatting (mind the Depth for the nested arrays)
-    # set ns hostName NSCPXDemo
-
-    $payload = @{
-    "nshostname"= @{
-        "hostname"="NSNitroDemo";
-        }
-    } | ConvertTo-Json -Depth 5
-
-    # Logging NetScaler Instance payload formatting
-    Write-Host "payload: " -ForegroundColor Yellow
-    Write-Host $payload -ForegroundColor Green
-
-    # Method #1: Making the REST API call to the NetScaler
-#    $dummy = Invoke-RestMethod -Method Put -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorAction SilentlyContinue
-    $response = Invoke-RestMethod -Method Get -Uri $strURI -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorAction SilentlyContinue
-
-
-    # Set hostname
-    # Specifying the correct URL 
-    $strURI = "http://$NSIP/nitro/v1/config/nshostname"
-
-    # Creating the right payload formatting (mind the Depth for the nested arrays)
-    # set ns hostName NSCPXDemo
-
-    $payload = @{
-    "nshostname"= @{
-        "hostname"="NSCPXDemo";
-        }
-    } | ConvertTo-Json -Depth 5
-
-    # Logging NetScaler Instance payload formatting
-    Write-Host "payload: " -ForegroundColor Yellow
-    Write-Host $payload -ForegroundColor Green
-
-    # Method #1: Making the REST API call to the NetScaler
-#    $dummy = Invoke-RestMethod -Method Put -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorAction SilentlyContinue
-    $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorAction SilentlyContinue
-
-
-    # Get NSIP
-    # Specifying the correct URL 
-    $strURI = "http://$NSIP/nitro/v1/config/nsip"
-
-    # Creating the right payload formatting (mind the Depth for the nested arrays)
-    # add ns ip 192.168.59.3 255.255.255.0 -vServer DISABLED
-
-    $payload = @{
-    "nsip"= @{
-        "ipaddress"="192.168.59.3";
-        "netmask"="255.255.255.0";
-        "type"="SNIP";
-        }
-    } | ConvertTo-Json -Depth 5
-
-    # Logging NetScaler Instance payload formatting
-    Write-Host "payload: " -ForegroundColor Yellow
-    Write-Host $payload -ForegroundColor Green
-
-    # Method #1: Making the REST API call to the NetScaler
-    #$dummy = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorVariable restError -ErrorAction SilentlyContinue
-    $response = Invoke-RestMethod -Method Get -Uri $strURI -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorVariable restError -ErrorAction SilentlyContinue
-
-
-    # Set NSIP
-    # Specifying the correct URL 
-    $strURI = "http://$NSIP/nitro/v1/config/nsip"
-
-    # Creating the right payload formatting (mind the Depth for the nested arrays)
-    # add ns ip 192.168.59.3 255.255.255.0 -vServer DISABLED
-
-    $payload = @{
-    "nsip"= @{
-        "ipaddress"="192.168.0.13";
-        "netmask"="255.255.255.0";
-        "type"="SNIP";
-        }
-    } | ConvertTo-Json -Depth 5
-
-    # Logging NetScaler Instance payload formatting
-    Write-Host "payload: " -ForegroundColor Yellow
-    Write-Host $payload -ForegroundColor Green
-
-    # Method #1: Making the REST API call to the NetScaler
-    #$dummy = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorVariable restError -ErrorAction SilentlyContinue
-    $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorVariable restError -ErrorAction SilentlyContinue
-
-
-
-#region Step 0: Disable Citrix User Experience Improvement Program (CUXIP)
-<#
-    update
-    URL:http://<netscaler-ip-address>/nitro/v1/config/systemparameter
-    HTTP Method:PUT
-    Request Headers:
-    Cookie:NITRO_AUTH_TOKEN=<tokenvalue>
-    Content-Type:application/json
-    Request Payload:
-    {"systemparameter":{
-            "rbaonresponse":<String_value>,
-            "promptstring":<String_value>,
-            "natpcbforceflushlimit":<Double_value>,
-            "natpcbrstontimeout":<String_value>,
-            "timeout":<Double_value>,
-            "localauth":<String_value>,
-            "minpasswordlen":<Double_value>,
-            "strongpassword":<String_value>,
-            "restrictedtimeout":<String_value>,
-            "fipsusermode":<String_value>,
-            "doppler":<String_value>,
-            "googleanalytics":<String_value>,
-            "totalauthtimeout":<Double_value>,
-            "cliloglevel":<String_value>
-    }}
-    Response:
-    HTTP Status Code on Success: 200 OK
-    HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <string> (for NetScaler-specific errors). The response payload provides details of the error
-#>
-    # Specifying the correct URL 
-    $strURI = "http://$NSIP/nitro/v1/config/systemparameter"
-
-    # Creating the right payload formatting (mind the Depth for the nested arrays)
-    # set system parameter -doppler DISABLED
-
-    $payload = @{
-    "systemparameter"= @{
-        "doppler"="DISABLED";
-        }
-    } | ConvertTo-Json -Depth 5
-
-    # Logging NetScaler Instance payload formatting
-    Write-Host "payload: " -ForegroundColor Yellow
-    Write-Host $payload -ForegroundColor Green
-
-    # Method #1: Making the REST API call to the NetScaler
-    $dummy = Invoke-RestMethod -Method Put -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorAction SilentlyContinue
-#endregion Disable Citrix User Experience Improvement Program (CUXIP)
-
-#region Step 2: Add SNIP
-<#
+#region Add LB Services
+    <#
     add
-    URL:http://<netscaler-ip-address>/nitro/v1/config/nsip
+    URL:http://<netscaler-ip-address>/nitro/v1/config/service
     HTTP Method:POST
     Request Headers:
     Cookie:NITRO_AUTH_TOKEN=<tokenvalue>
     Content-Type:application/json
     Request Payload:
-    {"nsip":{
-            "ipaddress":<String_value>,
-            "netmask":<String_value>,
-            "type":<String_value>,
-            "arp":<String_value>,
-            "icmp":<String_value>,
-            "vserver":<String_value>,
-            "telnet":<String_value>,
-            "ftp":<String_value>,
-            "gui":<String_value>,
-            "ssh":<String_value>,
-            "snmp":<String_value>,
-            "mgmtaccess":<String_value>,
-            "restrictaccess":<String_value>,
-            "dynamicrouting":<String_value>,
-            "ospf":<String_value>,
-            "bgp":<String_value>,
-            "rip":<String_value>,
-            "hostroute":<String_value>,
-            "hostrtgw":<String_value>,
-            "metric":<Integer_value>,
-            "vserverrhilevel":<String_value>,
-            "vserverrhimode":<String_value>,
-            "ospflsatype":<String_value>,
-            "ospfarea":<Double_value>,
-            "state":<String_value>,
-            "vrid":<Double_value>,
-            "icmpresponse":<String_value>,
-            "ownernode":<Double_value>,
-            "arpresponse":<String_value>,
-            "td":<Double_value>
-    }}
-    Response:
-    HTTP Status Code on Success: 201 Created
-    HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <string> (for NetScaler-specific errors). The response payload provides details of the error
-#>
-    # Specifying the correct URL 
-    $strURI = "http://$NSIP/nitro/v1/config/nsip"
-
-    # Creating the right payload formatting (mind the Depth for the nested arrays)
-    # add ns ip 192.168.59.3 255.255.255.0 -vServer DISABLED
-
-    $payload = @{
-    "nsip"= @{
-        "ipaddress"="192.168.59.3";
-        "netmask"="255.255.255.0";
-        "type"="SNIP";
-        }
-    } | ConvertTo-Json -Depth 5
-
-    # Logging NetScaler Instance payload formatting
-    Write-Host "payload: " -ForegroundColor Yellow
-    Write-Host $payload -ForegroundColor Green
-
-    # Method #1: Making the REST API call to the NetScaler
-    $dummy = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorVariable restError -ErrorAction SilentlyContinue
-#endregion Add SNIP
-
-#region Step 3a: Add Hostname
-<#
-    update
-    URL:http://<netscaler-ip-address>/nitro/v1/config/nshostname
-    HTTP Method:PUT
-    Request Headers:
-    Cookie:NITRO_AUTH_TOKEN=<tokenvalue>
-    Content-Type:application/json
-    Request Payload:
-    {"nshostname":{
-          "hostname":<String_value>,
-          "ownernode":<Double_value>
-    }}
-    Response:
-    HTTP Status Code on Success: 200 OK
-    HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <string> (for NetScaler-specific errors). The response payload provides details of the error
-#>
-    # Specifying the correct URL 
-    $strURI = "http://$NSIP/nitro/v1/config/nshostname"
-
-    # Creating the right payload formatting (mind the Depth for the nested arrays)
-    # set ns hostName NSNitroDemo
-
-    $payload = @{
-    "nshostname"= @{
-        "hostname"="NSNitroDemo";
-        }
-    } | ConvertTo-Json -Depth 5
-
-    # Logging NetScaler Instance payload formatting
-    Write-Host "payload: " -ForegroundColor Yellow
-    Write-Host $payload -ForegroundColor Green
-
-    # Method #1: Making the REST API call to the NetScaler
-    $dummy = Invoke-RestMethod -Method Put -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorAction SilentlyContinue
-#endregion Add Hostname
-
-#region Step 3b: Add DNS Server
-<#
-    add
-    URL:http://<netscaler-ip-address>/nitro/v1/config/dnsnameserver
-    HTTP Method:POST
-    Request Headers:
-    Cookie:NITRO_AUTH_TOKEN=<tokenvalue>
-    Content-Type:application/json
-    Request Payload:
-    {"dnsnameserver":{
+    {"service":{
+          "name":<String_value>,
           "ip":<String_value>,
-          "dnsvservername":<String_value>,
-          "local":<Boolean_value>,
-          "state":<String_value>,
-          "type":<String_value>,
-          "dnsprofilename":<String_value>
-    }}
-    Response:
-    HTTP Status Code on Success: 201 Created
-    HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <string> (for NetScaler-specific errors). The response payload provides details of the error
-#>
-    # Specifying the correct URL 
-    $strURI = "http://$NSIP/nitro/v1/config/dnsnameserver"
-
-    # Creating the right payload formatting (mind the Depth for the nested arrays)
-    # add dns nameServer 192.168.59.1
-
-    $payload = @{
-    "dnsnameserver"= @{
-        "ip"="192.168.59.1";
-        }
-    } | ConvertTo-Json -Depth 5
-
-    # Logging NetScaler Instance payload formatting
-    Write-Host "payload: " -ForegroundColor Yellow
-    Write-Host $payload -ForegroundColor Green
-
-    # Method #1: Making the REST API call to the NetScaler
-    $dummy = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorAction SilentlyContinue
-#endregion Add DNS Server
-
-#region Step 3c: Set Timezone
-<#
-    update
-    URL:http://<netscaler-ip-address>/nitro/v1/config/nsconfig
-    HTTP Method:PUT
-    Request Headers:
-    Cookie:NITRO_AUTH_TOKEN=<tokenvalue>
-    Content-Type:application/json
-    Request Payload:
-    {"nsconfig":{
-          "ipaddress":<String_value>,
-          "netmask":<String_value>,
-          "nsvlan":<Double_value>,
-          "ifnum":<String[]_value>,
-          "tagged":<String_value>,
-          "httpport":<Integer[]_value>,
-          "maxconn":<Double_value>,
+          "servername":<String_value>,
+          "servicetype":<String_value>,
+          "port":<Integer_value>,
+          "cleartextport":<Integer_value>,
+          "cachetype":<String_value>,
+          "maxclient":<Double_value>,
+          "healthmonitor":<String_value>,
           "maxreq":<Double_value>,
+          "cacheable":<String_value>,
           "cip":<String_value>,
           "cipheader":<String_value>,
-          "cookieversion":<String_value>,
-          "securecookie":<String_value>,
-          "pmtumin":<Double_value>,
-          "pmtutimeout":<Double_value>,
-          "ftpportrange":<String_value>,
-          "crportrange":<String_value>,
-          "timezone":<String_value>,
-          "grantquotamaxclient":<Double_value>,
-          "exclusivequotamaxclient":<Double_value>,
-          "grantquotaspillover":<Double_value>,
-          "exclusivequotaspillover":<Double_value>
+          "usip":<String_value>,
+          "pathmonitor":<String_value>,
+          "pathmonitorindv":<String_value>,
+          "useproxyport":<String_value>,
+          "sc":<String_value>,
+          "sp":<String_value>,
+          "rtspsessionidremap":<String_value>,
+          "clttimeout":<Double_value>,
+          "svrtimeout":<Double_value>,
+          "customserverid":<String_value>,
+          "serverid":<Double_value>,
+          "cka":<String_value>,
+          "tcpb":<String_value>,
+          "cmp":<String_value>,
+          "maxbandwidth":<Double_value>,
+          "accessdown":<String_value>,
+          "monthreshold":<Double_value>,
+          "state":<String_value>,
+          "downstateflush":<String_value>,
+          "tcpprofilename":<String_value>,
+          "httpprofilename":<String_value>,
+          "hashid":<Double_value>,
+          "comment":<String_value>,
+          "appflowlog":<String_value>,
+          "netprofile":<String_value>,
+          "td":<Double_value>,
+          "processlocal":<String_value>,
+          "dnsprofilename":<String_value>,
+          "monconnectionclose":<String_value>
     }}
     Response:
-    HTTP Status Code on Success: 200 OK
+    HTTP Status Code on Success: 201 Created
     HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <string> (for NetScaler-specific errors). The response payload provides details of the error
-#>
+    #>
     # Specifying the correct URL 
-    $strURI = "http://$NSIP/nitro/v1/config/nsconfig"
+    $strURI = "http://$NSIP/nitro/v1/config/service"
 
-    # Creating the right payload formatting (mind the Depth for the nested arrays)
-    # set ns param -timezone "GMT+01:00-CET-Europe/Amsterdam"
-
+    # add service svc_webserver_green HTTP 172.17.0.3 8080
     $payload = @{
-    "nsconfig"= @{
-        "timezone"="GMT+01:00-CET-Europe/Amsterdam";
+        "service"= @{
+          "name"="svc_webserver_green";
+          "ip"="172.17.0.3"
+          "servicetype"="HTTP";
+          "port"=8080;
+          "comment"="created by PowerShell script";
+        }
+    } | ConvertTo-Json -Depth 5
+
+    # Method #1: Making the REST API call to the NetScaler
+    $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
+
+    # Specifying the correct URL 
+    $strURI = "http://$NSIP/nitro/v1/config/service"
+
+    # add service svc_webserver_blue HTTP 172.17.0.4 8080
+    $payload = @{
+        "service"= @{
+          "name"="svc_webserver_blue";
+          "ip"="172.17.0.4"
+          "servicetype"="HTTP";
+          "port"=8080;
+          "comment"="created by PowerShell script";
         }
     } | ConvertTo-Json -Depth 5
 
@@ -388,240 +138,178 @@ Write-Host "------------------------------------------------------------------ "
     Write-Host $payload -ForegroundColor Green
 
     # Method #1: Making the REST API call to the NetScaler
-    $dummy = Invoke-RestMethod -Method Put -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorAction SilentlyContinue
-#endregion Set Timezone
+    $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
+#endregion Add LB Services
 
-#region Step 4: Get License information
+#region Add LB vServers
 <#
-    get (all)
-    URL:http://<netscaler-ip-address>/nitro/v1/config/nslicense
-    HTTP Method:GET
+    add
+    URL:http://<netscaler-ip-address>/nitro/v1/config/lbvserver
+    HTTP Method:POST
     Request Headers:
     Cookie:NITRO_AUTH_TOKEN=<tokenvalue>
-    Accept:application/json
-    Response:
-    HTTP Status Code on Success: 200 OK
-    HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <string> (for NetScaler-specific errors). The response payload provides details of the error
-    Response Header:
     Content-Type:application/json
-    Response Payload:
-    { "nslicense": [ {
-          "wl":<Boolean_value>,
-          "sp":<Boolean_value>,
-          "lb":<Boolean_value>,
-          "cs":<Boolean_value>,
-          "cr":<Boolean_value>,
-          "sc":<Boolean_value>,
-          "cmp":<Boolean_value>,
-          "delta":<Boolean_value>,
-          "pq":<Boolean_value>,
-          "ssl":<Boolean_value>,
-          "gslb":<Boolean_value>,
-          "gslbp":<Boolean_value>,
-          "hdosp":<Boolean_value>,
-          "routing":<Boolean_value>,
-          "cf":<Boolean_value>,
-          "contentaccelerator":<Boolean_value>,
-          "ic":<Boolean_value>,
-          "sslvpn":<Boolean_value>,
-          "f_sslvpn_users":<Double_value>,
-          "f_ica_users":<Double_value>,
-          "aaa":<Boolean_value>,
-          "ospf":<Boolean_value>,
-          "rip":<Boolean_value>,
-          "bgp":<Boolean_value>,
-          "rewrite":<Boolean_value>,
-          "ipv6pt":<Boolean_value>,
-          "appfw":<Boolean_value>,
-          "responder":<Boolean_value>,
-          "agee":<Boolean_value>,
-          "nsxn":<Boolean_value>,
-          "htmlinjection":<Boolean_value>,
-          "modelid":<Double_value>,
-          "push":<Boolean_value>,
-          "wionns":<Boolean_value>,
-          "appflow":<Boolean_value>,
-          "cloudbridge":<Boolean_value>,
-          "cloudbridgeappliance":<Boolean_value>,
-          "cloudextenderappliance":<Boolean_value>,
-          "isis":<Boolean_value>,
-          "cluster":<Boolean_value>,
-          "ch":<Boolean_value>,
-          "appqoe":<Boolean_value>,
-          "appflowica":<Boolean_value>,
-          "isstandardlic":<Boolean_value>,
-          "isenterpriselic":<Boolean_value>,
-          "isplatinumlic":<Boolean_value>,
-          "issgwylic":<Boolean_value>,
-          "rise":<Boolean_value>,
-          "vpath":<Boolean_value>,
-          "feo":<Boolean_value>,
-          "lsn":<Boolean_value>,
-          "ispooledlicensing":<String_value>,
-          "rdpproxy":<Boolean_value>,
-          "rep":<Boolean_value>
-    }]}
+    Request Payload:
+    {"lbvserver":{
+          "name":<String_value>,
+          "servicetype":<String_value>,
+          "ipv46":<String_value>,
+          "ippattern":<String_value>,
+          "ipmask":<String_value>,
+          "port":<Integer_value>,
+          "range":<Double_value>,
+          "persistencetype":<String_value>,
+          "timeout":<Double_value>,
+          "persistencebackup":<String_value>,
+          "backuppersistencetimeout":<Double_value>,
+          "lbmethod":<String_value>,
+          "hashlength":<Double_value>,
+          "netmask":<String_value>,
+          "v6netmasklen":<Double_value>,
+          "backuplbmethod":<String_value>,
+          "cookiename":<String_value>,
+          "rule":<String_value>,
+          "listenpolicy":<String_value>,
+          "listenpriority":<Double_value>,
+          "resrule":<String_value>,
+          "persistmask":<String_value>,
+          "v6persistmasklen":<Double_value>,
+          "pq":<String_value>,
+          "sc":<String_value>,
+          "rtspnat":<String_value>,
+          "m":<String_value>,
+          "tosid":<Double_value>,
+          "datalength":<Double_value>,
+          "dataoffset":<Double_value>,
+          "sessionless":<String_value>,
+          "state":<String_value>,
+          "connfailover":<String_value>,
+          "redirurl":<String_value>,
+          "cacheable":<String_value>,
+          "clttimeout":<Double_value>,
+          "somethod":<String_value>,
+          "sopersistence":<String_value>,
+          "sopersistencetimeout":<Double_value>,
+          "healththreshold":<Double_value>,
+          "sothreshold":<Double_value>,
+          "sobackupaction":<String_value>,
+          "redirectportrewrite":<String_value>,
+          "downstateflush":<String_value>,
+          "backupvserver":<String_value>,
+          "disableprimaryondown":<String_value>,
+          "insertvserveripport":<String_value>,
+          "vipheader":<String_value>,
+          "authenticationhost":<String_value>,
+          "authentication":<String_value>,
+          "authn401":<String_value>,
+          "authnvsname":<String_value>,
+          "push":<String_value>,
+          "pushvserver":<String_value>,
+          "pushlabel":<String_value>,
+          "pushmulticlients":<String_value>,
+          "tcpprofilename":<String_value>,
+          "httpprofilename":<String_value>,
+          "dbprofilename":<String_value>,
+          "comment":<String_value>,
+          "l2conn":<String_value>,
+          "oracleserverversion":<String_value>,
+          "mssqlserverversion":<String_value>,
+          "mysqlprotocolversion":<Double_value>,
+          "mysqlserverversion":<String_value>,
+          "mysqlcharacterset":<Double_value>,
+          "mysqlservercapabilities":<Double_value>,
+          "appflowlog":<String_value>,
+          "netprofile":<String_value>,
+          "icmpvsrresponse":<String_value>,
+          "rhistate":<String_value>,
+          "newservicerequest":<Double_value>,
+          "newservicerequestunit":<String_value>,
+          "newservicerequestincrementinterval":<Double_value>,
+          "minautoscalemembers":<Double_value>,
+          "maxautoscalemembers":<Double_value>,
+          "persistavpno":<Double[]_value>,
+          "skippersistency":<String_value>,
+          "td":<Double_value>,
+          "authnprofile":<String_value>,
+          "macmoderetainvlan":<String_value>,
+          "dbslb":<String_value>,
+          "dns64":<String_value>,
+          "bypassaaaa":<String_value>,
+          "recursionavailable":<String_value>,
+          "processlocal":<String_value>,
+          "dnsprofilename":<String_value>,
+          "lbprofilename":<String_value>,
+          "redirectfromport":<Integer_value>,
+          "httpsredirecturl":<String_value>
+    }}
+    Response:
+    HTTP Status Code on Success: 201 Created
+    HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <string> (for NetScaler-specific errors). The response payload provides details of the error
 #>
     # Specifying the correct URL 
-    $strURI = "http://$NSIP/nitro/v1/config/nslicense"
+    $strURI = "http://$NSIP/nitro/v1/config/lbvserver"
+
+    # add lb vserver cpx-vip HTTP 172.17.0.2 81
+    $payload = @{
+    "lbvserver"= @{
+        "name"="vsvr_webserver_81";
+        "servicetype"="HTTP";
+        "ipv46"="172.17.0.2";
+        "port"=81;
+        "lbmethod"="ROUNDROBIN"
+       }
+    } | ConvertTo-Json -Depth 5
+
+    # Logging NetScaler Instance payload formatting
+    Write-Host "payload: " -ForegroundColor Yellow
+    Write-Host $payload -ForegroundColor Green
 
     # Method #1: Making the REST API call to the NetScaler
-#    (Invoke-RestMethod -Method Get -Uri $strURI -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorAction SilentlyContinue).nslicense | Select-Object modelid, isstandardlic,isenterpriselic,isplatinumlic, f_sslvpn_users
-    $LicInfo = (Invoke-RestMethod -Method Get -Uri $strURI -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorAction SilentlyContinue).nslicense
-    Write-Host ("`nLicense info: `n-------------`n`tmodel ID = " + $LicInfo.modelid + "; Standard License = " + $LicInfo.isstandardlic + "; Enterprise License = " + $LicInfo.isenterpriselic + "; Platinum License = " + $LicInfo.isplatinumlic + "`n") -ForegroundColor Magenta
-#endregion Set Timezone
+    $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
 
-#endregion
+#endregion Add LB vServers
+
+#region Bind Service to vServer (bulk)
+<#
+    add:
+    URL:http://<netscaler-ip-address/nitro/v1/config/lbvserver_service_binding
+    HTTP Method:PUT
+    Request Headers:
+    Cookie:NITRO_AUTH_TOKEN=<tokenvalue>
+    Content-Type:application/json
+    Request Payload:
+    {
+    "lbvserver_service_binding":{
+          "name":<String_value>,
+          "servicename":<String_value>,
+          "weight":<Double_value>,
+          "servicegroupname":<String_value>
+    }}
+    Response:
+    HTTP Status Code on Success: 201 Created
+    HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <string> (for NetScaler-specific errors). The response payload provides details of the error
+#>
+    # Specifying the correct URL 
+    $strURI = "http://$NSIP/nitro/v1/config/lbvserver_service_binding"
+
+    # bind lb vserver cpx-vip db1
+    $payload = @{
+    "lbvserver_service_binding"= @(
+            @{"name"="vsvr_webserver_81";"servicename"="svc_webserver_green"},
+            @{"name"="vsvr_webserver_81";"servicename"="svc_webserver_blue"}
+        )
+    } | ConvertTo-Json -Depth 5
+
+    # Logging NetScaler Instance payload formatting
+    Write-Host "payload: " -ForegroundColor Yellow
+    Write-Host $payload -ForegroundColor Green
+
+    # Method #1: Making the REST API call to the NetScaler
+    $response = Invoke-RestMethod -Method Put -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
+#endregion Bind Service to vServer
 
 #region End NetScaler NITRO Session
     #Disconnect from the NetScaler VPX Virtual Appliance
     $LogOut = @{"logout" = @{}} | ConvertTo-Json
     $dummy = Invoke-RestMethod -Uri "http://$NSIP/nitro/v1/config/logout" -Body $LogOut -Method POST -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorAction SilentlyContinue
 #endregion End NetScaler NITRO Session
-
-
-Write-Host "------------------------------------------------------------ " -ForegroundColor Yellow
-Write-Host "| Pushing the Basic configuration to NetScaler with NITRO: | " -ForegroundColor Yellow
-Write-Host "------------------------------------------------------------ " -ForegroundColor Yellow
-
-    #region !! Adding a presentation demo break !!
-    # ********************************************
-        Read-Host 'Press Enter to continue…' | Out-Null
-        Write-Host
-    #endregion
-
-# ----------------------------------------
-# | Method #1: Using the SessionVariable |
-# ----------------------------------------
-
-#region Start NetScaler NITRO Session
-    #Connect to the NetScaler VPX Virtual Appliance
-    $Login = @{"login" = @{"username"=$NSUserName;"password"=$NSUserPW;"timeout"=”900”}} | ConvertTo-Json
-    $dummy = Invoke-RestMethod -Uri "http://$NSIP/nitro/v1/config/login" -Body $Login -Method POST -SessionVariable NetScalerSession -ContentType $ContentType -Verbose:$VerbosePreference -ErrorAction SilentlyContinue
-#endregion Start NetScaler NITRO Session
-
-
-# -----------------------------------
-# | NetScaler Basic System Settings |
-# -----------------------------------
-
-#region Enable NetScaler Modes
-<#
-    enable
-    URL:http://<netscaler-ip-address>/nitro/v1/config/nsmode?action=enable
-    HTTP Method:POST
-    Request Headers:
-    Cookie:NITRO_AUTH_TOKEN=<tokenvalue>
-    Content-Type:application/json
-    Request Payload:
-    {"nsmode":{
-          "mode":<String[]_value>
-    }}
-    Response:
-    HTTP Status Code on Success: 200 OK
-    HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <string> (for NetScaler-specific errors). The response payload provides details of the error
-#>
-    # Specifying the correct URL 
-    $strURI = "http://$NSIP/nitro/v1/config/nsmode?action=enable"
-
-    # Creating the right payload formatting (mind the Depth for the nested arrays)
-    # enable ns mode FR L3 Edge USNIP PMTUD
-
-    $payload = @{
-    "nsmode"= @{
-#        "mode"="FR Edge L3 USNIP PMTUD"
-        "mode"=@("FR","Edge","L3","USNIP","PMTUD")
-        }
-    } | ConvertTo-Json -Depth 5
-
-    # Logging NetScaler Instance payload formatting
-    Write-Host "payload: " -ForegroundColor Yellow
-    Write-Host $payload -ForegroundColor Green
-
-    # Method #1: Making the REST API call to the NetScaler
-    $dummy = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorAction SilentlyContinue
-#endregion Enable NetScaler Modes
-
-#region Disable NetScaler Feature (Call Home)
-<#
-    disable
-    URL:http://<netscaler-ip-address>/nitro/v1/config/nsfeature?action=disable
-    HTTP Method:POST
-    Request Headers:
-    Cookie:NITRO_AUTH_TOKEN=<tokenvalue>
-    Content-Type:application/json
-    Request Payload:
-    {"nsfeature":{
-          "feature":<String[]_value>
-    }}
-    Response:
-    HTTP Status Code on Success: 200 OK
-    HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <string> (for NetScaler-specific errors). The response payload provides details of the error
-#>
-    # Specifying the correct URL 
-    $strURI = "http://$NSIP/nitro/v1/config/nsfeature?action=disable"
-
-    # Creating the right payload formatting (mind the Depth for the nested arrays)
-    # disable ns feature CH
-
-    $payload = @{
-    "nsfeature"= @{
-#        "feature"="CH"
-        "feature"=@("CH")
-        }
-    } | ConvertTo-Json -Depth 5
-
-    # Logging NetScaler Instance payload formatting
-    Write-Host "payload: " -ForegroundColor Yellow
-    Write-Host $payload -ForegroundColor Green
-
-    # Method #1: Making the REST API call to the NetScaler
-    $dummy = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorAction SilentlyContinue
-#endregion Disable NetScaler Modes
-
-#region Enable NetScaler Basic & Advanced Features
-<#
-    enable
-    URL:http://<netscaler-ip-address>/nitro/v1/config/nsfeature?action=enable
-    HTTP Method:POST
-    Request Headers:
-    Cookie:NITRO_AUTH_TOKEN=<tokenvalue>
-    Content-Type:application/json
-    Request Payload:
-    {"nsfeature":{
-          "feature":<String[]_value>
-    }}
-    Response:
-    HTTP Status Code on Success: 200 OK
-    HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <string> (for NetScaler-specific errors). The response payload provides details of the error
-#>
-    # Specifying the correct URL 
-    $strURI = "http://$NSIP/nitro/v1/config/nsfeature?action=enable"
-
-    # Creating the right payload formatting (mind the Depth for the nested arrays)
-    # enable ns feature WL SP LB SSL SSLVPN REWRITE RESPONDER
-
-    $payload = @{
-    "nsfeature"= @{
-#        "feature"="lb ssl sslvpn rewrite responder"
-        "feature"=@("LB","SSL","SSLVPN","REWRITE","RESPONDER")
-        }
-    } | ConvertTo-Json -Depth 5
-
-    # Logging NetScaler Instance payload formatting
-    Write-Host "payload: " -ForegroundColor Yellow
-    Write-Host $payload -ForegroundColor Green
-
-    # Method #1: Making the REST API call to the NetScaler
-    $dummy = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorAction SilentlyContinue
-#endregion Enable NetScaler Basic & Advanced Features
-
-
-#region End NetScaler NITRO Session
-    #Disconnect from the NetScaler VPX Virtual Appliance
-    $LogOut = @{"logout" = @{}} | ConvertTo-Json
-    $dummy = Invoke-RestMethod -Uri "http://$NSIP/nitro/v1/config/logout" -Body $LogOut -Method POST -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorAction SilentlyContinue
-#endregion End NetScaler NITRO Session
-
-#Restore Verbose setting
-$VerbosePreference = $VerbosePrefOriginal
