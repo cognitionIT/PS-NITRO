@@ -3,8 +3,6 @@
 
 #region NITRO settings
     $ContentType = "application/json"
-#    $NSIP = "192.168.0.51:32768"
-    $NSIP = "192.168.59.101:32779"
     # Prompt for credentials
 #    $MyCreds =  Get-Credential
     # Build my own credentials variable, based on password string
@@ -16,7 +14,6 @@
     $NSUserPW = "nsroot"
 
     $strDate = Get-Date -Format yyyyMMddHHmmss
-
 <#
     # Store original VerbosePreference setting for later
     Write-Host ("Original Verbose Preference is: " + $VerbosePreference) -ForegroundColor Cyan
@@ -25,6 +22,51 @@
     Write-Host ("Verbose Preference is changed to: " + $VerbosePreference) -ForegroundColor Cyan
 #>
 #endregion NITRO settings
+
+#region Container settings
+$DockerHostIP = "192.168.0.51"
+
+$WebserverBlueIP = "172.17.0.4"
+$WebServerBluePort = "32772"
+$WebserverGreenIP = "172.17.0.3"
+$WebServerGreenPort = "32771"
+
+$CPXIP = "172.17.0.2"
+$CPXPortNSIP = "32769"
+$CPXPortVIP = "32768"
+
+$NSIP = ($DockerHostIP + ":" + $CPXPortNSIP)
+
+#endregion
+
+Write-Host "-------------------------------- " -ForegroundColor Yellow
+Write-Host "| Check the Docker Containers: | " -ForegroundColor Yellow
+Write-Host "-------------------------------- " -ForegroundColor Yellow
+
+    #region !! Adding a presentation demo break !!
+    # ********************************************
+        Read-Host 'Press Enter to continue…' | Out-Null
+        Write-Host
+    #endregion
+
+# Open webbrowsers to test the container websites
+    #get the default browser path from the registry
+    #$browserPath = "C:\Program Files (x86)\Mozilla Firefox\firefox.exe"
+    Write-Host "Checking the Blue webserver ..." -ForegroundColor Green
+    Start-sleep -Seconds 5
+    Invoke-Expression "cmd.exe /C start http://$DockerHostIP`:$WebServerBluePort/index.html"
+
+    Write-Host "Checking the Green webserver ..." -ForegroundColor Green
+    Start-sleep -Seconds 5
+    Invoke-Expression "cmd.exe /C start http://$DockerHostIP`:$WebServerGreenPort/index.html"
+
+    Write-Host "Checking the CPX NSIP ..." -ForegroundColor Green
+    Start-sleep -Seconds 5
+    Invoke-Expression "cmd.exe /C start http://$DockerHostIP`:$CPXPortNSIP"
+
+    Write-Host "Checking the CPX VIP ..." -ForegroundColor Green
+    Start-sleep -Seconds 5
+    Invoke-Expression "cmd.exe /C start http://$DockerHostIP`:$CPXPortVIP"
 
 Write-Host "------------------------------------------------------------- " -ForegroundColor Yellow
 Write-Host "| Pushing the LB configuration to NetScaler CPX with NITRO: | " -ForegroundColor Yellow
@@ -45,7 +87,7 @@ Write-Host "------------------------------------------------------------- " -For
     $dummy = Invoke-RestMethod -Uri "http://$NSIP/nitro/v1/config/login" -Body $Login -Method POST -SessionVariable NetScalerSession -ContentType $ContentType -Verbose:$VerbosePreference -ErrorAction SilentlyContinue
 #endregion Start NetScaler NITRO Session
 
-#region Add LB Services
+#region Add LB Services (bulk)
     <#
     add
     URL:http://<netscaler-ip-address>/nitro/v1/config/service
@@ -106,31 +148,12 @@ Write-Host "------------------------------------------------------------- " -For
     $strURI = "http://$NSIP/nitro/v1/config/service"
 
     # add service svc_webserver_green HTTP 172.17.0.3 8080
-    $payload = @{
-        "service"= @{
-          "name"="svc_webserver_green";
-          "ip"="172.17.0.3"
-          "servicetype"="HTTP";
-          "port"=8080;
-          "comment"="created by PowerShell script";
-        }
-    } | ConvertTo-Json -Depth 5
-
-    # Method #1: Making the REST API call to the NetScaler
-    $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
-
-    # Specifying the correct URL 
-    $strURI = "http://$NSIP/nitro/v1/config/service"
-
     # add service svc_webserver_blue HTTP 172.17.0.4 8080
     $payload = @{
-        "service"= @{
-          "name"="svc_webserver_blue";
-          "ip"="172.17.0.4"
-          "servicetype"="HTTP";
-          "port"=8080;
-          "comment"="created by PowerShell script";
-        }
+        "service"= @(
+            @{"name"="svc_webserver_green";"ip"="$WebserverGreenIP";"servicetype"="HTTP";"port"=8080;"comment"="created by PowerShell script"},
+            @{"name"="svc_webserver_blue";"ip"="$WebserverBlueIP";"servicetype"="HTTP";"port"=8080;"comment"="created by PowerShell script"}
+        )
     } | ConvertTo-Json -Depth 5
 
     # Logging NetScaler Instance payload formatting
@@ -139,6 +162,8 @@ Write-Host "------------------------------------------------------------- " -For
 
     # Method #1: Making the REST API call to the NetScaler
     $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
+    Start-sleep -Seconds 5
+
 #endregion Add LB Services
 
 #region Add LB vServers
@@ -254,7 +279,7 @@ Write-Host "------------------------------------------------------------- " -For
     "lbvserver"= @{
         "name"="vsvr_webserver_81";
         "servicetype"="HTTP";
-        "ipv46"="172.17.0.2";
+        "ipv46"="$CPXIP";
         "port"=81;
         "lbmethod"="ROUNDROBIN"
        }
@@ -266,6 +291,7 @@ Write-Host "------------------------------------------------------------- " -For
 
     # Method #1: Making the REST API call to the NetScaler
     $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
+    Start-sleep -Seconds 5
 
 #endregion Add LB vServers
 
@@ -306,6 +332,8 @@ Write-Host "------------------------------------------------------------- " -For
 
     # Method #1: Making the REST API call to the NetScaler
     $response = Invoke-RestMethod -Method Put -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
+    Start-sleep -Seconds 5
+
 #endregion Bind Service to vServer
 
 #region End NetScaler NITRO Session
