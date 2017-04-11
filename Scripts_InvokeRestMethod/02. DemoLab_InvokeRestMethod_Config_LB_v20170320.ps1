@@ -479,8 +479,9 @@ Write-Host "---------------------------------------------------------------- " -
     # 
     $payload = @{
     "servicegroup_servicegroupmember_binding"= @(
-            @{"servicegroupname"="svcgrp_SFStore";"servername"="SF1";"port"=80;"state"="ENABLED"},
-            @{"servicegroupname"="svcgrp_SFStore";"servername"="SF2";"port"=80;"state"="DISABLED"}
+            @{"servicegroupname"="svcgrp_SFStore";"servername"="SF1";"port"=80;"state"="ENABLED";"weight"=1},
+#            @{"servicegroupname"="svcgrp_SFStore";"servername"="SF2";"port"=80;"state"="DISABLED"}
+            @{"servicegroupname"="svcgrp_SFStore";"servername"="SF2";"port"=80;"state"="ENABLED";"weight"=2}
         )
     } | ConvertTo-Json -Depth 5
 
@@ -826,8 +827,10 @@ Write-Host "---------------------------------------------------------------- " -
     # 
     $payload = @{
     "lbvserver"= @(
-            @{"name"="vsvr_SFStore_http_redirect";"servicetype"="HTTP";"ipv46"=($SubNetIP + ".101");"port"=80;"lbmethod"="LEASTCONNECTION"},
-            @{"name"="vsvr_SFStore";"servicetype"="SSL";"ipv46"=($SubNetIP + ".101");"port"=443;"lbmethod"="LEASTCONNECTION"}
+#            @{"name"="vsvr_SFStore_http_redirect";"servicetype"="HTTP";"ipv46"=($SubNetIP + ".101");"port"=80;"lbmethod"="LEASTCONNECTION"},
+            @{"name"="vsvr_SFStore_http_redirect";"servicetype"="HTTP";"ipv46"=($SubNetIP + ".101");"port"=80;"lbmethod"="ROUNDROBIN"},
+#            @{"name"="vsvr_SFStore";"servicetype"="SSL";"ipv46"=($SubNetIP + ".101");"port"=443;"lbmethod"="LEASTCONNECTION"}
+            @{"name"="vsvr_SFStore";"servicetype"="SSL";"ipv46"=($SubNetIP + ".101");"port"=443;"lbmethod"="ROUNDROBIN"}
         )
     } | ConvertTo-Json -Depth 5
 
