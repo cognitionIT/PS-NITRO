@@ -4,7 +4,7 @@ Param()
 
 #region Script Settings
     #region Test Environment variables
-        $TestEnvironment = "Elektra"
+        $TestEnvironment = "demo"
 
         Switch ($TestEnvironment)
         {
@@ -111,8 +111,8 @@ If ($ConfigTrafficManagementSettings)
 
     #region Configure Load Balancing - Servers
         Add-NSServer -NSSession $NSSession -Name "localhost" -IPAddress "127.0.0.1" -ErrorAction SilentlyContinue
-        Add-NSServer -NSSession $NSSession -Name "SF2" -IPAddress ($SubnetIP + ".20") -ErrorAction SilentlyContinue
-        Add-NSServer -NSSession $NSSession -Name "SF1" -IPAddress ($SubnetIP + ".1") -ErrorAction SilentlyContinue
+        Add-NSServer -NSSession $NSSession -Name "SF2" -IPAddress ($SubnetIP + ".22") -ErrorAction SilentlyContinue
+        Add-NSServer -NSSession $NSSession -Name "SF1" -IPAddress ($SubnetIP + ".21") -ErrorAction SilentlyContinue
         Write-Host "LB Servers: " -ForegroundColor Yellow -NoNewline
         Get-NSServer -NSSession $NSSession | Select-Object name,ipaddress,state | Format-List
     #endregion

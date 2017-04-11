@@ -4,7 +4,7 @@ Param()
 
 #region Script Settings
     #region Test Environment variables
-        $TestEnvironment = "Elektra"
+        $TestEnvironment = "demo"
 
         Switch ($TestEnvironment)
         {
@@ -39,7 +39,7 @@ Param()
         # Protocol to use for the REST API/NITRO call
         $RESTProtocol = "https"
         # NetScaler information for REST API call
-        $NSaddress = ($SubnetIP+ ".2") # NSIP
+        $NSaddress = ($SubnetIP + ".2") # NSIP
         $NSUsername = "nsroot"
         $NSUserPW = "nsroot"
         # Connection protocol for the NetScaler
@@ -97,7 +97,7 @@ If ($ConfigFirstLogon)
     #endregion
 
     #region Step 3b. DNS Server IP Address (Domain Name Service - dnsnameserver)
-        Add-NSDnsNameServer -NSSession $NSSession -DNSServerIPAddress "192.168.0.1" -ErrorAction SilentlyContinue
+        Add-NSDnsNameServer -NSSession $NSSession -DNSServerIPAddress ($SubnetIP + ".1") -ErrorAction SilentlyContinue
         Write-Host "DNS Name Server: " -ForegroundColor Yellow -NoNewline
         Write-Host (Get-NSDnsNameServer -NSSession $NSSession | Select-Object ip, port, type, state, nameserverstate)
     #endregion

@@ -4,7 +4,7 @@ Param()
 
 #region Script settings
     #region Test Environment variables
-        $TestEnvironment = "Elektra"
+        $TestEnvironment = "demo"
 
         Switch ($TestEnvironment)
         {

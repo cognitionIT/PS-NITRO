@@ -383,7 +383,6 @@ HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <stri
 
 
 
-
 # --------------------------------------------
 # | Add NGW vServer                          |
 # --------------------------------------------
@@ -474,7 +473,7 @@ HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <stri
 # --------------------------------------------
 # | Bind VPN Session Policies to VPN vServer |
 # --------------------------------------------
-#region Bind VPN Session Policies to VPN vServer
+#region Bind VPN Session Policies to VPN vServer (bulk)
 <#
 NITRO Documentation:
 
@@ -526,7 +525,7 @@ HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <stri
 # ---------------------------------------
 # | Bind VPN STA servers to VPN vServer |
 # ---------------------------------------
-#region Bind VPN STA servers to VPN vServer
+#region Bind VPN STA servers to VPN vServer (bulk)
 <#
 NITRO Documentation:
 
