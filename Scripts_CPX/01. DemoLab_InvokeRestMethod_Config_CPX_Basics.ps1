@@ -8,7 +8,6 @@
     # Build my own credentials variable, based on password string
     $PW = ConvertTo-SecureString "nsroot" -AsPlainText -Force
     $MyCreds = New-Object System.Management.Automation.PSCredential ("nsroot", $PW)
-    $FileRoot = "H:\PSModules\NITRO\Scripts"
 
     $NSUserName = "nsroot"
     $NSUserPW = "nsroot"
@@ -27,13 +26,13 @@
 $DockerHostIP = "192.168.0.51"
 
 $WebserverBlueIP = "172.17.0.4"
-$WebServerBluePort = "32772"
+$WebServerBluePort = "32783"
 $WebserverGreenIP = "172.17.0.3"
-$WebServerGreenPort = "32771"
+$WebServerGreenPort = "32782"
 
 $CPXIP = "172.17.0.2"
-$CPXPortNSIP = "32769"
-$CPXPortVIP = "32768"
+$CPXPortNSIP = "32780"
+$CPXPortVIP = "32779"
 
 $NSIP = ($DockerHostIP + ":" + $CPXPortNSIP)
 

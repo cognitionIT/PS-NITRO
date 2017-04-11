@@ -1,9 +1,9 @@
-﻿# 20170320: WORK IN PROGRESS for Elektra computer
-# Add the LB configuration to the NetScaler VPX
+﻿# Add the LB configuration to the NetScaler VPX
 
 #region NITRO settings
     $ContentType = "application/json"
-    $NSIP = "192.168.59.2"
+    $SubNetIP = "192.168.0"
+    $NSIP = $SubNetIP + ".2"
     # Prompt for credentials
 #    $MyCreds =  Get-Credential
     # Build my own credentials variable, based on password string
@@ -286,8 +286,8 @@ Write-Host "---------------------------------------------------------------- " -
     $payload = @{
         "server"= @(
             @{"name"="localhost"; "ipaddress"="127.0.0.1"},
-            @{"name"="SF1"; "ipaddress"="192.168.59.1"},
-            @{"name"="SF2"; "ipaddress"="192.168.59.20"}
+            @{"name"="SF1"; "ipaddress"=($SubNetIP + ".21")},
+            @{"name"="SF2"; "ipaddress"=($SubNetIP + ".22")}
         )
     } | ConvertTo-Json -Depth 5
 
@@ -826,8 +826,8 @@ Write-Host "---------------------------------------------------------------- " -
     # 
     $payload = @{
     "lbvserver"= @(
-            @{"name"="vsvr_SFStore_http_redirect";"servicetype"="HTTP";"ipv46"="192.168.59.101";"port"=80;"lbmethod"="LEASTCONNECTION"},
-            @{"name"="vsvr_SFStore";"servicetype"="SSL";"ipv46"="192.168.59.101";"port"=443;"lbmethod"="LEASTCONNECTION"}
+            @{"name"="vsvr_SFStore_http_redirect";"servicetype"="HTTP";"ipv46"=($SubNetIP + ".101");"port"=80;"lbmethod"="LEASTCONNECTION"},
+            @{"name"="vsvr_SFStore";"servicetype"="SSL";"ipv46"=($SubNetIP + ".101");"port"=443;"lbmethod"="LEASTCONNECTION"}
         )
     } | ConvertTo-Json -Depth 5
 

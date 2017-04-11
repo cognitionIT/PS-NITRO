@@ -3,7 +3,8 @@
 
 #region NITRO settings
     $ContentType = "application/json"
-    $NSIP = "192.168.59.2"
+    $SubNetIP = "192.168.0"
+    $NSIP = $SubNetIP + ".2"
     # Prompt for credentials
 #    $MyCreds =  Get-Credential
     # Build my own credentials variable, based on password string
@@ -183,7 +184,7 @@ Write-Host "------------------------------------------------------------------ "
 
     $payload = @{
     "nsip"= @{
-        "ipaddress"="192.168.59.3";
+        "ipaddress"=($SubNetIP + ".3");
         "netmask"="255.255.255.0";
         "type"="SNIP";
         }
@@ -263,7 +264,7 @@ Write-Host "------------------------------------------------------------------ "
 
     $payload = @{
     "dnsnameserver"= @{
-        "ip"="192.168.59.1";
+        "ip"=($SubNetIP + ".1");
         }
     } | ConvertTo-Json -Depth 5
 

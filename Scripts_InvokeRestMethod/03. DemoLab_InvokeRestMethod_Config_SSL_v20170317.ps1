@@ -5,13 +5,14 @@
 
 #region NITRO settings
     $ContentType = "application/json"
-    $NSIP = "192.168.59.2"
+    $SubNetIP = "192.168.0"
+    $NSIP = $SubNetIP + ".2"
     # Prompt for credentials
 #    $MyCreds =  Get-Credential
     # Build my own credentials variable, based on password string
     $PW = ConvertTo-SecureString "nsroot" -AsPlainText -Force
     $MyCreds = New-Object System.Management.Automation.PSCredential ("nsroot", $PW)
-    $FileRoot = "H:\PSModules\NITRO\Scripts"
+    $FileRoot = "C:\GitHub\PS-NITRO\Scripts_InvokeRestMethod"
 
     $NSUserName = "nsroot"
     $NSUserPW = "nsroot"
@@ -258,16 +259,6 @@ Write-Host "---------------------------------------------------------------- " -
     $strURI = "http://$NSIP/nitro/v1/config/servicegroup_lbmonitor_binding/svcgrp_SFStore?args=monitor_name:lb_mon_SFStore"
 
     # unbind monitor to servicegroup
-    $payload = @{
-    "sslvserver_sslcertkey_binding"= @{
-        "vservername"="vsvr_SFStore";
-        "certkeyname"="wildcard.demo.lab";
-        }
-    } | ConvertTo-Json -Depth 5
-
-    # Logging NetScaler Instance payload formatting
-    Write-Host "payload: " -ForegroundColor Yellow
-    Write-Host $payload -ForegroundColor Green
 
     # Method #1: Making the REST API call to the NetScaler
     $response = Invoke-RestMethod -Method Delete -Uri $strURI -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
