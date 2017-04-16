@@ -23,16 +23,17 @@
 #endregion NITRO settings
 
 #region Container settings
-$DockerHostIP = "192.168.0.51"
+#$DockerHostIP = "192.168.0.51"
+$DockerHostIP = "192.168.59.101"
 
 $WebserverBlueIP = "172.17.0.4"
-$WebServerBluePort = "32783"
+$WebServerBluePort = "32772"
 $WebserverGreenIP = "172.17.0.3"
-$WebServerGreenPort = "32782"
+$WebServerGreenPort = "32771"
 
 $CPXIP = "172.17.0.2"
-$CPXPortNSIP = "32780"
-$CPXPortVIP = "32779"
+$CPXPortNSIP = "32769"
+$CPXPortVIP = "32768"
 
 $NSIP = ($DockerHostIP + ":" + $CPXPortNSIP)
 
@@ -48,7 +49,7 @@ Write-Host "-------------------------------- " -ForegroundColor Yellow
         Write-Host
     #endregion
 
-# Open webbrowsers to test the container websites
+#region Open webbrowsers to test the container websites
     #get the default browser path from the registry
     #$browserPath = "C:\Program Files (x86)\Mozilla Firefox\firefox.exe"
     Write-Host "Checking the Blue webserver ..." -ForegroundColor Green
@@ -66,6 +67,7 @@ Write-Host "-------------------------------- " -ForegroundColor Yellow
     Write-Host "Checking the CPX VIP ..." -ForegroundColor Green
     Start-sleep -Seconds 5
     Invoke-Expression "cmd.exe /C start http://$DockerHostIP`:$CPXPortVIP"
+#endregion Open webbrowsers
 
 Write-Host "------------------------------------------------------------- " -ForegroundColor Yellow
 Write-Host "| Pushing the LB configuration to NetScaler CPX with NITRO: | " -ForegroundColor Yellow
@@ -320,8 +322,8 @@ Write-Host "------------------------------------------------------------- " -For
     # bind lb vserver cpx-vip db1
     $payload = @{
     "lbvserver_service_binding"= @(
-            @{"name"="vsvr_webserver_81";"servicename"="svc_webserver_green"},
-            @{"name"="vsvr_webserver_81";"servicename"="svc_webserver_blue"}
+            @{"name"="vsvr_webserver_81";"servicename"="svc_webserver_green";"weight"=1},
+            @{"name"="vsvr_webserver_81";"servicename"="svc_webserver_blue";"weight"=2}
         )
     } | ConvertTo-Json -Depth 5
 
@@ -340,3 +342,4 @@ Write-Host "------------------------------------------------------------- " -For
     $LogOut = @{"logout" = @{}} | ConvertTo-Json
     $dummy = Invoke-RestMethod -Uri "http://$NSIP/nitro/v1/config/logout" -Body $LogOut -Method POST -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorAction SilentlyContinue
 #endregion End NetScaler NITRO Session
+
