@@ -1,11 +1,7 @@
-﻿# 20170409: Working setup for demo computer
-# Add the Basic NetScaler (First Logon Wizard & Modes & Features) configuration to the NetScaler CPX
+﻿# Add the Basic Load Balancing configuration to the NetScaler CPX
 
 #region NITRO settings
     $ContentType = "application/json"
-    # Prompt for credentials
-#    $MyCreds =  Get-Credential
-    # Build my own credentials variable, based on password string
     $PW = ConvertTo-SecureString "nsroot" -AsPlainText -Force
     $MyCreds = New-Object System.Management.Automation.PSCredential ("nsroot", $PW)
 
@@ -13,18 +9,10 @@
     $NSUserPW = "nsroot"
 
     $strDate = Get-Date -Format yyyyMMddHHmmss
-<#
-    # Store original VerbosePreference setting for later
-    Write-Host ("Original Verbose Preference is: " + $VerbosePreference) -ForegroundColor Cyan
-    $VerbosePrefOriginal = $VerbosePreference
-    $VerbosePreference = [System.Management.Automation.ActionPreference]::SilentlyContinue
-    Write-Host ("Verbose Preference is changed to: " + $VerbosePreference) -ForegroundColor Cyan
-#>
 #endregion NITRO settings
 
 #region Container settings
-#$DockerHostIP = "192.168.0.51"
-$DockerHostIP = "192.168.59.101"
+$DockerHostIP = "192.168.0.51"
 
 $WebserverBlueIP = "172.17.0.4"
 $WebServerBluePort = "32772"
@@ -50,8 +38,6 @@ Write-Host "-------------------------------- " -ForegroundColor Yellow
     #endregion
 
 #region Open webbrowsers to test the container websites
-    #get the default browser path from the registry
-    #$browserPath = "C:\Program Files (x86)\Mozilla Firefox\firefox.exe"
     Write-Host "Checking the Blue webserver ..." -ForegroundColor Green
     Start-sleep -Seconds 5
     Invoke-Expression "cmd.exe /C start http://$DockerHostIP`:$WebServerBluePort/index.html"
@@ -163,8 +149,6 @@ Write-Host "------------------------------------------------------------- " -For
 
     # Method #1: Making the REST API call to the NetScaler
     $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
-    Start-sleep -Seconds 5
-
 #endregion Add LB Services
 
 #region Add LB vServers
@@ -292,8 +276,6 @@ Write-Host "------------------------------------------------------------- " -For
 
     # Method #1: Making the REST API call to the NetScaler
     $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
-    Start-sleep -Seconds 5
-
 #endregion Add LB vServers
 
 #region Bind Service to vServer (bulk)
@@ -333,8 +315,6 @@ Write-Host "------------------------------------------------------------- " -For
 
     # Method #1: Making the REST API call to the NetScaler
     $response = Invoke-RestMethod -Method Put -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
-    Start-sleep -Seconds 5
-
 #endregion Bind Service to vServer
 
 #region End NetScaler NITRO Session

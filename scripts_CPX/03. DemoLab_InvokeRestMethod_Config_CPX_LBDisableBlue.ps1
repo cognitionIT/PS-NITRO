@@ -1,11 +1,5 @@
-﻿# 20170409: Working setup for demo computer
-# Add the Basic NetScaler (First Logon Wizard & Modes & Features) configuration to the NetScaler CPX
-
-#region NITRO settings
+﻿#region NITRO settings
     $ContentType = "application/json"
-    # Prompt for credentials
-#    $MyCreds =  Get-Credential
-    # Build my own credentials variable, based on password string
     $PW = ConvertTo-SecureString "nsroot" -AsPlainText -Force
     $MyCreds = New-Object System.Management.Automation.PSCredential ("nsroot", $PW)
 
@@ -13,18 +7,10 @@
     $NSUserPW = "nsroot"
 
     $strDate = Get-Date -Format yyyyMMddHHmmss
-<#
-    # Store original VerbosePreference setting for later
-    Write-Host ("Original Verbose Preference is: " + $VerbosePreference) -ForegroundColor Cyan
-    $VerbosePrefOriginal = $VerbosePreference
-    $VerbosePreference = [System.Management.Automation.ActionPreference]::SilentlyContinue
-    Write-Host ("Verbose Preference is changed to: " + $VerbosePreference) -ForegroundColor Cyan
-#>
 #endregion NITRO settings
 
 #region Container settings
-#$DockerHostIP = "192.168.0.51"
-$DockerHostIP = "192.168.59.101"
+$DockerHostIP = "192.168.0.51"
 
 $WebserverBlueIP = "172.17.0.4"
 $WebServerBluePort = "32772"
@@ -79,7 +65,6 @@ Write-Host "---------------------------------------------------------- " -Foregr
     # Specifying the correct URL 
     $strURI = "http://$NSIP/nitro/v1/config/service?action=disable"
 
-    # 
     $payload = @{
         "service"= @{
           "name"="svc_webserver_blue"
@@ -150,11 +135,9 @@ Write-Host "---------------------------------------------------------- " -Foregr
     }]}
     #>
     # Specifying the correct URL 
-#    $strURI = "http://$NSIP/nitro/v1/stat/service?args=name:svc_webserver_green"
     $strURI = "http://$NSIP/nitro/v1/stat/service"
 
     # Method #1: Making the REST API call to the NetScaler
-#    $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
     $response = Invoke-RestMethod -Method Get -Uri $strURI -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
     Write-Host "response: " -ForegroundColor Green
     $response.service | Select-Object name, primaryipaddress, primaryport, servicetype, state, totalrequests, cursrvrconnections, svrestablishedconn
@@ -224,7 +207,6 @@ Write-Host "---------------------------------------------------------- " -Foregr
     $strURI = "http://$NSIP/nitro/v1/stat/lbvserver?args=name:vsvr_webserver_81"
 
     # Method #1: Making the REST API call to the NetScaler
-#    $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
     $response = Invoke-RestMethod -Method Get -Uri $strURI -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
     Write-Host "response: " -ForegroundColor Green
     $response.lbvserver | Select-object name, primaryipaddress, primaryport, type, state, vslbhealth, actsvcs, tothits
