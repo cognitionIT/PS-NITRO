@@ -1,4 +1,17 @@
-﻿[CmdletBinding()]
+﻿<#
+.SYNOPSIS
+  Configure Basic Load Balancing Settings on the NetScaler VPX.
+.DESCRIPTION
+  Configure Basic Load Balancing Settings (SF LB example) on the NetScaler VPX, using the PS-NITRO Module.
+.NOTES
+  Version:        1.0
+  Author:         Esther Barthel, MSc
+  Creation Date:  2017-05-04
+  Purpose:        Created as part of the demo scripts for the PowerShell Conference EU 2017 in Hannover
+
+  Copyright (c) cognition IT. All rights reserved.
+#>
+[CmdletBinding()]
 # Declaring script parameters
 Param()
 
@@ -44,19 +57,20 @@ Param()
         $NSUserPW = "nsroot"
         # Connection protocol for the NetScaler
         Set-NSMgmtProtocol -Protocol $RESTProtocol
-
-    # Force PowerShell to trust the NetScaler (self-signed) certificate
+    #endregion
+    #region Force PowerShell to trust the NetScaler (self-signed) certificate
     If ($RESTProtocol = "https")
     {
         Write-Verbose "Forcing PowerShell to trust all certificates (including the self-signed netScaler certificate)"
         # source: https://blogs.technet.microsoft.com/bshukla/2010/04/12/ignoring-ssl-trust-in-powershell-system-net-webclient/ 
         [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
     }
-
-        # Start the session
-        $NSSession = Connect-NSAppliance -NSAddress $NSaddress -NSUserName $NSUsername -NSPassword $NSUserPW
     #endregion
 #endregion Script Settings
+
+#region Start the session
+    $NSSession = Connect-NSAppliance -NSAddress $NSaddress -NSUserName $NSUsername -NSPassword $NSUserPW
+#endregion
 
 # ---------------------
 # | App Expert config |

@@ -1,4 +1,17 @@
-﻿[CmdletBinding()]
+﻿<#
+.SYNOPSIS
+  Configure Basic SSL Settings on the NetScaler VPX.
+.DESCRIPTION
+  Configure Basic SSL Settings (SF LB example) on the NetScaler VPX, using the PS-NITRO Module.
+.NOTES
+  Version:        1.0
+  Author:         Esther Barthel, MSc
+  Creation Date:  2017-05-04
+  Purpose:        Created as part of the demo scripts for the PowerShell Conference EU 2017 in Hannover
+
+  Copyright (c) cognition IT. All rights reserved.
+#>
+[CmdletBinding()]
 # Declaring script parameters
 Param()
 
@@ -105,11 +118,6 @@ If ($ConfigSSLSettings)
 #endregion
 
 #region Final Step. Close the session to the NetScaler
-
-    #region changing the SSL vserver config to get a green status
-    #    Remove-NSServicegroupLBMonitorBinding -NSSession $NSSession -ServicegroupName "svcgrp_SFStore" -MonitorName "lb_mon_SFStore" -ErrorAction SilentlyContinue
-    #endregion
-
     # restore SSL validation to normal behavior
     If ($RESTProtocol = "https")
     {

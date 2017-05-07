@@ -1,4 +1,16 @@
-﻿# Add the LB configuration to the NetScaler VPX
+﻿<#
+.SYNOPSIS
+  Configure Basic Load Balancing Settings on the NetScaler VPX.
+.DESCRIPTION
+  Configure Basic Load Balancing Settings (SF LB example) on the NetScaler VPX, using the Invoke-RestMethod cmdlet for the REST API calls.
+.NOTES
+  Version:        1.0
+  Author:         Esther Barthel, MSc
+  Creation Date:  2017-05-04
+  Purpose:        Created as part of the demo scripts for the PowerShell Conference EU 2017 in Hannover
+
+  Copyright (c) cognition IT. All rights reserved.
+#>
 
 #region NITRO settings
     $ContentType = "application/json"
@@ -29,7 +41,7 @@ Write-Host "---------------------------------------------------------------- " -
 # | Method #1: Using the SessionVariable |
 # ----------------------------------------
 #region Start NetScaler NITRO Session
-    #Connect to the NetScaler VPX Virtual Appliance
+    #Connect to the NetScaler VPX
     $Login = @{"login" = @{"username"=$NSUserName;"password"=$NSUserPW;"timeout"=”900”}} | ConvertTo-Json
     $dummy = Invoke-RestMethod -Uri "http://$NSIP/nitro/v1/config/login" -Body $Login -Method POST -SessionVariable NetScalerSession -ContentType $ContentType -Verbose:$VerbosePreference
 #endregion Start NetScaler NITRO Session
@@ -57,7 +69,6 @@ Write-Host "---------------------------------------------------------------- " -
     # Method #1: Making the REST API call to the NetScaler
     $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
 #endregion Enable NetScaler Basic & Advanced Features
-
 
 # --------------------------------------
 # | Add App Expert settings            |
@@ -477,7 +488,6 @@ Write-Host "---------------------------------------------------------------- " -
     $payload = @{
     "servicegroup_servicegroupmember_binding"= @(
             @{"servicegroupname"="svcgrp_SFStore";"servername"="SF1";"port"=80;"state"="ENABLED";"weight"=1},
-#            @{"servicegroupname"="svcgrp_SFStore";"servername"="SF2";"port"=80;"state"="DISABLED"}
             @{"servicegroupname"="svcgrp_SFStore";"servername"="SF2";"port"=80;"state"="ENABLED";"weight"=2}
         )
     } | ConvertTo-Json -Depth 5
@@ -665,7 +675,6 @@ Write-Host "---------------------------------------------------------------- " -
     Write-Host $payload -ForegroundColor Green
 
     # Method #1: Making the REST API call to the NetScaler
-
     # !! Note:ping is binded by default to a service!!
 #    $response = Invoke-RestMethod -Method Put -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
 
@@ -835,7 +844,6 @@ Write-Host "---------------------------------------------------------------- " -
 
     # Method #1: Making the REST API call to the NetScaler
     $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
-
 #endregion Add LB vServers
 
 #region Bind Service to vServer
@@ -1009,7 +1017,7 @@ Write-Host "---------------------------------------------------------------- " -
 
 
 #region End NetScaler NITRO Session
-    #Disconnect from the NetScaler VPX Virtual Appliance
+    #Disconnect from the NetScaler VPX
     $LogOut = @{"logout" = @{}} | ConvertTo-Json
     Invoke-RestMethod -Uri "http://$NSIP/nitro/v1/config/logout" -Body $LogOut -Method POST -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
 #endregion End NetScaler NITRO Session

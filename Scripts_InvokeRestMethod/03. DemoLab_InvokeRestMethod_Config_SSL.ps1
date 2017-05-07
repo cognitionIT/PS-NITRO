@@ -1,5 +1,18 @@
-﻿# Add the SSL configuration to the NetScaler VPX
-# 20170320: !! NOTE: remember to remove the certificate files from the NetScaler before running this script => ACTION: Cleanup script needed for Hannover !!!!
+﻿# 20170320: !! DEMO NOTE: remember to remove the certificate files from the NetScaler before running this script => ACTION: Cleanup script needed for Hannover !!!!
+
+<#
+.SYNOPSIS
+  Configure Basic SSL Settings on the NetScaler VPX.
+.DESCRIPTION
+  Configure Basic SSL Settings (SF LB example) on the NetScaler VPX, using the Invoke-RestMethod cmdlet for the REST API calls.
+.NOTES
+  Version:        1.0
+  Author:         Esther Barthel, MSc
+  Creation Date:  2017-05-04
+  Purpose:        Created as part of the demo scripts for the PowerShell Conference EU 2017 in Hannover
+
+  Copyright (c) cognition IT. All rights reserved.
+#>
 
 #region NITRO settings
     $ContentType = "application/json"
@@ -30,7 +43,7 @@ Write-Host "---------------------------------------------------------------- " -
 # | Method #1: Using the SessionVariable |
 # ----------------------------------------
 #region Start NetScaler NITRO Session
-    #Connect to the NetScaler VPX Virtual Appliance
+    #Connect to the NetScaler VPX
     $Login = @{"login" = @{"username"=$NSUserName;"password"=$NSUserPW;"timeout"=”900”}} | ConvertTo-Json
     $dummy = Invoke-RestMethod -Uri "http://$NSIP/nitro/v1/config/login" -Body $Login -Method POST -SessionVariable NetScalerSession -ContentType $ContentType -Verbose:$VerbosePreference
 #endregion Start NetScaler NITRO Session
@@ -88,8 +101,7 @@ Write-Host "---------------------------------------------------------------- " -
 
     # Creating the right payload formatting (mind the Depth for the nested arrays)
 
-    # get the FileName, Content and Base64 String from the FilePath
-    # keep in mind that the filenames are case-sensitive
+    # Get FileName, Content and Base64 String from the FilePath, Keep in mind that the filenames are case-sensitive
     $PathToFile = $FileRoot + "\Certificates\rootCA.cer"
     $File1Name = Split-Path -Path $PathToFile -Leaf                                                 # Parameter explained: -Leaf     => Indicates that this cmdlet returns only the last item or container in the path. For example, in the path C:\Test\Logs\Pass1.log, it returns only Pass1.log.
     $FileContent = Get-Content $PathToFile -Encoding "Byte"
@@ -113,7 +125,7 @@ Write-Host "---------------------------------------------------------------- " -
 
     # Method #1: Making the REST API call to the NetScaler
     $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorVariable restError
-#endregion upload certificate
+#endregion Upload certificate
 
 #region Add certificate - key pairs
     <#
@@ -259,7 +271,7 @@ Write-Host "---------------------------------------------------------------- " -
         $response = Invoke-RestMethod -Method Delete -Uri $strURI -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
     #endregion BONUS: Changing the SSL vserver config to get a green status
 
-    #Disconnect from the NetScaler VPX Virtual Appliance
+    #Disconnect from the NetScaler VPX
     $LogOut = @{"logout" = @{}} | ConvertTo-Json
     Invoke-RestMethod -Uri "http://$NSIP/nitro/v1/config/logout" -Body $LogOut -Method POST -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
 #endregion End NetScaler NITRO Session

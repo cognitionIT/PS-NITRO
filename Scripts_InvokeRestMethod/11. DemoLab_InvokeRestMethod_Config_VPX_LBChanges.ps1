@@ -1,4 +1,16 @@
-﻿# Change server settings to the NetScaler CPX
+﻿<#
+.SYNOPSIS
+  Disable LB Service on the NetScaler VPX.
+.DESCRIPTION
+  Disable LB Service (SF LB example) on the NetScaler VPX, using the Invoke-RestMethod cmdlet for the REST API calls.
+.NOTES
+  Version:        1.0
+  Author:         Esther Barthel, MSc
+  Creation Date:  2017-05-04
+  Purpose:        Created as part of the demo scripts for the PowerShell Conference EU 2017 in Hannover
+
+  Copyright (c) cognition IT. All rights reserved.
+#>
 
 #region NITRO settings
     $ContentType = "application/json"
@@ -28,7 +40,7 @@ Write-Host "-------------------------------------------- " -ForegroundColor Yell
 # | Method #1: Using the SessionVariable |
 # ----------------------------------------
 #region Start NetScaler NITRO Session
-    #Connect to the NetScaler VPX Virtual Appliance
+    #Connect to the NetScaler VPX
     $Login = @{"login" = @{"username"=$NSUserName;"password"=$NSUserPW;"timeout"=”900”}} | ConvertTo-Json
     $dummy = Invoke-RestMethod -Uri "http://$NSIP/nitro/v1/config/login" -Body $Login -Method POST -SessionVariable NetScalerSession -ContentType $ContentType -Verbose:$VerbosePreference -ErrorAction SilentlyContinue
 #endregion Start NetScaler NITRO Session
@@ -36,10 +48,9 @@ Write-Host "-------------------------------------------- " -ForegroundColor Yell
 # ------------------------------------------
 # | Disable the blue webserver & Get stats |
 # ------------------------------------------
-
 Write-Host "* Disabling the Blue webserver with NITRO: " -ForegroundColor Cyan
 
-#region disable LB webserver blue
+#region Disable LB webserver blue (using config)
     # Specifying the correct URL 
     $strURI = "http://$NSIP/nitro/v1/config/servicegroup?action=disable"
 
@@ -61,7 +72,7 @@ Write-Host "* Disabling the Blue webserver with NITRO: " -ForegroundColor Cyan
     $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
 #endregion Disable LB webserver blue
 
-#region Get LB ServiceGroup stats
+#region Get LB ServiceGroup stats *using stat)
     # Specifying the correct URL 
     $strURI = "http://$NSIP/nitro/v1/stat/servicegroup/svcgrp_SFStore"
 
@@ -72,7 +83,8 @@ Write-Host "* Disabling the Blue webserver with NITRO: " -ForegroundColor Cyan
 #endregion Get LB ServiceGroup stats
 
 Start-Sleep 5
-#region Get LB vServer stats
+
+#region Get LB vServer stats (using stat)
     # Specifying the correct URL 
     $strURI = "http://$NSIP/nitro/v1/stat/lbvserver?args=name:vsvr_SFStore"
 
@@ -88,11 +100,9 @@ Write-Host "------------------------------------------- " -ForegroundColor Yello
 Write-Host "| Enabling the Blue webserver with NITRO: | " -ForegroundColor Yellow
 Write-Host "------------------------------------------- " -ForegroundColor Yellow
 
-
 # -----------------------------------------
 # | Enable the blue webserver & Get stats |
 # -----------------------------------------
-
 Write-Host "* Enabling the Blue webserver with NITRO: " -ForegroundColor Cyan
 
     #region !! Adding a presentation demo break !!
@@ -101,7 +111,7 @@ Write-Host "* Enabling the Blue webserver with NITRO: " -ForegroundColor Cyan
         Write-Host
     #endregion
 
-#region enable LB Service blue
+#region Enable LB Service blue
     # Specifying the correct URL 
     $strURI = "http://$NSIP/nitro/v1/config/servicegroup?action=enable"
 
@@ -121,7 +131,7 @@ Write-Host "* Enabling the Blue webserver with NITRO: " -ForegroundColor Cyan
 
     # Method #1: Making the REST API call to the NetScaler
     $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
-#endregion Disable LB Service blue
+#endregion Enable LB Service blue
 
 #region Get LB ServiceGroup stats
     # Specifying the correct URL 
@@ -142,13 +152,12 @@ Start-Sleep 5
     # Method #1: Making the REST API call to the NetScaler
     $response = Invoke-RestMethod -Method Get -Uri $strURI -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
     Write-Host "response: " -ForegroundColor Green
-#    $response.lbvserver | Select-object name, primaryipaddress, primaryport, type, state, vslbhealth, actsvcs, tothits
     $response.lbvserver | Select-object name, type, state, vslbhealth, actsvcs | Format-List
 #endregion Add LB vServer
 
 
 #region End NetScaler NITRO Session
-    #Disconnect from the NetScaler VPX Virtual Appliance
+    #Disconnect from the NetScaler VPX
     $LogOut = @{"logout" = @{}} | ConvertTo-Json
     $dummy = Invoke-RestMethod -Uri "http://$NSIP/nitro/v1/config/logout" -Body $LogOut -Method POST -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorAction SilentlyContinue
 #endregion End NetScaler NITRO Session

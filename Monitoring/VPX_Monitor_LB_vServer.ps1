@@ -1,4 +1,16 @@
-﻿
+﻿<#
+.SYNOPSIS
+  Monitoring Script for NetScaler VPX LB vServer.
+.DESCRIPTION
+  Monitoring Script for the NetScaler VPX LB vServer, based upon Stat REST API calls, using Invoke-RestMethod cmdlet.
+.NOTES
+  Version:        1.0
+  Author:         Esther Barthel, MSc
+  Creation Date:  2017-04-23
+
+  Copyright (c) cognition IT. All rights reserved.
+#>
+
 Function ShowAlert {
     [CmdletBinding()]
     param (
@@ -6,7 +18,7 @@ Function ShowAlert {
         [Parameter(Mandatory=$true)] [ValidateNotNullOrEmpty()] [string]$AlertMessage
     )
 
-    # Test popup
+    # Create a windows popup window
     Add-Type -AssemblyName PresentationCore,PresentationFramework
     # Button Options can be found here: https://msdn.microsoft.com/en-us/library/system.windows.messageboxbutton(v=vs.110).aspx
     $ButtonType = [System.Windows.MessageBoxButton]::Ok
@@ -49,50 +61,43 @@ Write-Host "--------------------------------------------------------------------
     $Alerted = $false
     while ($sw.elapsed -lt $timeout)
     {
+    #region Get LB Servicegroup member stats
+        # Specifying the correct URL 
+        $strURI = "http://$NSIP/nitro/v1/stat/servicegroupmember?args=servicegroupname:svcgrp_SFStore,servername:SF2,port:80"
 
-        #region Get LB Servicegroup member stats
-            # Specifying the correct URL 
-            $strURI = "http://$NSIP/nitro/v1/stat/servicegroupmember?args=servicegroupname:svcgrp_SFStore,servername:SF2,port:80"
+        # Method #1: Making the REST API call to the NetScaler
+        $response = Invoke-RestMethod -Method Get -Uri $strURI -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
 
-            # Method #1: Making the REST API call to the NetScaler
-            $response = Invoke-RestMethod -Method Get -Uri $strURI -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
-#            Write-Host "response: " -ForegroundColor Green
-#            $response.servicegroupmember | Select-Object servicegroupname, servicetype, state | Format-List
-
-            If ($response.servicegroupmember.state -ne "UP")
-            {
-                Write-Host ("Blue webserver status is " + $response.servicegroupmember.state) -ForegroundColor Red
-                ShowAlert -AlertTitle "Monitoring Blue webserver" -AlertMessage ("Blue webserver is " + $response.servicegroupmember.state)
-            }
-            Else
-            {
+        If ($response.servicegroupmember.state -ne "UP")
+        {
+            Write-Host ("Blue webserver status is " + $response.servicegroupmember.state) -ForegroundColor Red
+            ShowAlert -AlertTitle "Monitoring Blue webserver" -AlertMessage ("Blue webserver is " + $response.servicegroupmember.state)
+        }
+        Else
+        {
 #                Write-Host ("Blue webserver status is UP!") -ForegroundColor Green
-            }
-        #endregion Get LB Services stats
+        }
+    #endregion Get LB Services stats
 
-        #region Get LB vServer stats
-            # Specifying the correct URL 
-            $strURI = "http://$NSIP/nitro/v1/stat/lbvserver?args=name:vsvr_SFStore"
+    #region Get LB vServer stats
+        # Specifying the correct URL 
+        $strURI = "http://$NSIP/nitro/v1/stat/lbvserver?args=name:vsvr_SFStore"
 
-            # Method #1: Making the REST API call to the NetScaler
-            $response = Invoke-RestMethod -Method Get -Uri $strURI -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
-#            Write-Host "response: " -ForegroundColor Green
-#            $response.lbvserver | Select-object name, type, state, vslbhealth, actsvcs
+        # Method #1: Making the REST API call to the NetScaler
+        $response = Invoke-RestMethod -Method Get -Uri $strURI -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
 
-            If (($response.lbvserver.vslbhealth -ne 100) -and ($Alerted -eq $false))
-            {
-                Write-Host ("LB vServer runs at " + $response.lbvserver.vslbhealth + "% capacity!") -ForegroundColor Red
-            }
-            Else
-            {
-                Write-Host ("LB vServer runs at 100% capacity") -ForegroundColor Green
-            }
+        If (($response.lbvserver.vslbhealth -ne 100) -and ($Alerted -eq $false))
+        {
+            Write-Host ("LB vServer runs at " + $response.lbvserver.vslbhealth + "% capacity!") -ForegroundColor Red
+        }
+        Else
+        {
+            Write-Host ("LB vServer runs at 100% capacity") -ForegroundColor Green
+        }
+    #endregion Get LB vServer stats
 
-        #endregion Get LB vServer stats
-
-        start-sleep -seconds $Interval
+        Start-Sleep -seconds $Interval
         # check https://msdn.microsoft.com/en-us/library/ee372287%28v=vs.110%29.aspx?f=255&MSPPError=-2147217396 for formatting options
-#        Write-Output ("Elapsed Time: " + $sw.Elapsed.ToString('hh\:mm\:ss'))
         Write-Output ("Elapsed Time: " + $sw.Elapsed.ToString('mm\:ss'))
     }
     Write-Host "Time-out period of $Period seconds reached" -ForegroundColor Yellow
