@@ -1,4 +1,17 @@
-﻿[CmdletBinding()]
+﻿<#
+.SYNOPSIS
+  Configure Basic Load Balancing Settings on the NetScaler VPX.
+.DESCRIPTION
+  Configure Basic Load Balancing Settings (SF LB example) on the NetScaler VPX, using the PS-NITRO Module.
+.NOTES
+  Version:        1.0
+  Author:         Esther Barthel, MSc
+  Creation Date:  2017-01-15
+  Purpose:        Created as part of the demo scripts for Citrix Summit 2017 in Anaheim
+
+  Copyright (c) cognition IT. All rights reserved.
+#>
+[CmdletBinding()]
 # Declaring script parameters
 Param()
 
