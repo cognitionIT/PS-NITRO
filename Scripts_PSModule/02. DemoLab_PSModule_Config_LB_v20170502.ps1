@@ -125,8 +125,8 @@ If ($ConfigTrafficManagementSettings)
 
     #region Configure Load Balancing - Service Groups
         Add-NSServiceGroup -NSSession $NSSession -Name "svcgrp_SFStore" -Protocol HTTP -CacheType SERVER -Cacheable -State ENABLED -HealthMonitoring -AppflowLogging -AutoscaleMode DISABLED -ErrorAction SilentlyContinue
-        New-NSServicegroupServicegroupmemberBinding -NSSession $NSSession -Name "svcgrp_SFStore" -ServerName "SF2" -Port 80 -State DISABLED -ErrorAction SilentlyContinue
-        New-NSServicegroupServicegroupmemberBinding -NSSession $NSSession -Name "svcgrp_SFStore" -ServerName "SF1" -Port 80 -State ENABLED -ErrorAction SilentlyContinue
+        New-NSServicegroupServicegroupmemberBinding -NSSession $NSSession -Name "svcgrp_SFStore" -ServerName "SF2" -Port 80 -State ENABLED -Weight 2 -ErrorAction SilentlyContinue
+        New-NSServicegroupServicegroupmemberBinding -NSSession $NSSession -Name "svcgrp_SFStore" -ServerName "SF1" -Port 80 -State ENABLED -Weight 1 -ErrorAction SilentlyContinue
         Write-Host "LB Service Group: " -ForegroundColor Yellow -NoNewline
         Get-NSServicegroupServicegroupmemberBinding -NSSession $NSSession -Name "svcgrp_SFStore" | Select-Object servicegroupname,ip,port,svrstate,weight,servername,state
     #endregion
@@ -151,8 +151,8 @@ If ($ConfigTrafficManagementSettings)
     #endregion
 
     #region Load Balancing - vServers
-        Add-NSLBVServer -NSSession $NSSession -Name "vsvr_SFStore_http_redirect" -Protocol HTTP -IPAddressType IPAddress -IPAddress ($SubnetIP + ".101") -Port 80 -LBMethod LEASTCONNECTION  -ErrorAction SilentlyContinue
-        Add-NSLBVServer -NSSession $NSSession -Name "vsvr_SFStore" -Protocol SSL -IPAddressType IPAddress -IPAddress ($SubnetIP + ".101") -Port 443 -LBMethod LEASTCONNECTION -ErrorAction SilentlyContinue
+        Add-NSLBVServer -NSSession $NSSession -Name "vsvr_SFStore_http_redirect" -Protocol HTTP -IPAddressType IPAddress -IPAddress ($SubnetIP + ".101") -Port 80 -LBMethod ROUNDROBIN  -ErrorAction SilentlyContinue
+        Add-NSLBVServer -NSSession $NSSession -Name "vsvr_SFStore" -Protocol SSL -IPAddressType IPAddress -IPAddress ($SubnetIP + ".101") -Port 443 -LBMethod ROUNDROBIN -ErrorAction SilentlyContinue
         Write-Host "LB vServer: " -ForegroundColor Yellow -NoNewline
         Get-NSLBVServer -NSSession $NSSession | Select-Object name,ipv46, port, servicetype, effectivestate, status | Format-List
 
@@ -177,6 +177,9 @@ If ($ConfigTrafficManagementSettings)
 #endregion
 
 #region Final Step. Close the session to the NetScaler
+    # extra cleaning rule for demo purposes
+    Remove-NSServicegroupLBMonitorBinding -NSSession $NSSession -ServicegroupName "svcgrp_SFStore" -MonitorName "lb_mon_SFStore"
+
     # restore SSL validation to normal behavior
     If ($RESTProtocol = "https")
     {

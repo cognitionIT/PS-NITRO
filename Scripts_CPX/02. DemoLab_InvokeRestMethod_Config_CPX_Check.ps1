@@ -1,4 +1,4 @@
-﻿# Add the Basic Load Balancing configuration to the NetScaler CPX
+﻿# Check the Basic Load Balancing configuration to the NetScaler CPX
 
 #region NITRO settings
     $ContentType = "application/json"
@@ -31,50 +31,13 @@ Write-Host "-------------------------------- " -ForegroundColor Yellow
 Write-Host "| Check the Docker Containers: | " -ForegroundColor Yellow
 Write-Host "-------------------------------- " -ForegroundColor Yellow
 
-    #region !! Adding a presentation demo break !!
-    # ********************************************
-        Read-Host 'Press Enter to continue…' | Out-Null
-        Write-Host
-    #endregion
-
-#region Open webbrowsers to test the container websites
-    Write-Host "Checking the Blue webserver ..." -ForegroundColor Green
-    Start-sleep -Seconds 5
-    Invoke-Expression "cmd.exe /C start http://$DockerHostIP`:$WebServerBluePort/index.html"
-
-    Write-Host "Checking the Green webserver ..." -ForegroundColor Green
-    Start-sleep -Seconds 5
-    Invoke-Expression "cmd.exe /C start http://$DockerHostIP`:$WebServerGreenPort/index.html"
-
-    Write-Host "Checking the CPX NSIP ..." -ForegroundColor Green
-    Start-sleep -Seconds 5
-    Invoke-Expression "cmd.exe /C start http://$DockerHostIP`:$CPXPortNSIP"
-
-    Write-Host "Checking the CPX VIP ..." -ForegroundColor Green
-    Start-sleep -Seconds 5
-    Invoke-Expression "cmd.exe /C start http://$DockerHostIP`:$CPXPortVIP"
-#endregion Open webbrowsers
-
-Write-Host "------------------------------------------------------------- " -ForegroundColor Yellow
-Write-Host "| Pushing the LB configuration to NetScaler CPX with NITRO: | " -ForegroundColor Yellow
-Write-Host "------------------------------------------------------------- " -ForegroundColor Yellow
-
-    #region !! Adding a presentation demo break !!
-    # ********************************************
-        Read-Host 'Press Enter to continue…' | Out-Null
-        Write-Host
-    #endregion
-
-# ----------------------------------------
-# | Method #1: Using the SessionVariable |
-# ----------------------------------------
 #region Start NetScaler NITRO Session
     #Connect to the NetScaler VPX Virtual Appliance
     $Login = @{"login" = @{"username"=$NSUserName;"password"=$NSUserPW;"timeout"=”900”}} | ConvertTo-Json
     $dummy = Invoke-RestMethod -Uri "http://$NSIP/nitro/v1/config/login" -Body $Login -Method POST -SessionVariable NetScalerSession -ContentType $ContentType -Verbose:$VerbosePreference -ErrorAction SilentlyContinue
 #endregion Start NetScaler NITRO Session
 
-#region Add LB Services (bulk)
+#region Get LB Services (bulk)
     <#
     add
     URL:http://<netscaler-ip-address>/nitro/v1/config/service
@@ -144,14 +107,17 @@ Write-Host "------------------------------------------------------------- " -For
     } | ConvertTo-Json -Depth 5
 
     # Logging NetScaler Instance payload formatting
-    Write-Host "payload: " -ForegroundColor Yellow
-    Write-Host $payload -ForegroundColor Green
+#    Write-Host "payload: " -ForegroundColor Yellow
+#    Write-Host $payload -ForegroundColor Green
 
     # Method #1: Making the REST API call to the NetScaler
-    $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
-#endregion Add LB Services
+    $response = Invoke-RestMethod -Method Get -Uri $strURI -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
 
-#region Add LB vServers
+    Write-Host "response: " -ForegroundColor Green
+    $response.service | Select-Object name, servicetype, svrstate | Format-List
+#endregion Get LB Services
+
+#region Get LB vServers
 <#
     add
     URL:http://<netscaler-ip-address>/nitro/v1/config/lbvserver
@@ -271,51 +237,16 @@ Write-Host "------------------------------------------------------------- " -For
     } | ConvertTo-Json -Depth 5
 
     # Logging NetScaler Instance payload formatting
-    Write-Host "payload: " -ForegroundColor Yellow
-    Write-Host $payload -ForegroundColor Green
+#    Write-Host "payload: " -ForegroundColor Yellow
+#    Write-Host $payload -ForegroundColor Green
 
     # Method #1: Making the REST API call to the NetScaler
-    $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
+    $response = Invoke-RestMethod -Method Get -Uri $strURI -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
+
+    Write-Host "response: " -ForegroundColor Green
+    $response.lbvserver | Select-Object name, servicetype, curstate, lbmethod, health, activeservices | Format-List
 #endregion Add LB vServers
 
-#region Bind Service to vServer (bulk)
-<#
-    add:
-    URL:http://<netscaler-ip-address/nitro/v1/config/lbvserver_service_binding
-    HTTP Method:PUT
-    Request Headers:
-    Cookie:NITRO_AUTH_TOKEN=<tokenvalue>
-    Content-Type:application/json
-    Request Payload:
-    {
-    "lbvserver_service_binding":{
-          "name":<String_value>,
-          "servicename":<String_value>,
-          "weight":<Double_value>,
-          "servicegroupname":<String_value>
-    }}
-    Response:
-    HTTP Status Code on Success: 201 Created
-    HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <string> (for NetScaler-specific errors). The response payload provides details of the error
-#>
-    # Specifying the correct URL 
-    $strURI = "http://$NSIP/nitro/v1/config/lbvserver_service_binding"
-
-    # bind lb vserver cpx-vip db1
-    $payload = @{
-    "lbvserver_service_binding"= @(
-            @{"name"="vsvr_webserver_81";"servicename"="svc_webserver_green";"weight"=1},
-            @{"name"="vsvr_webserver_81";"servicename"="svc_webserver_blue";"weight"=2}
-        )
-    } | ConvertTo-Json -Depth 5
-
-    # Logging NetScaler Instance payload formatting
-    Write-Host "payload: " -ForegroundColor Yellow
-    Write-Host $payload -ForegroundColor Green
-
-    # Method #1: Making the REST API call to the NetScaler
-    $response = Invoke-RestMethod -Method Put -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
-#endregion Bind Service to vServer
 
 #region End NetScaler NITRO Session
     #Disconnect from the NetScaler VPX Virtual Appliance

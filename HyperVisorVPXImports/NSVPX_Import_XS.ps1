@@ -1,8 +1,8 @@
 ﻿<#
 .SYNOPSIS
-  Citrix NetScaler VPX import script for ESX.
+  Citrix NetScaler VPX import script for XS.
 .DESCRIPTION
-  Citrix NetScaler VPX import script for ESX importing the virtual appliance with a fixed IP.
+  Citrix NetScaler VPX import script for Citrix XenServer importing the virtual appliance with a fixed IP.
 .NOTES
   Version:        1.1
   Author:         Esther Barthel, MSc

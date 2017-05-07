@@ -4,12 +4,10 @@
     $ContentType = "application/json"
     $SubNetIP = "192.168.0"
     $NSIP = $SubNetIP + ".2"
-    # Prompt for credentials
-#    $MyCreds =  Get-Credential
     # Build my own credentials variable, based on password string
     $PW = ConvertTo-SecureString "nsroot" -AsPlainText -Force
     $MyCreds = New-Object System.Management.Automation.PSCredential ("nsroot", $PW)
-    $FileRoot = "H:\PSModules\NITRO\Scripts"
+    $FileRoot = "C:\GitHub\PS-NITRO\Scripts_InvokeRestMethod"
 
     $NSUserName = "nsroot"
     $NSUserPW = "nsroot"
@@ -30,7 +28,6 @@ Write-Host "---------------------------------------------------------------- " -
 # ----------------------------------------
 # | Method #1: Using the SessionVariable |
 # ----------------------------------------
-
 #region Start NetScaler NITRO Session
     #Connect to the NetScaler VPX Virtual Appliance
     $Login = @{"login" = @{"username"=$NSUserName;"password"=$NSUserPW;"timeout"=”900”}} | ConvertTo-Json
@@ -827,9 +824,7 @@ Write-Host "---------------------------------------------------------------- " -
     # 
     $payload = @{
     "lbvserver"= @(
-#            @{"name"="vsvr_SFStore_http_redirect";"servicetype"="HTTP";"ipv46"=($SubNetIP + ".101");"port"=80;"lbmethod"="LEASTCONNECTION"},
             @{"name"="vsvr_SFStore_http_redirect";"servicetype"="HTTP";"ipv46"=($SubNetIP + ".101");"port"=80;"lbmethod"="ROUNDROBIN"},
-#            @{"name"="vsvr_SFStore";"servicetype"="SSL";"ipv46"=($SubNetIP + ".101");"port"=443;"lbmethod"="LEASTCONNECTION"}
             @{"name"="vsvr_SFStore";"servicetype"="SSL";"ipv46"=($SubNetIP + ".101");"port"=443;"lbmethod"="ROUNDROBIN"}
         )
     } | ConvertTo-Json -Depth 5

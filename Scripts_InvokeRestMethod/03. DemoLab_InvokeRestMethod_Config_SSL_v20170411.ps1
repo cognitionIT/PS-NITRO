@@ -1,14 +1,10 @@
-﻿# 20170317: Working setup for Elektra computer
-# Add the SSL configuration to the NetScaler VPX
-
+﻿# Add the SSL configuration to the NetScaler VPX
 # 20170320: !! NOTE: remember to remove the certificate files from the NetScaler before running this script => ACTION: Cleanup script needed for Hannover !!!!
 
 #region NITRO settings
     $ContentType = "application/json"
     $SubNetIP = "192.168.0"
     $NSIP = $SubNetIP + ".2"
-    # Prompt for credentials
-#    $MyCreds =  Get-Credential
     # Build my own credentials variable, based on password string
     $PW = ConvertTo-SecureString "nsroot" -AsPlainText -Force
     $MyCreds = New-Object System.Management.Automation.PSCredential ("nsroot", $PW)
@@ -33,7 +29,6 @@ Write-Host "---------------------------------------------------------------- " -
 # ----------------------------------------
 # | Method #1: Using the SessionVariable |
 # ----------------------------------------
-
 #region Start NetScaler NITRO Session
     #Connect to the NetScaler VPX Virtual Appliance
     $Login = @{"login" = @{"username"=$NSUserName;"password"=$NSUserPW;"timeout"=”900”}} | ConvertTo-Json
@@ -52,7 +47,6 @@ Write-Host "---------------------------------------------------------------- " -
 
     $payload = @{
     "nsfeature"= @{
-#        "feature"="cs aaa"
         "feature"=@("SSL")
         }
     } | ConvertTo-Json -Depth 5
@@ -240,32 +234,31 @@ Write-Host "---------------------------------------------------------------- " -
     $response = Invoke-RestMethod -Method Put -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
 #endregion Bind Certificate to VServer
 
-
-#region BONUS: Changing the SSL vserver config to get a green status
-    <#
-        delete:
-        URL:http://<netscaler-ip-address>/nitro/v1/config/servicegroup_lbmonitor_binding/servicegroupname_value<String>
-        Query-parameters:
-        args
-        http://<netscaler-ip-address>/nitro/v1/config/servicegroup_lbmonitor_binding/servicegroupname_value<String>?args=port:<Integer_value>,monitor_name:<String_value>
-        HTTP Method:DELETE
-        Request Header:
-        Cookie:NITRO_AUTH_TOKEN=<tokenvalue>
-        Response:
-        HTTP Status Code on Success: 200 OK
-        HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <string> (for NetScaler-specific errors). The response payload provides details of the error
-    #>
-    # Specifying the correct URL 
-    $strURI = "http://$NSIP/nitro/v1/config/servicegroup_lbmonitor_binding/svcgrp_SFStore?args=monitor_name:lb_mon_SFStore"
-
-    # unbind monitor to servicegroup
-
-    # Method #1: Making the REST API call to the NetScaler
-    $response = Invoke-RestMethod -Method Delete -Uri $strURI -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
-#endregion BONUS: Changing the SSL vserver config to get a green status
-
-
 #region End NetScaler NITRO Session
+
+    #region BONUS: Changing the SSL vserver config to get a green status
+        <#
+            delete:
+            URL:http://<netscaler-ip-address>/nitro/v1/config/servicegroup_lbmonitor_binding/servicegroupname_value<String>
+            Query-parameters:
+            args
+            http://<netscaler-ip-address>/nitro/v1/config/servicegroup_lbmonitor_binding/servicegroupname_value<String>?args=port:<Integer_value>,monitor_name:<String_value>
+            HTTP Method:DELETE
+            Request Header:
+            Cookie:NITRO_AUTH_TOKEN=<tokenvalue>
+            Response:
+            HTTP Status Code on Success: 200 OK
+            HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <string> (for NetScaler-specific errors). The response payload provides details of the error
+        #>
+        # Specifying the correct URL 
+        $strURI = "http://$NSIP/nitro/v1/config/servicegroup_lbmonitor_binding/svcgrp_SFStore?args=monitor_name:lb_mon_SFStore"
+
+        # unbind monitor to servicegroup
+
+        # Method #1: Making the REST API call to the NetScaler
+        $response = Invoke-RestMethod -Method Delete -Uri $strURI -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
+    #endregion BONUS: Changing the SSL vserver config to get a green status
+
     #Disconnect from the NetScaler VPX Virtual Appliance
     $LogOut = @{"logout" = @{}} | ConvertTo-Json
     Invoke-RestMethod -Uri "http://$NSIP/nitro/v1/config/logout" -Body $LogOut -Method POST -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference

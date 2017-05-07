@@ -95,12 +95,7 @@ If ($ConfigSSLSettings)
     #region Bind Certificate to VServer
         Add-NSSSLVServerCertKeyBinding -NSSession $NSSession -VServerName vsvr_SFStore -CertKeyName "wildcard.demo.lab" -ErrorAction SilentlyContinue
         Write-Host "VServer certificate bindings: " -ForegroundColor Yellow
-        #Remove-NSSSLVServerCertKeyBinding -NSSession $NSSession -VServerName vsvr_SFStore -CertKeyName "wildcard.demo.lab" -Verbose
         Get-NSSSLVServerCertKeyBinding -NSSession $NSSession -VServerName vsvr_SFStore
-    #endregion
-
-    #region changing the SSL vserver config to get a green status
-        Remove-NSServicegroupLBMonitorBinding -NSSession $NSSession -ServicegroupName "svcgrp_SFStore" -MonitorName "lb_mon_SFStore" -ErrorAction SilentlyContinue
     #endregion
 
     Write-Host 
@@ -110,6 +105,11 @@ If ($ConfigSSLSettings)
 #endregion
 
 #region Final Step. Close the session to the NetScaler
+
+    #region changing the SSL vserver config to get a green status
+    #    Remove-NSServicegroupLBMonitorBinding -NSSession $NSSession -ServicegroupName "svcgrp_SFStore" -MonitorName "lb_mon_SFStore" -ErrorAction SilentlyContinue
+    #endregion
+
     # restore SSL validation to normal behavior
     If ($RESTProtocol = "https")
     {
