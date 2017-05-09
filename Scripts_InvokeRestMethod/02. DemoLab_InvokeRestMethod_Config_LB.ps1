@@ -833,8 +833,8 @@ Write-Host "---------------------------------------------------------------- " -
     # 
     $payload = @{
     "lbvserver"= @(
-            @{"name"="vsvr_SFStore_http_redirect";"servicetype"="HTTP";"ipv46"=($SubNetIP + ".101");"port"=80;"lbmethod"="ROUNDROBIN"},
-            @{"name"="vsvr_SFStore";"servicetype"="SSL";"ipv46"=($SubNetIP + ".101");"port"=443;"lbmethod"="ROUNDROBIN"}
+            @{"name"="vsvr_SFStore_http_redirect";"servicetype"="HTTP";"ipv46"=($SubNetIP + ".11");"port"=80;"lbmethod"="ROUNDROBIN"},
+            @{"name"="vsvr_SFStore";"servicetype"="SSL";"ipv46"=($SubNetIP + ".11");"port"=443;"lbmethod"="ROUNDROBIN"}
         )
     } | ConvertTo-Json -Depth 5
 

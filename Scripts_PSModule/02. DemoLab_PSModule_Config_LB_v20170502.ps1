@@ -156,8 +156,6 @@ If ($ConfigTrafficManagementSettings)
 
         New-NSServicegroupLBMonitorBinding -NSSession $NSSession -ServicegroupName "svcgrp_SFStore" -MonitorName "ping" -ErrorAction SilentlyContinue
         New-NSServicegroupLBMonitorBinding -NSSession $NSSession -ServicegroupName "svcgrp_SFStore" -MonitorName "lb_mon_SFStore" -ErrorAction SilentlyContinue
-        Write-Host "LB Servicegroup Monitor binding: " -ForegroundColor Yellow
-        Get-NSServicegroupLBMonitorBinding -NSSession $NSSession -Name "svcgrp_SFStore"
 
         Remove-NSServicegroupLBMonitorBinding -NSSession $NSSession -ServicegroupName "svcgrp_SFStore" -MonitorName "ping"
         Write-Host "LB Servicegroup Monitor binding: " -ForegroundColor Yellow
@@ -165,8 +163,8 @@ If ($ConfigTrafficManagementSettings)
     #endregion
 
     #region Load Balancing - vServers
-        Add-NSLBVServer -NSSession $NSSession -Name "vsvr_SFStore_http_redirect" -Protocol HTTP -IPAddressType IPAddress -IPAddress ($SubnetIP + ".101") -Port 80 -LBMethod ROUNDROBIN  -ErrorAction SilentlyContinue
-        Add-NSLBVServer -NSSession $NSSession -Name "vsvr_SFStore" -Protocol SSL -IPAddressType IPAddress -IPAddress ($SubnetIP + ".101") -Port 443 -LBMethod ROUNDROBIN -ErrorAction SilentlyContinue
+        Add-NSLBVServer -NSSession $NSSession -Name "vsvr_SFStore_http_redirect" -Protocol HTTP -IPAddressType IPAddress -IPAddress ($SubnetIP + ".11") -Port 80 -LBMethod ROUNDROBIN  -ErrorAction SilentlyContinue
+        Add-NSLBVServer -NSSession $NSSession -Name "vsvr_SFStore" -Protocol SSL -IPAddressType IPAddress -IPAddress ($SubnetIP + ".11") -Port 443 -LBMethod ROUNDROBIN -ErrorAction SilentlyContinue
         Write-Host "LB vServer: " -ForegroundColor Yellow -NoNewline
         Get-NSLBVServer -NSSession $NSSession | Select-Object name,ipv46, port, servicetype, effectivestate, status | Format-List
 
