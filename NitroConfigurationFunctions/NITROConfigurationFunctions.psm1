@@ -1010,6 +1010,7 @@ Set-StrictMode -Version Latest
 
         Write-Verbose "$($MyInvocation.MyCommand): Exit"
     }
+
     # Import-NSTimeZones is part of the Citrix NITRO Module
     # Copied from Citrix's Module to ensure correct scoping of variables and functions
     function Import-NSTimeZones {
@@ -1384,6 +1385,104 @@ Set-StrictMode -Version Latest
     #region System - High Availability
 
     # New-NSHighAvailabilityPair is part of the Citrix NITRO Module
+    function New-NSHighAvailabilityPair {
+        <#
+        .SYNOPSIS
+            Configures a new high availability pair
+        .DESCRIPTION
+            Configures a new high availability pair
+            This also means that the configuration on the primary node is propagated and synchronized with the secondary node
+        .PARAMETER PrimaryNSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER SecondaryNSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER SaveAfterSync
+            Specify to save the NetScaler appliance configuration (including the HA changes) after creating and synchronizing the HA pair
+        .PARAMETER InitialSyncTimeout
+            Time in seconds to wait for synchronization to occur until timing out. This only applies when specifying SaveAfterSync
+        .PARAMETER PeerNodeId
+            Node ID to use for the peer node. This is normally kept as 1
+        .EXAMPLE
+            New-NSHighAvailabilityPair -PrimaryNSSession $PrimarySession -SecondaryNSSession $SecondarySession
+        .NOTES
+            Copyright (c) Citrix Systems, Inc. All rights reserved.
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true)] [PSObject]$PrimaryNSSession,
+            [Parameter(Mandatory=$true)] [PSObject]$SecondaryNSSession,
+            [Parameter(Mandatory=$false)] [switch]$SaveAfterSync,
+            [Parameter(Mandatory=$false)] [int]$InitialSyncTimeout=900,
+            [Parameter(Mandatory=$false)] [int]$PeerNodeId=1
+        )
+
+        Write-Verbose "$($MyInvocation.MyCommand): Enter"
+    
+        #GETTING MANAGEMENT ADDRESS
+        Write-Verbose "Getting management IP address from '$($PrimaryNSSession.Endpoint)'"
+        $response = Invoke-NSNitroRestApi -NSSession $PrimaryNSSession -OperationMethod GET -ResourceType nsconfig
+        $primaryNSIP = $response.nsconfig.ipaddress
+
+        Write-Verbose "Getting management IP address from '$($SecondaryNSSession.Endpoint)'"
+        $response = Invoke-NSNitroRestApi -NSSession $SecondaryNSSession -OperationMethod GET -ResourceType nsconfig
+        $secondaryNSIP = $response.nsconfig.ipaddress
+    
+        #FORCE THE NODES TO PRIMARY AND SECONDARY
+        Write-Verbose "Setting '$($PrimaryNSSession.Endpoint)' to STAYPRIMARY"
+        $payload = @{id=0;hastatus="STAYPRIMARY"}
+        $response = Invoke-NSNitroRestApi -NSSession $PrimaryNSSession -OperationMethod PUT -ResourceType hanode -Payload $payload -Action update
+        Write-Verbose "Setting '$($SecondaryNSSession.Endpoint)' to STAYSECONDARY"
+        $payload = @{id=0;hastatus="STAYSECONDARY"}
+        $response = Invoke-NSNitroRestApi -NSSession $SecondaryNSSession -OperationMethod PUT -ResourceType hanode -Payload $payload -Action update
+
+        #ADD ALL OTHER NODES ON EACH NETSCALER 
+        Write-Verbose "Adding node $PeerNodeId for '$($SecondaryNSSession.Endpoint)' on '$($PrimaryNSSession.Endpoint)'"
+        $payload = @{id=$PeerNodeId;ipaddress=$secondaryNSIP}
+        $response = Invoke-NSNitroRestApi -NSSession $PrimaryNSSession -OperationMethod POST -ResourceType hanode -Payload $payload -Action add
+        Write-Verbose "Adding node $PeerNodeId for '$($PrimaryNSSession.Endpoint)' on '$($SecondaryNSSession.Endpoint)'"
+        $payload = @{id=$PeerNodeId;ipaddress=$primaryNSIP}
+        $response = Invoke-NSNitroRestApi -NSSession $SecondaryNSSession -OperationMethod POST -ResourceType hanode -Payload $payload -Action add
+
+        #ENABLE NODES, FIRST ON SECONDARY AND FINALLY ON PRIMARY
+        Write-Verbose "Setting '$($SecondaryNSSession.Endpoint)' to ENABLED"
+        $payload = @{id=0;hastatus="ENABLED"}
+        $response = Invoke-NSNitroRestApi -NSSession $SecondaryNSSession -OperationMethod PUT -ResourceType hanode -Payload $payload -Action update
+        Write-Verbose "Setting '$($PrimaryNSSession.Endpoint)' to ENABLED"
+        $payload = @{id=0;hastatus="ENABLED"}
+        $response = Invoke-NSNitroRestApi -NSSession $PrimaryNSSession -OperationMethod PUT -ResourceType hanode -Payload $payload -Action update
+    
+
+        if ($SaveAfterSync) {
+            $canWait = $true
+            $waitStart = Get-Date
+            while ($canWait) {
+                Write-Verbose "Waiting for synchronization to complete..."
+                Start-Sleep -Seconds 5
+                $validation = Invoke-NSNitroRestApi -NSSession $PrimaryNSSession -OperationMethod GET -ResourceType hanode
+                $secondaryNode = $validation.hanode | where { $_.id -eq "$PeerNodeId" }
+                if ($($(Get-Date) - $waitStart).TotalSeconds -gt $InitialSyncTimeout) {
+                    $canWait = $false
+                } elseif ($secondaryNode.hasync -eq "IN PROGRESS" -or $secondaryNode.hasync -eq "ENABLED") {
+                    Write-Verbose "Synchronization not done yet."
+                    continue
+                } elseif ($secondaryNode.hasync -eq "SUCCESS") {
+                    Write-Verbose "Synchronization succesful. Saving configuration on both NetScaler appliances..."
+                    Save-NSConfig -NSSession $PrimaryNSSession
+                    Save-NSConfig -NSSession $SecondaryNSSession
+                    break
+                } else {
+                    throw "Unexpected sync status '$($secondaryNode.hasync)'"
+                }
+            }
+
+            if (-not $canWait) {
+                throw "Timeout expired. Unable to save NetScaler appliance configuration because sync took too long."
+            }
+        }
+
+        Write-Verbose "$($MyInvocation.MyCommand): Exit"
+
+    }
 
     #endregion
     #region DONE System - NTP Servers
@@ -3125,6 +3224,7 @@ Set-StrictMode -Version Latest
         )
     }
     Set-Variable -Name NSRewriteActionTypes -Value $(Import-NSRewriteActionTypes) -Option Constant
+
     function Update-NSRewriteAction {
         <#
         .SYNOPSIS
@@ -3532,6 +3632,7 @@ Set-StrictMode -Version Latest
         return @('noob', 'respondwith', 'redirect', 'respondwithhtmlpage', 'sqlresponse_ok','sqlresponse_error')
     }
     Set-Variable -Name NSResponderActionTypes -Value $(Import-NSResponderActionTypes) -Option Constant
+
     function Update-NSResponderAction {
         <#
         .SYNOPSIS
@@ -5942,8 +6043,11 @@ Set-StrictMode -Version Latest
 
     #endregion
     #endregion
+
     #region Traffic Management - Content Switching
+
     #endregion
+
     #region Traffic Management - DNS
 
     # Add-NSDnsNameServer is part of the Citrix NITRO Module
@@ -6127,6 +6231,7 @@ Set-StrictMode -Version Latest
     #endregion
 
     #region Traffic Management - GSLB
+
     #endregion
 
     #region Traffic Management - SSL
@@ -6952,13 +7057,352 @@ Set-StrictMode -Version Latest
 #region NetScaler Gateway
 
     # Add-NSVPNVServer is part of the Citrix NITRO Module
+    function Add-NSVPNVServer {
+        <#
+        .SYNOPSIS
+            Add a new VPN virtual server
+        .DESCRIPTION
+            Add a new VPN virtual server
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER Name
+            Name of the virtual server
+        .PARAMETER IPAddress
+            IPv4 or IPv6 address to assign to the virtual server
+            Usually a public IP address. User devices send connection requests to this IP address
+        .PARAMETER Port
+            Port number for the virtual server
+        .PARAMETER ICAOnly
+            User can log on in basic mode only, through either Citrix Receiver or a browser. Users are not allowed to connect by using the Access Gateway Plug-in
+        .EXAMPLE
+            Add-NSVPNVServer -NSSession $Session -Name "myVPNVirtualServer" -IPAddress "10.108.151.3" -Port 443 -ICAOnly
+        .NOTES
+            Copyright (c) Citrix Systems, Inc. All rights reserved.
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+            [Parameter(Mandatory=$true)] [string]$Name,
+            [Parameter(Mandatory=$true)] [string]$IPAddress,
+            [Parameter(Mandatory=$false)] [ValidateRange(1,65535)] [int]$Port=443,
+            [Parameter(Mandatory=$false)] [switch]$ICAOnly=$true
+        )
+
+        Write-Verbose "$($MyInvocation.MyCommand): Enter"
+
+        Write-Verbose "Validating IP Address"
+        $IPAddressObj = New-Object -TypeName System.Net.IPAddress -ArgumentList 0
+        if (-not [System.Net.IPAddress]::TryParse($IPAddress,[ref]$IPAddressObj)) {
+            throw "'$IPAddress' is an invalid IP address"
+        }
+
+        $ica = if ($ICAOnly) { "ON" } else { "OFF" }
+        $payload = @{name=$Name;ipv46=$IPAddress;port=$Port;icaonly=$ica;servicetype="SSL"}
+        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType vpnvserver -Payload $payload -Action add 
+   
+        Write-Verbose "$($MyInvocation.MyCommand): Exit"
+
+    }
+
     # New-NSVPNVServerAuthLDAPPolicyBinding is part of the Citrix NITRO Module
+    function New-NSVPNVServerAuthLDAPPolicyBinding {
+        <#
+        .SYNOPSIS
+            Bind authentication LDAP policy to VPN virtual server
+        .DESCRIPTION
+            Bind authentication LDAP policy to VPN virtual server
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER VirtualServerName
+            Name of the VPN virtual server
+        .PARAMETER LDAPPolicyName
+            The name of the policy to be bound to the vpn vserver
+        .EXAMPLE
+            New-NSVPNVServerAuthLDAPPolicyBinding -NSSession $Session -VirtualServerName "myVPNVirtualServer" -LDAPPolicyName "10.108.151.1_LDAP_pol"
+        .NOTES
+            Copyright (c) Citrix Systems, Inc. All rights reserved.
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+            [Parameter(Mandatory=$true)] [string]$VirtualServerName,
+            [Parameter(Mandatory=$true)] [string]$LDAPPolicyName
+        )
+
+        Write-Verbose "$($MyInvocation.MyCommand): Enter"
+
+        $payload = @{name=$VirtualServerName;policy=$LDAPPolicyName}
+        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType vpnvserver_authenticationldappolicy_binding -Payload $payload -Action add 
+
+        Write-Verbose "$($MyInvocation.MyCommand): Exit"
+    }
+
     # Add-NSVPNSessionAction is part of the Citrix NITRO Module
+    function Add-NSVPNSessionAction {
+        <#
+        .SYNOPSIS
+            Create VPN session action resource
+        .DESCRIPTION
+            Create VPN session action resource
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER SessionActionName
+            Name for the session action
+        .PARAMETER TransparentInterception
+            Switch parameter. Allow access to network resources by using a single IP address and subnet mask or a range of IP addresses.
+            When turned off,  sets the mode to proxy, in which you configure destination and source IP addresses and port numbers.
+            If you are using the NetScale Gateway Plug-in for Windows, turn it on, in which the mode is set to transparent. 
+            If you are using the NetScale Gateway Plug-in for Java, turn it off.
+        .PARAMETER SplitTunnel
+            Send, through the tunnel, traffic only for intranet applications that are defined in NetScaler Gateway. 
+            Route all other traffic directly to the Internet.
+            The OFF setting routes all traffic through Access Gateway. 
+            With the REVERSE setting, intranet applications define the network traffic that is not intercepted.All network traffic directed to internal IP addresses bypasses the VPN tunnel, while other traffic goes through Access Gateway. 
+            Reverse split tunneling can be used to log all non-local LAN traffic. 
+            Possible values = ON, OFF, REVERSE
+        .PARAMETER DefaultAuthorizationAction
+            Specify the network resources that users have access to when they log on to the internal network. Acceptable vaules: "ALLOW","DENY"
+            Default to "DENY", which deny access to all network resources. 
+        .PARAMETER SSO,
+            Set single sign-on (SSO) for the session. When the user accesses a server, the user's logon credentials are passed to the server for authentication.
+            Acceptable values: "ON","OFF", default to 'ON"
+        .PARAMETER IcaProxy
+            Enable ICA proxy to configure secure Internet access to servers running Citrix XenApp or XenDesktop by using Citrix Receiver instead of the Access Gateway Plug-in.
+        .PARAMETER NtDomain
+            Single sign-on domain to use for single sign-on to applications in the internal network. 
+            This setting can be overwritten by the domain that users specify at the time of logon or by the domain that the authentication server returns.
+        .PARAMETER ClientlessVpnMode
+            Enable clientless access for web, XenApp or XenDesktop, and FileShare resources without installing the Access Gateway Plug-in. 
+            Available settings function as follows: * ON - Allow only clientless access. * OFF - Allow clientless access after users log on with the Access Gateway Plug-in. * DISABLED - Do not allow clientless access.
+        .PARAMETER ClientChoices
+            Provide users with multiple logon options. With client choices, users have the option of logging on by using the Access Gateway Plug-in for Windows, Access Gateway Plug-in for Java, the Web Interface, or clientless access from one location.
+            Depending on how Access Gateway is configured, users are presented with up to three icons for logon choices. The most common are the Access Gateway Plug-in for Windows, Web Interface, and clientless access.
+        .PARAMETER StoreFrontUrl,
+            Web address for StoreFront to be used in this session for enumeration of resources from XenApp or XenDesktop.
+        .PARAMETER WIHome
+            Web address of the Web Interface server, such as http:///Citrix/XenApp, or Receiver for Web, which enumerates the virtualized resources, such as XenApp, XenDesktop, and cloud applications.
+        .EXAMPLE
+            Add-NSVPNSessionAction -NSSession $Session -SessionActionName AC_OS_10.108.151.1_S_ -NTDomain xd.local -WIHome "http://10.8.115.243/Citrix/StoreWeb" -StoreFrontUrl "http://10.8.115.243"
+        .NOTES
+            Copyright (c) Citrix Systems, Inc. All rights reserved.
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+            [Parameter(Mandatory=$true)] [string]$SessionActionName,
+            [Parameter(Mandatory=$false)] [ValidateSet("ON","OFF")] [string]$TransparentInterception="OFF",
+            [Parameter(Mandatory=$false)] [ValidateSet("ON","OFF","REVERSE")] [string]$SplitTunnel="OFF",
+            [Parameter(Mandatory=$false)] [ValidateSet("ALLOW","DENY")] [string]$DefaultAuthorizationAction="ALLOW",
+            [Parameter(Mandatory=$false)] [ValidateSet("ON","OFF")] [string]$SSO="ON",
+            [Parameter(Mandatory=$false)] [ValidateSet("ON","OFF")] [string]$IcaProxy="ON",
+            [Parameter(Mandatory=$true)] [string]$NTDomain,
+            [Parameter(Mandatory=$false)] [ValidateSet("ON","OFF","DISABLED")] [string]$ClientlessVpnMode="OFF",
+            [Parameter(Mandatory=$false)] [ValidateSet("ON","OFF")] [string]$ClientChoices="OFF",
+            [Parameter(Mandatory=$false)] [string]$StoreFrontUrl,
+            [Parameter(Mandatory=$false)] [string]$WIHome="$StoreFrontUrl/Citrix/StoreWeb"
+        )
+
+        Write-Verbose "$($MyInvocation.MyCommand): Enter"
+
+        $payload = @{
+            name = $SessionActionName
+            transparentinterception = $TransparentInterception
+            splittunnel = $SplitTunnel
+            defaultauthorizationaction = $DefaultAuthorizationAction
+            SSO = $SSO
+            icaproxy = $IcaProxy
+            wihome = $WIHome
+            clientchoices = $ClientChoices
+            ntdomain = $NTDomain
+            clientlessvpnmode=$ClientlessVpnMode
+        }
+        if (-not [string]::IsNullOrEmpty($StoreFrontUrl)) {
+            $payload.Add("storefronturl",$StoreFrontUrl)
+        }
+        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType vpnsessionaction -Payload $payload -Action add 
+
+        Write-Verbose "$($MyInvocation.MyCommand): Exit"
+    }
+
     # Add-NSVPNSessionPolicy is part of the Citrix NITRO Module
+    function Add-NSVPNSessionPolicy {
+        <#
+        .SYNOPSIS
+            Add VPN Session policy resources
+        .DESCRIPTION
+            Add VPN Session policy resources
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER SessionActionName
+            Action to be applied by the new session policy if the rule criteria are met.
+        .PARAMETER SessionPolicyName
+            Name for the new session policy that is applied after the user logs on to Access Gateway.
+        .PARAMETER SessionRuleExpression
+            Expression, or name of a named expression, specifying the traffic that matches the policy.
+            Can be written in either default or classic syntax. 
+        .EXAMPLE
+            Add-NSVPNSessionPolicy -NSSession $Session -SessionActionName "AC_OS_10.108.151.1_S_" -SessionPolicyName "PL_OS_10.108.151.1" -SessionRuleExpression "REQ.HTTP.HEADER User-Agent CONTAINS CitrixReceiver || REQ.HTTP.HEADER Referer NOTEXISTS"
+        .NOTES
+            Copyright (c) Citrix Systems, Inc. All rights reserved.
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+            [Parameter(Mandatory=$true)] [string]$SessionActionName,
+            [Parameter(Mandatory=$true)] [string]$SessionPolicyName,
+            [Parameter(Mandatory=$true)] [string]$SessionRuleExpression
+        )
+
+        Write-Verbose "$($MyInvocation.MyCommand): Enter"
+
+        $payload = @{name=$SessionPolicyName;action=$SessionActionName;rule=$SessionRuleExpression}
+        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType vpnsessionpolicy -Payload $payload -Action add 
+
+        Write-Verbose "$($MyInvocation.MyCommand): Exit"
+    }
+
     # New-NSVPNVServerSessionPolicyBinding is part of the Citrix NITRO Module
+    function New-NSVPNVServerSessionPolicyBinding {
+        <#
+        .SYNOPSIS
+            Bind VPN session policy to VPN virtual server
+        .DESCRIPTION
+            Bind VPN session policy to VPN virtual server
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER VirtualServerName
+            Name of the virtual server
+        .PARAMETER SessionPolicyName
+            The name of the policy, if any, bound to the vpn vserver
+        .PARAMETER Priority
+            The priority, if any, of the vpn vserver policy
+        .EXAMPLE
+            New-NSVPNVServerSessionPolicyBinding -NSSession $Session -VirtualServerName "myVPNVirtualServer" -SessionPolicyName "PL_OS_10.108.151.3" -Priority "100"
+        .EXAMPLE    
+            New-NSVPNVServerSessionPolicyBinding -NSSession $Session -VirtualServerName "myVPNVirtualServer" -SessionPolicyName "PL_WB_10.108.151.3" -Priority "100"
+        .NOTES
+            Copyright (c) Citrix Systems, Inc. All rights reserved.
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+            [Parameter(Mandatory=$true)] [string]$VirtualServerName,
+            [Parameter(Mandatory=$true)] [string]$SessionPolicyName,
+            [Parameter(Mandatory=$false)] [string]$Priority="100"
+        )
+
+        Write-Verbose "$($MyInvocation.MyCommand): Enter"
+
+        $payload = @{name=$VirtualServerName;policy=$SessionPolicyName;priority=$Priority}
+        $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType vpnvserver_vpnsessionpolicy_binding -Payload $payload -Action add 
+
+        Write-Verbose "$($MyInvocation.MyCommand): Exit"
+    }
+
     # New-NSVPNVServerSTAServerBinding is part of the Citrix NITRO Module
+    function New-NSVPNVServerSTAServerBinding {
+        <#
+        .SYNOPSIS
+            Bind STA server to VPN virtual server
+        .DESCRIPTION
+            Bind STA server to VPN virtual server
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER VirtualServerName
+            Name of the virtual server.
+        .PARAMETER STAServerURL
+            Configured Secure Ticketing Authority (STA) server URL.
+        .EXAMPLE
+            New-NSVPNVServerSTAServerBinding -NSSession $Session -VirtualServerName "myVPNVirtualServer" -STAServerURL "http://10.108.156.7"
+        .NOTES
+            Copyright (c) Citrix Systems, Inc. All rights reserved.
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+            [Parameter(Mandatory=$true)] [string]$VirtualServerName,
+            [Parameter(Mandatory=$true,ValueFromPipeline=$true,ValueFromPipelineByPropertyName=$true)] [string]$STAServerURL
+        )
+
+        Begin {
+            Write-Verbose "$($MyInvocation.MyCommand): Enter"
+        }
+        Process {
+            $payload = @{name=$VirtualServerName;staserver=$STAServerURL}
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType vpnvserver_staserver_binding -Payload $payload -Action add 
+        }
+        End {
+            Write-Verbose "$($MyInvocation.MyCommand): Exit"
+        }
+    }
 
     # Set-NSSFStore is part of the Citrix NITRO Module
+    function Set-NSSFStore {
+        <#
+        .SYNOPSIS
+            Configure NetScaler to work with an existing StoreFront Receiver for Web site.
+        .DESCRIPTION
+            Configure NetScaler to work with an existing StoreFront Receiver for Web site. That involves creating session policies and actions and bind them to the virtual server
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER NSUserName
+            UserName to access the NetScaler Managerment Console, default to nsroot
+        .PARAMETER NSPassword
+            Password to access the NetScaler Managerment Console, default to nsroot
+        .PARAMETER VirtualServerName
+            Virtual Server Name
+        .PARAMETER VirtualServerIP
+            IPAddress of Virtual Server
+        .PARAMETER StoreFrontServerURL
+            URL including the name or IPAddress of the StoreFront Server
+        .PARAMETER STAServerURL
+            STA Server URL, usually the XenApp & XenDesktop Controllers
+        .PARAMETER SingleSignOnDomain
+            Single SignOn Domain Name, the same domain is used to autheticate to NetScaler Gateway and pass on to StoreFront
+        .PARAMETER ReceiverForWebPath
+            Path to the Receiver For Web Website
+        .EXAMPLE
+            Set-NSSFStore -NSSession $Session -VirtualServerName "SkynetVS" -VirtualServerIPAddress "10.108.151.3" -StoreFrontServerURL "https://10.108.156.7" -STAServerURL "https://10.108.156.7" -SingleSignOnDomain xd.local
+        .NOTES
+            Copyright (c) Citrix Systems, Inc. All rights reserved.
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true)] [PSObject]$NSSession,
+            [Parameter(Mandatory=$false)] [string]$NSUserName="nsroot", 
+            [Parameter(Mandatory=$false)] [string]$NSPassword="nsroot",
+            [Parameter(Mandatory=$true)] [string]$VirtualServerName,
+            [Parameter(Mandatory=$true)] [string]$VirtualServerIPAddress,
+            [Parameter(Mandatory=$true)] [string]$StoreFrontServerURL,
+            [Parameter(Mandatory=$true)] [string[]]$STAServerURL,
+            [Parameter(Mandatory=$true)] [string]$SingleSignOnDomain,
+            [Parameter(Mandatory=$false)] [string]$ReceiverForWebPath="/Citrix/StoreWeb"
+        )
+
+        Write-Verbose "$($MyInvocation.MyCommand): Enter"
+
+        Add-NSVPNSessionAction -NSSession $NSSession -SessionActionName "AC_OS_$($VirtualServerIPAddress)_S_" -TransparentInterception "OFF" -SplitTunnel "OFF" `
+        -DefaultAuthorizationAction "ALLOW" -SSO "ON" -IcaProxy "ON" -NTDomain $SingleSignOnDomain -ClientlessVpnMode "OFF" -ClientChoices "OFF" `
+        -WIHome "$($StoreFrontServerURL.TrimEnd('/'))/$($ReceiverForWebPath.Trim('/'))" -StoreFrontUrl "$($StoreFrontServerURL.TrimEnd('/'))"
+
+        Add-NSVPNSessionAction -NSSession $NSSession -SessionActionName "AC_WB_$($VirtualServerIPAddress)_S_" -TransparentInterception "OFF" -SplitTunnel "OFF" `
+        -DefaultAuthorizationAction "ALLOW" -SSO "ON" -IcaProxy "ON" -NTDomain $SingleSignOnDomain -ClientlessVpnMode "OFF" -ClientChoices "OFF" `
+        -WIHome "$($StoreFrontServerURL.TrimEnd('/'))/$($ReceiverForWebPath.Trim('/'))"
+
+        Add-NSVPNSessionPolicy -NSSession $NSSession -SessionActionName "AC_OS_$($VirtualServerIPAddress)_S_" -SessionPolicyName "PL_OS_$($VirtualServerIPAddress)" `
+        -SessionRuleExpression "REQ.HTTP.HEADER User-Agent CONTAINS CitrixReceiver || REQ.HTTP.HEADER Referer NOTEXISTS"
+
+        Add-NSVPNSessionPolicy -NSSession $NSSession -SessionActionName "AC_WB_$($VirtualServerIPAddress)_S_" -SessionPolicyName "PL_WB_$($VirtualServerIPAddress)" `
+        -SessionRuleExpression "REQ.HTTP.HEADER User-Agent NOTCONTAINS CitrixReceiver && REQ.HTTP.HEADER Referer EXISTS"
+
+        New-NSVPNVServerSessionPolicyBinding -NSSession $NSSession -VirtualServerName $VirtualServerName -SessionPolicyName "PL_OS_$($VirtualServerIPAddress)" -Priority 100
+        New-NSVPNVServerSessionPolicyBinding -NSSession $NSSession -VirtualServerName $VirtualServerName -SessionPolicyName "PL_WB_$($VirtualServerIPAddress)" -Priority 100
+
+        $STAServerURL | New-NSVPNVServerSTAServerBinding -NSSession $NSSession -VirtualServerName $VirtualServerName
+
+        Write-Verbose "$($MyInvocation.MyCommand): Exit"
+    }
+
 
 #endregion
 
