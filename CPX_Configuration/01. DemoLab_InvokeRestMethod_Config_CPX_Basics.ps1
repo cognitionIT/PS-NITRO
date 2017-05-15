@@ -72,8 +72,8 @@ Write-Host "------------------------------------------------------------- " -For
 
     #region !! Adding a presentation demo break !!
     # ********************************************
-        Read-Host 'Press Enter to continue…' | Out-Null
-        Write-Host
+#        Read-Host 'Press Enter to continue…' | Out-Null
+#        Write-Host
     #endregion
 
 # ----------------------------------------
@@ -316,7 +316,7 @@ Write-Host "------------------------------------------------------------- " -For
     $payload = @{
     "lbvserver_service_binding"= @(
             @{"name"="vsvr_webserver_81";"servicename"="svc_webserver_green";"weight"=1},
-            @{"name"="vsvr_webserver_81";"servicename"="svc_webserver_blue";"weight"=2}
+            @{"name"="vsvr_webserver_81";"servicename"="svc_webserver_blue";"weight"=1}
         )
     } | ConvertTo-Json -Depth 5
 

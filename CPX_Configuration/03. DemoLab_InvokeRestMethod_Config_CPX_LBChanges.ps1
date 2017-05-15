@@ -93,6 +93,7 @@ Write-Host "* Disabling the Blue webservice with NITRO: " -ForegroundColor Cyan
 #endregion Get LB Services stats
 
 Start-Sleep 5
+
 #region Get LB vServer stats (using stat)
     # Specifying the correct URL 
     $strURI = "http://$NSIP/nitro/v1/stat/lbvserver?args=name:vsvr_webserver_81"

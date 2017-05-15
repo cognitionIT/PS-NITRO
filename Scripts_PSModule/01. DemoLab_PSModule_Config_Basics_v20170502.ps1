@@ -87,7 +87,7 @@ If ($ConfigFirstLogon)
         Write-Host
     #endregion
 
-    #region Step 0. Enable (or disable) Citrix User Experience Improvement Program (CEIP):
+    #region Step 0. Disable Citrix User Experience Improvement Program (CEIP):
         Disable-NSCEIP -NSSession $NSSession
         Write-Host "CEIP Status: " -ForegroundColor Yellow -NoNewline
         Write-Host (Get-NSCEIP -NSSession $NSSession)
