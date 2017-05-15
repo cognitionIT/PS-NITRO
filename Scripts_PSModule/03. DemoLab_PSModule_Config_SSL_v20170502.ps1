@@ -89,13 +89,13 @@ If ($ConfigSSLSettings)
         (Get-NSSystemFile -NSSession $NSSession -NetScalerFolder "/nsconfig/ssl/" | Where-Object {((($_.filename -like "*.cert") -or ($_.filename -like "*.cer") -or ($_.filename -like "*.der") -or ($_.filename -like "*.pfx")) -and ($_.filename -notlike "ns-*"))})
 
         Add-NSSystemFile -NSSession $NSSession -PathToFile "$RootFolder\rootCA.cer" -NetScalerFolder "/nsconfig/ssl/" -ErrorAction SilentlyContinue
-        Add-NSSystemFile -NSSession $NSSession -PathToFile "$RootFolder\Wildcard.pfx" -NetScalerFolder "/nsconfig/ssl/" -ErrorAction SilentlyContinue
+        Add-NSSystemFile -NSSession $NSSession -PathToFile "$RootFolder\Wildcard.pfx" -NetScalerFolder "/nsconfig/ssl/" -ErrorAction SilentlyContinue -Verbose:$true
 
         # keep in mind that the filenames are case-sensitive
         Add-NSSSLCertKey -NSSession $NSSession -CertKeyName "RootCA" -CertPath "/nsconfig/ssl/rootCA.cer" -CertKeyFormat PEM -ExpiryMonitor -NotificationPeriod 25 -ErrorAction SilentlyContinue
         Add-NSSSLCertKey -NSSession $NSSession -CertKeyName "wildcard.demo.lab" -CertPath "/nsconfig/ssl/Wildcard.pfx" -CertKeyFormat PFX -Password "password" -ErrorAction SilentlyContinue
 
-        Write-Host "Certificate key pairs: " -ForegroundColor Yellow
+        Write-Host "`n Certificate key pairs: " -ForegroundColor Yellow
         Get-NSSSLCertKey -NSSession $NSSession | Select-Object certkey, cert, key, inform, status, expirymonitor, notificationperiod | Where-Object {($_.certkey -notlike "ns-*")}
     #endregion
 

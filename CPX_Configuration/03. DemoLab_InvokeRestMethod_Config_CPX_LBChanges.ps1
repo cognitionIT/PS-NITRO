@@ -82,6 +82,7 @@ Write-Host "* Disabling the Blue webservice with NITRO: " -ForegroundColor Cyan
     $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
 #endregion Disable LB Service blue
 
+Start-Sleep -Seconds 5
 #region Get LB Services stats (using stat)
     # Specifying the correct URL 
     $strURI = "http://$NSIP/nitro/v1/stat/service/svc_webserver_blue"
@@ -92,7 +93,7 @@ Write-Host "* Disabling the Blue webservice with NITRO: " -ForegroundColor Cyan
     $response.service | Select-Object name, servicetype, state, totalrequests | Format-List
 #endregion Get LB Services stats
 
-Start-Sleep 5
+Start-Sleep -Seconds 5
 
 #region Get LB vServer stats (using stat)
     # Specifying the correct URL 
@@ -151,7 +152,7 @@ Write-Host "* Enabling the Blue webservice with NITRO: " -ForegroundColor Cyan
     $response.service | Select-Object name, servicetype, state, svrestablishedconn | Format-List
 #endregion Get LB Services stats
 
-Start-Sleep 5
+Start-Sleep -Seconds 5
 
 #region Get LB vServer stats (using stat)
     # Specifying the correct URL 

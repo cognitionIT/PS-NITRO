@@ -70,11 +70,7 @@ Write-Host "------------------------------------------------------------- " -For
 Write-Host "| Pushing the LB configuration to NetScaler CPX with NITRO: | " -ForegroundColor Yellow
 Write-Host "------------------------------------------------------------- " -ForegroundColor Yellow
 
-    #region !! Adding a presentation demo break !!
-    # ********************************************
-#        Read-Host 'Press Enter to continue…' | Out-Null
-#        Write-Host
-    #endregion
+Start-Sleep -Seconds 5
 
 # ----------------------------------------
 # | Method #1: Using the SessionVariable |

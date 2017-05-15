@@ -736,8 +736,8 @@ Write-Host "------------------------------------------------------------------ "
         } | ConvertTo-Json -Depth 5
 
         # Logging NetScaler Instance payload formatting
-        Write-Host "payload: " -ForegroundColor Yellow
-        Write-Host $payload -ForegroundColor Green
+#        Write-Host "payload: " -ForegroundColor Yellow
+#        Write-Host $payload -ForegroundColor Green
 
         # Method #1: Making the REST API call to the NetScaler
         $response = Invoke-RestMethod -Uri $strURI -Method Post -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
