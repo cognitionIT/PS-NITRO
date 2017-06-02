@@ -6093,6 +6093,7 @@ Set-StrictMode -Version Latest
 
     }
 
+    # NOTE: Update gives error that DNS Profile does not exist, better make it a New-DNSServerDNSProfileBinding function
     function Update-NSDnsNameServer {
     # Updated: 20160824 - Removed unknown Action parameter
         <#
@@ -6135,7 +6136,7 @@ Set-StrictMode -Version Latest
         }
 
     }
-    # NOTE: Update gives error that DNS Profile does not exist, better make it a New-DNSServerDNSProfileBinding function
+
     function Remove-NSDnsNameServer {
     # Updated: 20160824 - Removed unknown Action parameter
         <#
@@ -6237,7 +6238,6 @@ Set-StrictMode -Version Latest
     #region Traffic Management - SSL
 
     # Add-NSServerCertificate is part of the Citrix NITRO Module
-    # Add-NSCertKeyPair is part of the Citrix NITRO Module
     function Add-NSServerCertificate {
         <#
         .SYNOPSIS
@@ -6351,6 +6351,7 @@ Set-StrictMode -Version Latest
         Write-Verbose "$($MyInvocation.MyCommand): Exit"
     }
 
+    # Add-NSCertKeyPair is part of the Citrix NITRO Module
     function Add-NSCertKeyPair {
         <#
         .SYNOPSIS
