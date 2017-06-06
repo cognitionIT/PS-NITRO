@@ -1,19 +1,19 @@
 ﻿    # Add-NSDnsNameServer is part of the Citrix NITRO Module
     # Copied from Citrix's Module to ensure correct scoping of variables and functions
+    # Updated: 20160824 - Esther Barthel - Removed unknown Action parameter
     function Add-NSDnsNameServer {
-    # Updated: 20160824 - Removed unknown Action parameter
         <#
-        .SYNOPSIS
-            Add domain name server resource
-        .DESCRIPTION
-            Add domain name server resource
+	.SYNOPSIS
+	    Add domain name server resource
+	.DESCRIPTION
+	    Add domain name server resource
         .PARAMETER NSSession
             An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER DNSServerIPAddress
-            IP address of an external name server
-        .EXAMPLE
-            [string[]]$DNSServers = @("10.8.115.210","10.8.115.211")
-            $DNSServers | Add-NSDnsNameServer -NSSession $Session 
+	.PARAMETER DNSServerIPAddress
+	    IP address of an external name server
+	.EXAMPLE
+		[string[]]$DNSServers = @("10.8.115.210","10.8.115.211")
+		$DNSServers | Add-NSDnsNameServer -NSSession $Session 
         .NOTES
             Copyright (c) Citrix Systems, Inc. All rights reserved.
         #>

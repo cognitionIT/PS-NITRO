@@ -13,7 +13,7 @@
         .PARAMETER NetScalerFolder
             Full path to the folder on the NetScaler Appliance to upload the file to
         .EXAMPLE
-            Send two lfiles to NetScaler appliance
+            Send two files to NetScaler appliance
             $licfiles = @("C:\NSLicense\CAG_Enterprise_VPX_2012.lic","C:\NSLicense\CAGU-Hostname_10000CCU_sslvpn-sg.lic")
             $licfiles | Send-NSLicense -NSSession $session -NetScalerFolder "/nsconfig/license"
         .NOTES

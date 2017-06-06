@@ -1,5 +1,4 @@
-﻿
-    # Add-NSAuthLDAPAction is part of the Citrix NITRO Module
+﻿    # Add-NSAuthLDAPAction is part of the Citrix NITRO Module
     # Copied from Citrix's Module to ensure correct scoping of variables and functions
     function Add-NSAuthLDAPAction {
         <#
@@ -17,7 +16,7 @@
             Base (node) from which to start LDAP searches
         .PARAMETER LDAPBindDN
             Full distinguished name (DN) that is used to bind to the LDAP server
-        .PARAMETER LDAPBindDNPassword,
+        .PARAMETER LDAPBindDNPassword
             Password used to bind to the LDAP server
         .PARAMETER LDAPLoginName
             LDAP login name attribute. The NetScaler appliance uses the LDAP login name to query external LDAP servers or Active Directories

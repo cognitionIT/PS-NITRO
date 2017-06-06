@@ -23,6 +23,8 @@
                 Store Name. For monitors of type STOREFRONT, STORENAME is an optional argument defining storefront service store name. Applicable to STOREFRONT monitors
             .PARAMETER Reverse
                 Mark a service as DOWN, instead of UP, when probe criteria are satisfied, and as UP instead of DOWN when probe criteria are not satisfied. Default value: NO. Possible values = YES, NO
+            .PARAMETER State
+	  	State of the monitor.
             .EXAMPLE
                 Add-NSLBMonitor -NSSession $Session -Name "Server1_Monitor" -Type "HTTP"
             .NOTES

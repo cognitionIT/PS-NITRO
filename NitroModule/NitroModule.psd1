@@ -233,7 +233,7 @@
 		'Add-NSVPNSessionPolicy',
 		'New-NSVPNVServerSessionPolicyBinding',
 		'New-NSVPNVServerSTAServerBinding',
-		'Set-NSSFStore,
+		'Set-NSSFStore'
 	)
 	
 	# Cmdlets to export from this module
