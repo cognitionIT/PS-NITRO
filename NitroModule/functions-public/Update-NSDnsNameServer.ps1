@@ -1,6 +1,6 @@
 ﻿    # NOTE: Update gives error that DNS Profile does not exist, better make it a New-DNSServerDNSProfileBinding function
-    function Update-NSDnsNameServer {
     # Updated: 20160824 - Removed unknown Action parameter
+    function Update-NSDnsNameServer {
         <#
         .SYNOPSIS
             Update domain name server resource

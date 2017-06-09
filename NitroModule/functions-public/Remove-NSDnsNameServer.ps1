@@ -1,5 +1,5 @@
-﻿    function Remove-NSDnsNameServer {
-    # Updated: 20160824 - Removed unknown Action parameter
+﻿    # Updated: 20160824 - Removed unknown Action parameter
+    function Remove-NSDnsNameServer {
         <#
         .SYNOPSIS
             Remove domain name server resource

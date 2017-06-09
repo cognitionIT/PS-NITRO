@@ -1,5 +1,5 @@
-﻿    function Remove-NSSSLVServerCertKeyBinding {
-    # Created: 20160912
+﻿    # Created: 20160912
+    function Remove-NSSSLVServerCertKeyBinding {
         <#
         .SYNOPSIS
             Unbind a SSL certificate to a NetScaler vServer
@@ -12,7 +12,7 @@
         .PARAMETER CertKeyName
             Name of the certificate-key pair to bind to the vServer
         .EXAMPLE
-            Remove-NSSSLVServerCertKeyBinding -NSSession $Session -VServerName $name -CertKeyName "wildcard"
+            Remove-NSSSLVServerCertKeyBinding -NSSession $Session -VServerName vsvr_lb_storefront -CertKeyName "wildcard.demo.lab"
         .NOTES
             Copyright (c) cognition IT. All rights reserved.
         #>

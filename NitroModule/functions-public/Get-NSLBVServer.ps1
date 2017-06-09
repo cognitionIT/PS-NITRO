@@ -1,4 +1,18 @@
 ﻿    function Get-NSLBVServer {
+        <#
+        .SYNOPSIS
+            Retrieve NetScaler vServer information
+        .DESCRIPTION
+            Retrieve NetScaler vServer information
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER Name
+            Name of the vServer to retrieve.
+        .EXAMPLE
+            Get-NSLBVServer -NSSession $Session -Name vsvr_lb_storefront
+        .NOTES
+            Copyright (c) cognition IT. All rights reserved.
+        #>
         [CmdletBinding()]
         param (
             [Parameter(Mandatory=$true)] [PSObject]$NSSession,

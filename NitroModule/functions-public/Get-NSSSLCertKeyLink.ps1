@@ -1,5 +1,5 @@
-﻿    function Get-NSSSLCertKeyLink {
-    # Created: 20160906
+﻿    # Created: 20160906
+    function Get-NSSSLCertKeyLink {
         <#
         .SYNOPSIS
             Retrieve certificate links

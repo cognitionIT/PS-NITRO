@@ -13,7 +13,7 @@
             Password to access the NetScaler Managerment Console, default to nsroot
         .PARAMETER VirtualServerName
             Virtual Server Name
-        .PARAMETER VirtualServerIP
+        .PARAMETER VirtualServerIPAddress
             IPAddress of Virtual Server
         .PARAMETER StoreFrontServerURL
             URL including the name or IPAddress of the StoreFront Server

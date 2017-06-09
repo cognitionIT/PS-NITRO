@@ -1,5 +1,5 @@
-﻿        function Get-NSServicegroupLBMonitorBinding{
-        # Created: 20160825
+﻿        # Created: 20160825
+        function Get-NSServicegroupLBMonitorBinding{
             <#
             .SYNOPSIS
                 Retrieve a Monitor binding for a given Servicegroup

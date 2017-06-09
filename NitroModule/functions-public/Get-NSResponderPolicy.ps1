@@ -1,17 +1,21 @@
 ﻿    function Get-NSResponderPolicy {
         <#
         .SYNOPSIS
-            Retrieve a Responder Action to the NetScalerConfiguration
+            Retrieve Responder Policy information from the NetScaler
         .DESCRIPTION
-            Retrieve a Responder Action to the NetScalerConfiguration
+            Retrieve Responder Policy information from the NetScaler
         .PARAMETER NSSession
             An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER ActionName
-            Name for the user-defined rewrite action.
+        .PARAMETER Name
+            Name of the responder policy.
+        .PARAMETER ShowBuiltIn
+            Switch parameter
+            Flag to determine if responder policy is built-in or not. 
+            Possible values = MODIFIABLE, DELETABLE, IMMUTABLE, PARTITION_ALL
         .EXAMPLE
-            Get-NSResponderAction -NSSession $Session -ActionName $ActionName
+            Get-NSResponderPolicy -NSSession $Session -Name rsp_pol_http_https_redirect
         .EXAMPLE
-            Get-NSResponderAction -NSSession $Session
+            Get-NSResponderPolicy -NSSession $Session -ShowBuiltIn
         .NOTES
             Copyright (c) cognition IT. All rights reserved.
         #>

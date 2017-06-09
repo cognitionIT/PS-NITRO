@@ -24,7 +24,7 @@
         .PARAMETER DefaultAuthorizationAction
             Specify the network resources that users have access to when they log on to the internal network. Acceptable vaules: "ALLOW","DENY"
             Default to "DENY", which deny access to all network resources. 
-        .PARAMETER SSO,
+        .PARAMETER SSO
             Set single sign-on (SSO) for the session. When the user accesses a server, the user's logon credentials are passed to the server for authentication.
             Acceptable values: "ON","OFF", default to 'ON"
         .PARAMETER IcaProxy
@@ -38,7 +38,7 @@
         .PARAMETER ClientChoices
             Provide users with multiple logon options. With client choices, users have the option of logging on by using the Access Gateway Plug-in for Windows, Access Gateway Plug-in for Java, the Web Interface, or clientless access from one location.
             Depending on how Access Gateway is configured, users are presented with up to three icons for logon choices. The most common are the Access Gateway Plug-in for Windows, Web Interface, and clientless access.
-        .PARAMETER StoreFrontUrl,
+        .PARAMETER StoreFrontUrl
             Web address for StoreFront to be used in this session for enumeration of resources from XenApp or XenDesktop.
         .PARAMETER WIHome
             Web address of the Web Interface server, such as http:///Citrix/XenApp, or Receiver for Web, which enumerates the virtualized resources, such as XenApp, XenDesktop, and cloud applications.

@@ -14,6 +14,8 @@
             Expression against which traffic is evaluated.
         .PARAMETER Expression
             Default syntax expression that specifies the content to insert into the request or response at the specified location, or that replaces the specified string.
+        .PARAMETER Comment
+            Any comments that you might want to associate with the Rewrite Policy.
         .EXAMPLE
             Update-NSRewritePolicy -NSSession $Session -PolicyName $PolicyName -PolicyAction $PolicyAction -PolicyRule "HTTP.REQ.URL.EQ(""/"")" -Comment "updated"
         .NOTES

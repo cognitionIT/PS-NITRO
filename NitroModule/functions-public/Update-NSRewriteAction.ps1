@@ -12,6 +12,10 @@
             Default syntax expression that specifies which part of the request or response to rewrite. Minimum length = 1
         .PARAMETER Expression
             Default syntax expression that specifies the content to insert into the request or response at the specified location, or that replaces the specified string.
+        .PARAMETER HeaderName
+            Inserts the HTTP header specified by <header_string_builder_expr> and header contents specified by <contents_string_builder_expr>.
+        .PARAMETER Comment
+            Any comments that you might want to associate with the Rewrite Action.
         .EXAMPLE
             Update-NSRewriteAction -NSSession $Session -ActionName $ActionName -ActionType replace -TargetExpression "HTTP.REQ.URL" -Expression "\"/Citrix/XenApp\""
         .NOTES

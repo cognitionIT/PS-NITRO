@@ -14,12 +14,14 @@
                 Cache type supported by the cache server. Possible values = TRANSPARENT, REVERSE, FORWARD
             .PARAMETER Cacheable
                 Use the transparent cache redirection virtual server to forward the request to the cache server. Note: Do not set this parameter if you set the Cache Type. Default value: NO. Possible values = YES, NO
-            .SWITCH Disabled
+            .PARAMETER Disabled
                 DisablesInitial state of the service group. Default value: ENABLED. Possible values = ENABLED, DISABLED
             .PARAMETER HealthMonitoring
                 Monitor the health of this service. Available settings function as follows: YES - Send probes to check the health of the service. NO - Do not send probes to check the health of the service. With the NO option, the appliance shows the service as UP at all times. Default value: YES. Possible values = YES, NO
-            .PARAMETER ApplfowLogging
+            .PARAMETER AppflowLogging
                 Enable logging of AppFlow information for the specified service group. Default value: ENABLED. Possible values = ENABLED, DISABLED
+        .PARAMETER Comment
+            Any comments that you might want to associate with the Service Group.
             .EXAMPLE
                 Add-NSServiceGroup -NSSession $Session -Name "svcgrp" -Protocol "HTTP" -CacheType SERVER -AutoscaleMode "DISABLED" 
             .NOTES

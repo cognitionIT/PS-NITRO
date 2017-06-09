@@ -1,16 +1,18 @@
-﻿    function Remove-NSSystemFile {
-    # Created: 20160905
+﻿    # Created: 20160905
+    function Remove-NSSystemFile {
         <#
         .SYNOPSIS
             Delete a file from a NetScaler Appliance
         .DESCRIPTION
             Delete a file from a NetScaler Appliance
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
         .PARAMETER NetScalerFolder
             Full path of the folder that hosts the file to be removed from the NetScaler Appliance
         .PARAMETER FileName
             Name of the file to be removed from the NetScaler Appliance
         .EXAMPLE
-            Remove-NSSystemFile -NSSession $session -NetScalerFolder "/nsconfig/license/" -FileName $filename
+            Remove-NSSystemFile -NSSession $session -NetScalerFolder "/nsconfig/license/" -FileName wildcard_demo_lab.pfx
         .NOTES
             Copyright (c) cognition IT. All rights reserved.
         #>

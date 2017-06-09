@@ -1,21 +1,23 @@
 ﻿    # New-NSLBVServerServiceBinding is part of the Citrix NITRO Module
     # Copied from Citrix's Module to ensure correct scoping of variables and functions
     # CHANGED
-    function New-NSLBVServerServiceBinding {
     # Updated: 20160824 - Removed unknown Action parameter
+    function New-NSLBVServerServiceBinding {
         <#
         .SYNOPSIS
-            Bind service to VPN virtual server
+            Bind a Service to a Load Balancing vServer
         .DESCRIPTION
-            Bind service to VPN virtual server
+            Bind a Service to a Load Balancing vServer
         .PARAMETER NSSession
             An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER VirtualServerName
+        .PARAMETER Name
             Name of the virtual server
         .PARAMETER ServiceName
             Service to bind to the virtual server
+        .PARAMETER Weight
+            Integer specifying the weight of the service. Default value: 1. Minimum value = 1. Maximum value = 100
         .EXAMPLE
-            New-NSLBVServerServiceBinding -NSSession $Session -VirtualServerName "myLBVirtualServer" -ServiceName "Server1_Service"
+            New-NSLBVServerServiceBinding -NSSession $Session -Name vsvr_lb_storefront -ServiceName svc_lb_storefront
         .NOTES
             Copyright (c) Citrix Systems, Inc. All rights reserved.
             Copyright (c) cognition IT. All rights reserved.
@@ -23,11 +25,8 @@
         [CmdletBinding()]
         param (
             [Parameter(Mandatory=$true)] [PSObject]$NSSession,
-            # Name for the virtual server.
             [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name,
-            # Service to bind to the virtual server.
             [Parameter(Mandatory=$false)][ValidateNotNullOrEmpty()] [string]$ServiceName,
-            # Integer specifying the weight of the service. Default value: 1. Minimum value = 1. Maximum value = 100
             [Parameter(Mandatory=$false)][ValidateRange(1,100)] [int]$Weight
         )
         Begin {

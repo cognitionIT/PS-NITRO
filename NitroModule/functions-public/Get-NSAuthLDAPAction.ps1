@@ -6,6 +6,8 @@
             Retrieve a NetScaler LDAP action
         .PARAMETER NSSession
             An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER LDAPActionName
+            Name of the LDAP action. 
         .EXAMPLE
             Get-NSAuthLDAPAction -NSSession $Session
         .NOTES

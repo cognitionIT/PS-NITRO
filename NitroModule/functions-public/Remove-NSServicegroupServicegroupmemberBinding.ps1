@@ -7,9 +7,17 @@
             .PARAMETER NSSession
                 An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
             .PARAMETER Name
-                Name of the Service.
+                Name of the Servicegroup.
+            .PARAMETER ServerName
+                Name of the Server to unbind from the service group
+            .PARAMETER IPAddress
+                IP Address.
+            .PARAMETER Port
+                Server port number.
             .EXAMPLE
-                Remove-NSServer -NSSession $Session -Name $ServerName
+                Remove-NSServicegroupServicegroupmemberBinding -NSSession $Session -Name svcgrp_lb_storefront -ServerName SF1
+            .EXAMPLE
+                Remove-NSServicegroupServicegroupmemberBinding -NSSession $Session -Name svcgrp_lb_storefront -IPAddress "192.168.0.21"
             .NOTES
                 Copyright (c) cognition IT. All rights reserved.
             #>

@@ -1,5 +1,5 @@
-﻿    function Get-NSSSLVServerCertKeyBinding {
-    # Created: 20160912
+﻿    # Created: 20160912
+    function Get-NSSSLVServerCertKeyBinding {
         <#
         .SYNOPSIS
             Retrieve certificate links
@@ -7,12 +7,10 @@
             Retrieve certificate links
         .PARAMETER NSSession
             An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER CertKeyName
-            Name of the file to retrieve. Minimum length = 1
+        .PARAMETER VServerName
+            Name of the SSL virtual server.
         .EXAMPLE
-            Get-NSSSLCertKeyLink -NSSession $Session -CertKeyName $name
-        .EXAMPLE
-            Get-NSSSLCertKeyLink -NSSession $Session
+            Get-NSSSLVServerCertKeyBinding -NSSession $Session -VServerName vsvr_lb_storefront
         .NOTES
             Copyright (c) cognition IT. All rights reserved.
         #>

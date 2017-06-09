@@ -1,5 +1,5 @@
-﻿    function Remove-NSSSLCertKey {
-    # Created: 20160906
+﻿    # Created: 20160906
+    function Remove-NSSSLCertKey {
         <#
         .SYNOPSIS
             Remove a SSL Cert Key pair
@@ -10,7 +10,7 @@
         .PARAMETER CertKeyName
             Name for the certificate and private-key pair
         .EXAMPLE
-            Remove-NSSSLCertKey -NSSession $Session -CertKeyName "*.xd.local"
+            Remove-NSSSLCertKey -NSSession $Session -CertKeyName "wildcard.demo.lab"
         .NOTES
             Copyright (c) cognition IT. All rights reserved.
         #>

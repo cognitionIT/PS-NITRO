@@ -1,5 +1,5 @@
-﻿    function Remove-NSSSLCertKeyLink {
-    # Created: 20160829
+﻿    # Created: 20160829
+    function Remove-NSSSLCertKeyLink {
         <#
         .SYNOPSIS
             Remove the cert link for a SSL certificate
@@ -10,7 +10,7 @@
         .PARAMETER CertKeyName
             Name for the certificate and private-key pair
         .EXAMPLE
-            Add-NSCertKeyPair -NSSession $Session -CertKeyName "wildcard"
+            Remove-NSSSLCertKeyLink -NSSession $Session -CertKeyName "wildcard.demo.lab"
         .NOTES
             Copyright (c) cognition IT. All rights reserved.
         #>

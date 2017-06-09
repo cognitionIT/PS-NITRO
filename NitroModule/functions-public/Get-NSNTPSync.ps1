@@ -4,6 +4,8 @@
             Retrieve the NTP Synchronization setting from the NetScaler Configuration
         .DESCRIPTION
             Retrieve the NTP Synchronization setting from the NetScaler Configuration
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
         .EXAMPLE
             Get-NSNTPSync -NSSession $Session
         .NOTES

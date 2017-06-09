@@ -12,6 +12,14 @@
                 Name of the service to which to bind monitor
             .PARAMETER MonitorName
                 The monitor name
+            .PARAMETER State
+                The configured state (enable/disable) of the monitor on this server. Possible values = ENABLED, DISABLED
+            .PARAMETER Weight
+                Weight to assign to the monitor-service binding. When a monitor is UP, the weight assigned to its binding with the service determines how much the monitor contributes toward keeping the health of the service above the value configured for the Monitor Threshold parameter.
+                Minimum value = 1. Maximum value = 100
+            .PARAMETER Passive
+                Switch parameter
+                Indicates if load monitor is passive. A passive load monitor does not remove service from LB decision when threshold is breached.
             .EXAMPLE
                 New-NSServiceLBMonitorBinding -NSSession $Session -ServiceName "Server1_Service" -MonitorName "Server1_Monitor"
             .NOTES

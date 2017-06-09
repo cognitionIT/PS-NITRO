@@ -8,12 +8,13 @@
                 An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
             .PARAMETER Name
                 Name of the Monitor.
+            .PARAMETER Type
+                Type of monitor that you want to create.
             .EXAMPLE
                 Remove-NSLBMonitor -NSSession $Session -Name $MonitorName
             .NOTES
                 Copyright (c) cognition IT. All rights reserved.
             #>
-
             [CmdletBinding()]
             param (
                 [Parameter(Mandatory=$true)] [PSObject]$NSSession,

@@ -1,13 +1,12 @@
 ﻿    # Send-NSLicense is part of the Citrix NITRO Module
     # Copied from Citrix's Module to ensure correct scoping of variables and functions
-    function Send-NSLicense {    
     # Updated 20160912: Removed Action parameter to avoid errors
+    function Send-NSLicense {    
         <#
         .SYNOPSIS
             Uploading the license file(s) to NetScaler Appliance
         .DESCRIPTION
             Uploading the license file(s) to license folder of NetScaler Appliance. Destination file names are the same as source file names.
-
             This requires the Nitro Rest API version 10.5 or higher.
         .PARAMETER NSSession
             An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance

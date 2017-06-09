@@ -4,12 +4,14 @@
             Delete a NetScaler NTP Server Configuration
         .DESCRIPTION
             Delete a NetScaler NTP Server Configuration
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
         .PARAMETER ServerName
             Fully qualified domain name or IPv4 address of the NTP server.
         .EXAMPLE
-            Delete-NSNTPServer -NSSession $Session -ServerName "10.108.151.2"
+            Remove-NSNTPServer -NSSession $Session -ServerName "10.108.151.2"
         .EXAMPLE
-            Delete-NSNTPServer -NSSession $Session -ServerName "ntp.server.com"
+            Remove-NSNTPServer -NSSession $Session -ServerName "ntp.server.com"
         .NOTES
             Copyright (c) cognition IT. All rights reserved.
         #>

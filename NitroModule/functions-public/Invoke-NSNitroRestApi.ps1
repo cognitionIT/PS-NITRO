@@ -1,5 +1,6 @@
 ﻿    # Invoke-NSNitroRestApi is UPDATED (provided by Citrix)
     # [adjusted for beter DELETE function support]
+    # 20160117: Adjusted to ensure DELETE methods can produce output as well as use the Arguments parameter
     function Invoke-NSNitroRestApi {
         <#
         .SYNOPSIS
@@ -16,6 +17,8 @@
             Name of the NS appliance resource, optional
         .PARAMETER Action
             Name of the action to perform on the NS appliance resource
+        .PARAMETER Arguments
+            Payload for the arguments that can be added to the REST API call when the HTTP Method GET or DELETE is used.
         .PARAMETER Payload
             Payload  of the web request, in hashtable format
         .PARAMETER GetWarning
@@ -34,7 +37,6 @@
         .NOTES
             Copyright (c) Citrix Systems, Inc. All rights reserved.
             Copyright (c) cognition IT. All rights reserved.
-            20160117: Adjusted to ensure DELETE methods can produce output as well as use the Arguments parameter
         #>
         [CmdletBinding()]
         param (

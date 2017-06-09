@@ -3,20 +3,18 @@
         .SYNOPSIS
             Backup NetScaler Appliance
         .DESCRIPTION
-            Restart NetScaler Appliance, with an option to save NetScaler Config File before rebooting
+            Backup NetScaler Appliance
         .PARAMETER NSSession
             An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER SaveNSConfig
-            Switch Parameter to save NetScaler Config file before rebooting.
-        .PARAMETER WarmReboot
-            Switch Parameter to perform warm reboot of the NetScaler appliance
-        .PARAMETER Wait
-            Switch Parameter to wait after reboot until Nitro REST API is online
-        .PARAMETER WaitTimeout
-            Timeout in seconds for the wait after reboot
+        .PARAMETER Filename
+            Name of the backup file(*.tgz) to be created.
+        .PARAMETER Level
+            Level of data to be backed up. Default value: basic. Possible values = basic, full
+        .PARAMETER Comment
+            Comment specified at the time of creation of the backup file(*.tgz).
         .EXAMPLE
             Save NetScaler Config file and restart NetScaler VPX
-            Restart-NSAppliance -NSIP 10.108.151.1 -SaveNSConfig -WebSession $session
+            New-SystemBackup -NSSession $NSSession -Filename nsbackup.tgz -Level Full -Comment "weekly backup"
         .NOTES
             Copyright (c) Citrix Systems, Inc. All rights reserved.
         #>

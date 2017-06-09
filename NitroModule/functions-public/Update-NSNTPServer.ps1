@@ -16,12 +16,12 @@
             Maximum time after which the NTP server must poll the NTP messages. In seconds, expressed as a power of 2. Minimum value = 4. Maximum value = 17.
         .PARAMETER Key
             Key to use for encrypting authentication fields. All packets sent to and received from the server must include authentication fields encrypted by using this key. To require authentication for communication with the server, you must set either the value of this parameter or the autokey parameter. Minimum value = 1. Maximum value = 65534.
-        .SWITCH Preferred
+        .PARAMETER Preferred
             Preferred NTP server. The NetScaler appliance chooses this NTP server for time synchronization among a set of correctly operating hosts. Default value: NO. Possible values = YES, NO
         .EXAMPLE
-            Update-NSNTPServer -NSSession $Session -NTPServerIP "10.108.151.2" -MinPoll 5 -MaxPoll 10
+            Update-NSNTPServer -NSSession $Session -ServerIP "10.108.151.2" -MinPoll 5 -MaxPoll 10
         .EXAMPLE
-            Update-NSNTPServer -NSSession $Session -NTPServerName "ntp.server.com" -Preferred        
+            Update-NSNTPServer -NSSession $Session -ServerName "ntp.server.com" -Preferred        
         .NOTES
             Copyright (c) cognition IT. All rights reserved.
         #>

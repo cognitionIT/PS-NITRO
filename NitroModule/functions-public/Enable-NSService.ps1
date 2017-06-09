@@ -1,4 +1,18 @@
 ﻿        function Enable-NSService {
+        <#
+        .SYNOPSIS
+            Enable NetScaler Service
+        .DESCRIPTION
+            Enable NetScaler Service
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER Name
+            Name of the Service to be enabled.
+        .EXAMPLE
+            Enable-NSService -NSSession $Session -Name svc_storefront
+        .NOTES
+            Copyright (c) cognition IT. All rights reserved.
+        #>
             [CmdletBinding()]
             param (
                 [Parameter(Mandatory=$true)] [PSObject]$NSSession,

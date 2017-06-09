@@ -1,5 +1,5 @@
-﻿        function Remove-NSServicegroupLBMonitorBinding{
-        # Created: 20160825
+﻿        # Created: 20160825
+        function Remove-NSServicegroupLBMonitorBinding{
             <#
             .SYNOPSIS
                 Remove a NetScaler Monitor Binding from a Servicegroup
@@ -12,7 +12,7 @@
             .PARAMETER MonitorName
                 Name of the monitor bound to the servicegroup.
             .EXAMPLE
-                Remove-NSServicegroupLBMonitorBinding -NSSession $Session -ServicegroupName $ServicegroupName -MonitorName $MonitorName
+                Remove-NSServicegroupLBMonitorBinding -NSSession $Session -ServicegroupName svcgrp_lb_storefront -MonitorName mon_storefront
             .NOTES
                 Copyright (c) cognition IT. All rights reserved.
             #>

@@ -14,12 +14,12 @@
             Base (node) from which to start LDAP searches
         .PARAMETER LDAPBindDN
             Full distinguished name (DN) that is used to bind to the LDAP server
-        .PARAMETER LDAPBindDNPassword,
+        .PARAMETER LDAPBindDNPassword
             Password used to bind to the LDAP server
         .PARAMETER LDAPLoginName
             LDAP login name attribute. The NetScaler appliance uses the LDAP login name to query external LDAP servers or Active Directories
         .EXAMPLE
-            Update-NSAuthLDAPAction -NSSession $Session -LDAPActionName "10.108.151.1_LDAP" -LDAPServerIP 10.8.115.245 -LDAPBaseDN "dc=xd,dc=local" -LDAPBindDN "administrator@xd.local" -LDAPBindDNPassword "passw0rd"
+            Update-NSAuthLDAPAction -NSSession $Session -LDAPActionName "10.108.151.1_LDAP" -LDAPServerIP "10.8.115.245" -LDAPBaseDN "dc=xd,dc=local" -LDAPBindDN "administrator@xd.local" -LDAPBindDNPassword "password"
         .NOTES
             Copyright (c) cognition IT. All rights reserved.
         #>

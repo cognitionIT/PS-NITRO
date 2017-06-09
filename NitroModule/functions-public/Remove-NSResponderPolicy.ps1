@@ -1,15 +1,15 @@
 ﻿    function Remove-NSResponderPolicy {
         <#
         .SYNOPSIS
-            Remove a Rewrite Action to the NetScalerConfiguration
+            Remove a Responder Policy from the NetScalerConfiguration
         .DESCRIPTION
-            Remove a Rewrite Action to the NetScalerConfiguration
+            Remove a Responder Policy from the NetScalerConfiguration
         .PARAMETER NSSession
             An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER ActionName
-            Name for the user-defined rewrite action.
+        .PARAMETER Name
+            Name for the user-defined responder policy.
         .EXAMPLE
-            Remove-NSRewriteAction -NSSession $Session -ActionName $ActionName
+            Remove-NSResponderPolicy -NSSession $Session -Name rsp_pol_http_https_redirect
         .NOTES
             Copyright (c) cognition IT. All rights reserved.
         #>

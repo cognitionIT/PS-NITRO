@@ -1,5 +1,5 @@
-﻿    function New-NSSSLRSAKey {
-    # Created: 20160829
+﻿    # Created: 20160829
+    function New-NSSSLRSAKey {
         <#
         .SYNOPSIS
             Create a SSL RSAkey
@@ -7,11 +7,21 @@
             Create a SSL RSAkey
         .PARAMETER NSSession
             An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-        .PARAMETER DNSServerIPAddress
+        .PARAMETER KeyFileName
+            Name of and, optionally, path to the private key used to create the certificate signing request, which then becomes part of the certificate-key pair. The private key can be either an RSA or a DSA key. The key must be present in the appliance's local storage. /nsconfig/ssl is the default path.
+        .PARAMETER KeySize
+            Size, in bits, of the RSA key. Minimum value = 512. Maximum value = 4096
+        .PARAMETER PublicExponent
+            Public exponent for the RSA key. The exponent is part of the cipher algorithm and is required for creating the RSA key.
+            Default value: F4. Possible values = 3, F4
+        .PARAMETER KeyFormat
+            Format in which the key is stored on the appliance. Default value: PEM. Possible values = DER, PEM.
+        .PARAMETER PEMEncodingAlgorithm
             IP address of an external name server
+        .PARAMETER PEMPassphrase
+            Password for the PEM certificate file
         .EXAMPLE
-            [string[]]$DNSServers = @("10.8.115.210","10.8.115.211")
-            $DNSServers | Add-NSDnsNameServer -NSSession $Session 
+            New-NSSSLRSAKey -NSSession $Session -KeyFileName selfsigned.key -KeySize 2048 -KeyFormat PEM -PEMEncodingAlgorithm DES3 -PEMPassPhrase "password"
         .NOTES
             Copyright (c) cognition IT. All rights reserved.
         #>

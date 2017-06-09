@@ -1,5 +1,5 @@
-﻿        function New-NSServicegroupLBMonitorBinding {
-        # Created: 20160825
+﻿        # Created: 20160825
+        function New-NSServicegroupLBMonitorBinding {
             <#
             .SYNOPSIS
                 Bind monitor to servicegroup
@@ -7,12 +7,12 @@
                 Bind monitor to servicegroup
             .PARAMETER NSSession
                 An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
-            .PARAMETER ServiceName
+            .PARAMETER ServicegroupName
                 Name of the servicegroup to which to bind monitor
             .PARAMETER MonitorName
                 The monitor name
             .EXAMPLE
-                New-NSServicegroupLBMonitorBinding -NSSession $Session -ServicegroupName "Server1_Service" -MonitorName "Server1_Monitor"
+                New-NSServicegroupLBMonitorBinding -NSSession $Session -ServicegroupName svcgrp_lb_storefront -MonitorName mon_storefront
             .NOTES
                 Copyright (c) Citrix Systems, Inc. All rights reserved.
             #>

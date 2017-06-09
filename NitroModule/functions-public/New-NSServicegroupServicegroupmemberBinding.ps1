@@ -1,5 +1,5 @@
-﻿        function New-NSServicegroupServicegroupmemberBinding {
-        #Updated 20160824: Removed unknown Action parameter
+﻿        #Updated 20160824: Removed unknown Action parameter
+        function New-NSServicegroupServicegroupmemberBinding {
             <#
             .SYNOPSIS
                 Retrieve a Service from the NetScalerConfiguration
@@ -9,13 +9,13 @@
                 An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
             .PARAMETER Name
                 Name of the service group. Minimum length = 1
-            .PARAMETER IP
+            .PARAMETER IPAddress
                 IP Address.
             .PARAMETER ServerName
                 Name of the server to which to bind the service group. Minimum length = 1
             .PARAMETER Weight
                 Weight to assign to the servers in the service group. Specifies the capacity of the servers relative to the other servers in the load balancing configuration. The higher the weight, the higher the percentage of requests sent to the service. Minimum value = 1. Maximum value = 100
-            .PARAMETER port
+            .PARAMETER Port
                 server port number. Range 1 - 65535
             .PARAMETER CustomserverId
                 The identifier for this IP:Port pair. Used when the persistency type is set to Custom Server ID. Default value: "None"
@@ -23,10 +23,10 @@
                 The identifier for the service. This is used when the persistency type is set to Custom Server ID.
             .PARAMETER State
                 Initial state of the service group. Default value: ENABLED. Possible values = ENABLED, DISABLED
-            .PARAMETER hashid
+            .PARAMETER HashId
                 The hash identifier for the service. This must be unique for each service. This parameter is used by hash based load balancing methods. Minimum value = 1
             .EXAMPLE
-                Get-NSService -NSSession $Session -Name $ServiceName
+                New-NSServicegroupServicegroupmemberBinding -NSSession $NSSession -Name "svcgrp_SFStore" -ServerName "SF2" -Port 80 -State ENABLED -Weight 2
             .EXAMPLE
                 Get-NSService -NSSession $Session
             .NOTES

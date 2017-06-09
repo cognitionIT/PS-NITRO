@@ -1,5 +1,5 @@
-﻿    function Get-NSSystemFile {
-    # Created: 20160905
+﻿    # Created: 20160905
+    function Get-NSSystemFile {
         <#
         .SYNOPSIS
             Retrieve system file resource(s) from the NetScaler configuration
@@ -7,12 +7,14 @@
             Retrieve system file resource(s) from the NetScaler configuration
         .PARAMETER NSSession
             An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER NetScalerFolder
+            The folder location on the NetScaler where the file resides
         .PARAMETER FileName
-            Name of the file to retrieve. Minimum length = 1
+            Name of the file. It should not include filepath. Maximum length = 63
         .EXAMPLE
-            Get-NSSystemFile -NSSession $Session -NetScalerFolder $folder -FileName $filename
+            Get-NSSystemFile -NSSession $NSSession -NetScalerFolder "/nsconfig/ssl/"
         .EXAMPLE
-            Get-NSSystemGroup -NSSession $Session -NetScalerFolder $folder
+            Get-NSSystemFile -NSSession $NSSession -NetScalerFolder "/nsconfig/ssl/" | Where-Object {((($_.filename -like "*.cert") -or ($_.filename -like "*.cer") -or ($_.filename -like "*.der") -or ($_.filename -like "*.pfx")) -and ($_.filename -notlike "ns-*"))}
         .NOTES
             Copyright (c) cognition IT. All rights reserved.
         #>

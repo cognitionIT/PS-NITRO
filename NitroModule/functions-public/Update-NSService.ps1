@@ -25,6 +25,8 @@
                 Used with the Client IP parameter
                 If you set the Client IP parameter, and you do not specify a name for the header, the appliance uses the header name specified for the global Client IP Header parameter
                 If the global Client IP Header parameter is not specified, the appliance inserts a header with the name "client-ip."
+        .PARAMETER Comment
+            Any comments that you might want to associate with the Service.
             .EXAMPLE
                 Add-NSService -NSSession $Session -Name "Server1_Service" -ServerName "Server1" -ServerIPAddress "10.108.151.3" -Type "HTTP" -Port 80
             .NOTES

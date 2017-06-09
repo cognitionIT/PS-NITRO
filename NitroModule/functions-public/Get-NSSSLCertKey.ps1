@@ -1,5 +1,5 @@
-﻿    function Get-NSSSLCertKey {
-    # Created: 20160905
+﻿    # Created: 20160905
+    function Get-NSSSLCertKey {
         <#
         .SYNOPSIS
             Retrieve certificate key resource(s) from the NetScaler configuration

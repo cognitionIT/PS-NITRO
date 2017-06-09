@@ -18,6 +18,8 @@
                 IP address of the service to which to send probes. If the parameter is set to 0, the IP address of the server to which the monitor is bound is considered the destination IP address
             .PARAMETER StoreName
                 Store Name. For monitors of type STOREFRONT, STORENAME is an optional argument defining storefront service store name. Applicable to STOREFRONT monitors
+            .PARAMETER State
+	  	        State of the monitor.
             .PARAMETER Reverse
                 Mark a service as DOWN, instead of UP, when probe criteria are satisfied, and as UP instead of DOWN when probe criteria are not satisfied. Default value: NO. Possible values = YES, NO
             .EXAMPLE

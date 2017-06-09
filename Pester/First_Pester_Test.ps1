@@ -17,7 +17,7 @@ Import-Module Pester
 Describe "NitroModule" -Tags "Module" {
     
     # Import the new NITRO Module
-    Import-Module C:\GitHub\PS-NITRO\NitroModule
+    Import-Module G:\GitHub\PS-NITRO\NitroModule
     
     # Retrieve all functions from the Module
     $FunctionsList = (get-command -Module NitroModule | Where-Object -FilterScript { $_.CommandType -eq 'Function' }).Name

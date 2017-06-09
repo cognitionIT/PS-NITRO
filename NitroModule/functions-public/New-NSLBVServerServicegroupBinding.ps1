@@ -1,5 +1,22 @@
-﻿    function New-NSLBVServerServicegroupBinding {
-    # Updated: 20160824 - Removed unknown Action parameter
+﻿    # Updated: 20160824 - Removed unknown Action parameter
+    function New-NSLBVServerServicegroupBinding {
+        <#
+        .SYNOPSIS
+            Bind a Servicegroup to a Load Balancing vServer
+        .DESCRIPTION
+            Bind a Servicegroup to a Load Balancing vServer
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER Name
+            Name of the virtual server
+        .PARAMETER ServiceGroupName
+            Servicegroup to bind to the vServer
+        .EXAMPLE
+            New-NSLBVServerServicegroupBinding -NSSession $Session -Name vsvr_lb_storefront -ServiceGroupName svcgrp_lb_storefront
+        .NOTES
+            Copyright (c) Citrix Systems, Inc. All rights reserved.
+            Copyright (c) cognition IT. All rights reserved.
+        #>
         [CmdletBinding()]
         param (
             [Parameter(Mandatory=$true)] [PSObject]$NSSession,
@@ -7,10 +24,6 @@
             [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()] [string]$Name,
             # The service group name bound to the selected load balancing virtual server
             [Parameter(Mandatory=$false)][ValidateNotNullOrEmpty()] [string]$ServiceGroupName
-            # Service to bind to the virtual server.
-#            [Parameter(Mandatory=$false)][ValidateNotNullOrEmpty()] [string]$ServiceName,
-            # Integer specifying the weight of the service. Default value: 1. Minimum value = 1. Maximum value = 100
-#            [Parameter(Mandatory=$false)][ValidateRange(1,100)] [int]$Weight
         )
         Begin {
             Write-Verbose "$($MyInvocation.MyCommand): Enter"

@@ -4,6 +4,8 @@
             Retrieve a NetScaler NTP Server Configuration
         .DESCRIPTION
             Retrieve a NetScaler NTP Server Configuration
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
         .PARAMETER ServerName
             Fully qualified domain name or IPv4 address of the NTP server.
         .EXAMPLE

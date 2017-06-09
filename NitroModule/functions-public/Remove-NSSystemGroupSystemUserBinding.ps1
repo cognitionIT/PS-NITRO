@@ -8,7 +8,7 @@
             An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
         .PARAMETER GroupName
             Name of the group to add the binding to. Minimum length = 1
-        .PARAMETER PolicyName
+        .PARAMETER UserName
             Name of the system user that is binded to the group.
         .EXAMPLE
             Remove-NSSystemGroupSystemUserBinding -NSSession $Session -GroupName group -UserName systemuser

@@ -1,4 +1,18 @@
 ﻿    function Get-NSLBVServerResponderPolicyBinding {
+        <#
+        .SYNOPSIS
+            Retrieve NetScaler vServer Responder Policy Binding
+        .DESCRIPTION
+            Retrieve NetScaler vServer Responder Policy Binding
+        .PARAMETER NSSession
+            An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
+        .PARAMETER Name
+            Name of the Load Balancing vServer.
+        .EXAMPLE
+            Get-NSLBVServerResponderPolicyBinding -NSSession $Session -Name vsvr_lb_storefront
+        .NOTES
+            Copyright (c) cognition IT. All rights reserved.
+        #>
         [CmdletBinding()]
         param (
             [Parameter(Mandatory=$true)] [PSObject]$NSSession,

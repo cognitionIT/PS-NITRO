@@ -8,7 +8,7 @@
             An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
         .PARAMETER Level
             Types of configurations to be cleared. Possible values = basic, extended, full
-        .SWITCH Enforced
+        .PARAMETER Enforced
             Configurations will be cleared without prompting for confirmation.
         .EXAMPLE
             Clear-NSConfig -NSSession $Session
