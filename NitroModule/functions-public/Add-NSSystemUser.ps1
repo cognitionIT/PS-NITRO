@@ -10,13 +10,15 @@
             Name for a user. Cannot be changed after the user is added. Minimum length = 1
         .PARAMETER Password
             Password for the system user. Can include any ASCII character. Minimum length = 1
-        .SWITCH ExternalAuth
+        .PARAMETER ExternalAuth
+            Switch parameter.
             Whether to use external authentication servers for the system user authentication or not. Default value: ENABLED. Possible values = ENABLED, DISABLED.
         .PARAMETER PromptString
             String to display at the command-line prompt. Minimum length = 1
         .PARAMETER Timeout
             CLI session inactivity timeout, in seconds. Default value is 900 seconds.
-        .SWITCH Logging
+        .PARAMETER Logging
+            Switch parameter.
             Users logging privilege. Default value: DISABLED. Possible values = ENABLED, DISABLED.
         .EXAMPLE
             Add-NSSystemUser -NSSession $Session -UserName user -Password password

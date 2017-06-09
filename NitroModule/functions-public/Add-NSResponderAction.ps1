@@ -13,14 +13,16 @@
             Possible values = noop, respondwith, redirect, respondwithhtmlpage, sqlresponse_ok, sqlresponse_error
         .PARAMETER TargetExpression
             Expression specifying what to respond with. Typically a URL for redirect policies or a default-syntax expression.
-        .PARAMETER HTLMPage
-            For respondwithhtmlpage policies, name of the HTML page object to use as the response. You must first import the page object. Minimum length = 1
+        .PARAMETER HTMLPage
+            For respondwithhtmlpage policies, name of the HTML page object to use as the response. You must first import the page object. Minimum length=1
         .PARAMETER BypassSafetyCheck
             Bypass the safety check, allowing potentially unsafe expressions. Default value: NO. Possible values = YES, NO
         .PARAMETER ResponseStatusCode
             HTTP response status code, for example 200, 302, 404, etc. The default value for the redirect action type is 302 and for respondwithhtmlpage is 200. Minimum value = 100. Maximum value = 599
         .PARAMETER ReasonPhrase
             Expression specifying the reason phrase of the HTTP response. The reason phrase may be a string literal with quotes or a PI expression. For example: "Invalid URL: " + HTTP.REQ.URL.
+        .PARAMETER Comment
+            Any comments that you might want to associate with the Responder Action.
         .EXAMPLE
             Add-NSRewriteAction -NSSession $Session -ActionName $ActionName -ActionType replace -TargetExpression "HTTP.REQ.URL" -Expression "\"/Citrix/XenApp\""
         .NOTES

@@ -3,7 +3,7 @@
             .SYNOPSIS
                 Add a new service group
             .DESCRIPTION
-                Add a new service group
+                Add a new service group to the NetScaler configuration
             .PARAMETER NSSession
                 An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
             .PARAMETER Name
@@ -16,11 +16,13 @@
                 Auto scale option for a servicegroup. Default value: DISABLED. Possible values = DISABLED, DNS, POLICY
             .PARAMETER Cacheable
                 Use the transparent cache redirection virtual server to forward the request to the cache server. Note: Do not set this parameter if you set the Cache Type. Default value: NO. Possible values = YES, NO
-            .SWITCH Disabled
+            .PARAMETER State
                 DisablesInitial state of the service group. Default value: ENABLED. Possible values = ENABLED, DISABLED
             .PARAMETER HealthMonitoring
+                Switch parameter.
                 Monitor the health of this service. Available settings function as follows: YES - Send probes to check the health of the service. NO - Do not send probes to check the health of the service. With the NO option, the appliance shows the service as UP at all times. Default value: YES. Possible values = YES, NO
-            .PARAMETER ApplfowLogging
+            .PARAMETER AppflowLogging
+                Switch parameter.
                 Enable logging of AppFlow information for the specified service group. Default value: ENABLED. Possible values = ENABLED, DISABLED
             .EXAMPLE
                 Add-NSServiceGroup -NSSession $Session -Name "svcgrp" -Protocol "HTTP" -CacheType SERVER -AutoscaleMode "DISABLED" 

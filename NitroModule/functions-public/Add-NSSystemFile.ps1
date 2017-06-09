@@ -1,6 +1,6 @@
-﻿    function Add-NSSystemFile {    
-    # Created: 20160905
-<#
+﻿    # Created: 20160905
+    function Add-NSSystemFile {    
+    <#
         .SYNOPSIS
             Uploading a file to the NetScaler Appliance
         .DESCRIPTION

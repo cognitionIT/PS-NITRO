@@ -1,5 +1,5 @@
-﻿    function Add-NSSSLCertKeyLink {
-    # Created: 20160829
+﻿    # Created: 20160829
+    function Add-NSSSLCertKeyLink {
         <#
         .SYNOPSIS
             Link a SSL certificate to another SSL certificate
@@ -10,7 +10,7 @@
         .PARAMETER CertKeyName
             Name for the certificate and private-key pair
         .PARAMETER LinkCertKeyName
-            Name for the Linked certificate and private-key pair
+            Name for the Linked certificate and private-key pai
         .EXAMPLE
             Add-NSCertKeyPair -NSSession $Session -CertKeyName "wildcard" -LinkCertKeyName "rootCA"
         .NOTES

@@ -1,10 +1,10 @@
-﻿    function Add-NSSSLCertKey {
-    # Created: 20160829
+﻿    # Created: 20160829
+    function Add-NSSSLCertKey {
         <#
         .SYNOPSIS
             Install a SSL certificate key pair
         .DESCRIPTION
-            Install a SSL certificate key pair
+            Install a SSL certificate key pair on the NetScaler appliance.
         .PARAMETER NSSession
             An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
         .PARAMETER CertKeyName
@@ -17,7 +17,8 @@
             Input format of the certificate and the private-key files, allowed values are "PEM" and "DER", default to "PEM"
         .PARAMETER Password
             Pass phrase used to encrypt the private-key. Required when adding an encrypted private-key in PEM format
-        .SWITCH ExpiryMonitor
+        .PARAMETER ExpiryMonitor
+            Switch parameter.
             Determines whether the expiration of a certificate needs to be monitored
         .PARAMETER NotificationPeriod
             How many days before the certificate is expiring a notification is shown
