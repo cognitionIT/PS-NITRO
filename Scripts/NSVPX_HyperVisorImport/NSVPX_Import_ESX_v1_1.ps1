@@ -34,11 +34,18 @@ $VMNetworkName = "Internal Network"
 # Optional VM variable (can be useful for NetScaler license management). The MAC address must be in the valid "manual" range 00:50:56:00:00:00 - 00:50:56:3F:FF:FF.    
 $MACaddress = "00:50:56:34:05:58"
  
-#Load VMware PowerCLI Snapins
-If ((Get-PSSnapin -Name VMware.VimAutomation.Core -ErrorAction SilentlyContinue) -eq $null)
+#Check version of PowerCLI and use appropiate method for adding cmdlets
+If ((Get-Command Connect-ViServer -ErrorAction SilentlyContinue) -eq $null)
 {
-    Add-PsSnapin VMware.VimAutomation.Core
-    Write-Verbose -Message "Adding the VMware.VimAutomation.Core PowerShell snap-in ..." -Verbose
+  $powercliVersion = $(Get-Module -ListAvailable | where {$_.name -match "VMware.VimAutomation.Core"}).Version.Major
+
+  if ($powercliVersion -ge 6){
+    import-module VMware.VimAutomation.Core
+  }
+  else {
+    Add-PSSnapin VMware.VimAutomation.Core
+  }
+  Write-Verbose -Message "Adding the VMware.VimAutomation.Core PowerShell component..." -Verbose
 }
  
 # Connect to the vSphere server
