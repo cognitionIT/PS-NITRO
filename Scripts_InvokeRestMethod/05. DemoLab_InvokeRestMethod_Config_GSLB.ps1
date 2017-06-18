@@ -14,12 +14,14 @@
 
 #region NITRO settings
     $ContentType = "application/json"
-    $SubNetIP = "192.168.59"
+#    $SubNetIP = "192.168.59"
+    $SubNetIP = "192.168.0"
     $NSIP = $SubNetIP + ".2"
     # Build my own credentials variable, based on password string
     $PW = ConvertTo-SecureString "nsroot" -AsPlainText -Force
     $MyCreds = New-Object System.Management.Automation.PSCredential ("nsroot", $PW)
-    $FileRoot = "C:\GitHub\PS-NITRO_v20170509\Scripts_InvokeRestMethod"
+#    $FileRoot = "C:\GitHub\PS-NITRO_v20170509\Scripts_InvokeRestMethod"
+    $FileRoot = "C:\GitHub\PS-NITRO\Scripts_InvokeRestMethod"
 
     $NSUserName = "nsroot"
     $NSUserPW = "nsroot"
@@ -163,23 +165,169 @@ Write-Host "--------------------------------------------------------------- " -F
     Invoke-RestMethod -Uri $strURI -Method Post -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
 #endregion Add ADNS Service
 
+
+#region Create DNS Name Server records
+<#
+    add
+
+    URL:http://<netscaler-ip-address>/nitro/v1/config/dnsnsrec
+
+    HTTP Method:POST
+
+    Request Headers:
+
+    Cookie:NITRO_AUTH_TOKEN=<tokenvalue>
+    Content-Type:application/json
+
+    Request Payload:
+
+    {"dnsnsrec":{
+          "domain":<String_value>,
+          "nameserver":<String_value>,
+          "ttl":<Double_value>
+    }}
+
+    Response:
+
+    HTTP Status Code on Success: 201 Created
+    HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <string> (for NetScaler-specific errors). The response payload provides details of the error
+#>
+    # Specifying the correct URL 
+    $strURI = "http://$NSIP/nitro/v1/config/dnsnsrec"
+
+    # Creating the right payload formatting (mind the Depth for the nested arrays)
+    # add dns nsRec gslb.demo.lab nsnitro.gslb.demo.lab
+
+    $payload = @{
+    "dnsnsrec"= @{
+          "domain"="gslb.demo.lab";
+          "nameserver"="nsnitro.gslb.demo.lab";
+        }
+    } | ConvertTo-Json -Depth 5
+
+    # Logging NetScaler Instance payload formatting
+    Write-Host "payload: " -ForegroundColor Yellow
+    Write-Host $payload -ForegroundColor Green
+
+    # Method #1: Making the REST API call to the NetScaler
+    Invoke-RestMethod -Uri $strURI -Method Post -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
+#endregion Create DNS Name Server records
+
+#region Create DNS SOA record
+<#
+    add
+
+    URL:http://<netscaler-ip-address>/nitro/v1/config/dnssoarec
+
+    HTTP Method:POST
+
+    Request Headers:
+
+    Cookie:NITRO_AUTH_TOKEN=<tokenvalue>
+    Content-Type:application/json
+
+    Request Payload:
+
+    {"dnssoarec":{
+          "domain":<String_value>,
+          "originserver":<String_value>,
+          "contact":<String_value>,
+          "serial":<Double_value>,
+          "refresh":<Double_value>,
+          "retry":<Double_value>,
+          "expire":<Double_value>,
+          "minimum":<Double_value>,
+          "ttl":<Double_value>
+    }}
+
+    Response:
+
+    HTTP Status Code on Success: 201 Created
+    HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <string> (for NetScaler-specific errors). The response payload provides details of the error
+#>
+    # Specifying the correct URL 
+    $strURI = "http://$NSIP/nitro/v1/config/dnssoarec"
+
+    # Creating the right payload formatting (mind the Depth for the nested arrays)
+    # add dns soaRec gslb.demo.lab -originServer nsnitro.gslb.demo.lab -contact admin.demo.lab
+
+    $payload = @{
+    "dnssoarec"= @{
+          "domain"="gslb.demo.lab";
+          "originserver"="nsnitro.gslb.demo.lab";
+          "contact"="admin.demo.lab";
+        }
+    } | ConvertTo-Json -Depth 5
+
+    # Logging NetScaler Instance payload formatting
+    Write-Host "payload: " -ForegroundColor Yellow
+    Write-Host $payload -ForegroundColor Green
+
+    # Method #1: Making the REST API call to the NetScaler
+    Invoke-RestMethod -Uri $strURI -Method Post -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
+#endregion Create DNS SOA record
+
+# Create DNS A Record
+#region Create DNS A record
+<#
+    add
+
+    URL:http://<netscaler-ip-address>/nitro/v1/config/dnsaddrec
+    HTTP Method:POST
+    Request Headers:
+        Cookie:NITRO_AUTH_TOKEN=<tokenvalue>
+        Content-Type:application/json
+
+    Request Payload:
+
+    {"dnsaddrec":{
+            "hostname":<String_value>,
+            "ipaddress":<String_value>,
+            "ttl":<Double_value>
+    }}
+
+    Response:
+    HTTP Status Code on Success: 201 Created
+    HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <string> (for NetScaler-specific errors). 
+#>
+    # Specifying the correct URL 
+    $strURI = "http://$NSIP/nitro/v1/config/dnsaddrec"
+
+    # Creating the right payload formatting (mind the Depth for the nested arrays)
+    # add dns addRec nsnitro.gslb.demo.lab 192.168.0.2
+
+    $payload = @{
+    "dnsaddrec"= @{
+      "hostname"="nsnitro.gslb.demo.lab";
+      "ipaddress"=($SubnetIP + ".2");
+        }
+    } | ConvertTo-Json -Depth 5
+
+    # Logging NetScaler Instance payload formatting
+    Write-Host "payload: " -ForegroundColor Yellow
+    Write-Host $payload -ForegroundColor Green
+
+    # Method #1: Making the REST API call to the NetScaler
+    Invoke-RestMethod -Uri $strURI -Method Post -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
+#endregion Create DNS A record
+
+
 # --------------------------
 # | Add GSLB Configuration |
 # --------------------------
-#region Add GSLB local site
+#region Add GSLB Sites (bulk)
     # Specifying the correct URL 
     $strURI = "http://$NSIP/nitro/v1/config/gslbsite"
 
     # Creating the right payload formatting (mind the Depth for the nested arrays)
-    # add gslb site Site1 192.168.59.5 -publicIP 192.168.59.5
+    # add gslb site Site1 192.168.0.5 -publicIP 192.168.0.5
+    # add gslb site Site2 192.168.10.5 -publicIP 192.168.10.5
 
     $payload = @{
-    "gslbsite"= @{
-      "sitename"="Site1";
-      "sitetype"="LOCAL";
-      "siteipaddress"=($SubnetIP + ".5");
-      "publicip"=($SubnetIP + ".5")
-        }
+    "gslbsite"= @( 
+        @{"sitename"="Site1";"sitetype"="LOCAL";"siteipaddress"=($SubnetIP + ".5");"publicip"=($SubnetIP + ".5")},
+        @{"sitename"="Site2";"sitetype"="REMOTE";"siteipaddress"="192.168.10.5";"publicip"="192.168.10.5"}
+        )
     } | ConvertTo-Json -Depth 5
 
     # Logging NetScaler Instance payload formatting
@@ -187,30 +335,47 @@ Write-Host "--------------------------------------------------------------- " -F
     Write-Host $payload -ForegroundColor Green
 
     # Method #1: Making the REST API call to the NetScaler
-    Invoke-RestMethod -Uri $strURI -Method Post -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
+    $response = Invoke-RestMethod -Uri $strURI -Method Post -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
 #endregion Add GSLB local site
 
-#region Add GSLB service
+#region Add GSLB services (bulk)
     # Specifying the correct URL 
     $strURI = "http://$NSIP/nitro/v1/config/gslbservice"
 
     # Creating the right payload formatting (mind the Depth for the nested arrays)
-    # add gslb service gslb_svc_SFStore_Site1 192.168.59.101 SSL 443 -publicIP 192.168.59.101 -publicPort 443 -maxClient 0 -siteName Site1 -cltTimeout 180 -svrTimeout 360 -downStateFlush ENABLED
+    # add gslb service gslb_svc_nsg_vpn_test_site1 192.168.0.9 SSL 443 -publicIP 192.168.0.9 -publicPort 443 -maxClient 0 -siteName Site1 -cltTimeout 180 -svrTimeout 360 -downStateFlush ENABLED
+    # add gslb service gslb_svc_nsg_vpn_test_site2 192.168.10.9 SSL 443 -publicIP 192.168.10.9 -publicPort 443 -maxClient 0 -siteName Site2 -cltTimeout 180 -svrTimeout 360 -downStateFlush ENABLED
 
     $payload = @{
-    "gslbservice"= @{
-      "servicename"= "gslb_svc_nsg_vpn_test_site1";
-      "ip"=($SubnetIP + ".102");
-      "servicetype"="SSL";
-      "port"=443;
-      "publicip"=($SubnetIP + ".102");
-      "publicport"=443;
-      "maxclient"=0;
-      "sitename"="Site1";
-      "clttimeout"=180;
-      "svrtimeout"=360;
-      "downstateflush"="ENABLED"
-        }
+    "gslbservice"= @(
+            @{
+              "servicename"= "gslb_svc_nsg_vpn_test_site1";
+              "ip"=($SubnetIP + ".9");
+              "servicetype"="SSL";
+              "port"=443;
+              "publicip"=($SubnetIP + ".9");
+              "publicport"=443;
+              "maxclient"=0;
+              "sitename"="Site1";
+              "clttimeout"=180;
+              "svrtimeout"=360;
+              "downstateflush"="ENABLED"
+            },
+            @{
+              "servicename"= "gslb_svc_nsg_vpn_test_site2";
+              "ip"="192.168.10.9";
+              "servicetype"="SSL";
+              "port"=443;
+              "publicip"="192.168.10.9";
+              "publicport"=443;
+              "maxclient"=0;
+              "sitename"="Site2";
+              "clttimeout"=180;
+              "svrtimeout"=360;
+              "downstateflush"="ENABLED"
+            }
+        )
+
     } | ConvertTo-Json -Depth 5
 
     # Logging NetScaler Instance payload formatting
@@ -218,10 +383,55 @@ Write-Host "--------------------------------------------------------------- " -F
     Write-Host $payload -ForegroundColor Green
 
     # Method #1: Making the REST API call to the NetScaler
-    Invoke-RestMethod -Uri $strURI -Method Post -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
+    $response = Invoke-RestMethod -Uri $strURI -Method Post -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
 #endregion Add GSLB service
 
-#region Add GSLB vServer
+#region Add GSLB vServer (bulk)
+    # Specifying the correct URL 
+    $strURI = "http://$NSIP/nitro/v1/config/gslbvserver"
+
+    # Creating the right payload formatting (mind the Depth for the nested arrays)
+    # add gslb vserver gslb_vsvr_SFStore SSL -backupLBMethod ROUNDROBIN -tolerance 0 -EDR ENABLED -ECS ENABLED -appflowLog DISABLED
+    # set gslb vserver gslb_vsvr_SFStore -backupLBMethod ROUNDROBIN -tolerance 0 -EDR ENABLED -ECS ENABLED -appflowLog DISABLED
+
+    $payload = @{
+    "gslbvserver"= @(
+            @{
+              "name"="gslb_vsvr_nsg_vpn_test";
+              "servicetype"="SSL";
+              "iptype"="IPV4"; # default value
+              "dnsrecordtype"="A"; # default value
+              "lbmethod"="LEASTCONNECTION"; # default value
+              "backuplbmethod"= "ROUNDROBIN";
+              "tolerance"=0;
+              "edr"="ENABLED";
+              "ecs"="ENABLED";
+              "appflowlog"="DISABLED"
+            },
+            @{
+              "name"="gslb_vsvr_nsg_vpn_backup";
+              "servicetype"="SSL";
+              "iptype"="IPV4"; # default value
+              "dnsrecordtype"="A"; # default value
+              "lbmethod"="LEASTCONNECTION"; # default value
+              "backuplbmethod"= "ROUNDROBIN";
+              "tolerance"=0;
+              "edr"="ENABLED";
+              "ecs"="ENABLED";
+              "appflowlog"="DISABLED"
+            }
+        )
+    } | ConvertTo-Json -Depth 5
+
+    # Logging NetScaler Instance payload formatting
+    Write-Host "payload: " -ForegroundColor Yellow
+    Write-Host $payload -ForegroundColor Green
+
+    # Method #1: Making the REST API call to the NetScaler
+    $response = Invoke-RestMethod -Uri $strURI -Method Post -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
+#endregion Add GSLB vServer
+
+#region Update GSLB vServer
     # Specifying the correct URL 
     $strURI = "http://$NSIP/nitro/v1/config/gslbvserver"
 
@@ -232,15 +442,8 @@ Write-Host "--------------------------------------------------------------- " -F
     $payload = @{
     "gslbvserver"= @{
       "name"="gslb_vsvr_nsg_vpn_test";
-      "servicetype"="SSL";
-      "iptype"="IPV4"; # default value
-      "dnsrecordtype"="A"; # default value
-      "lbmethod"="LEASTCONNECTION"; # default value
-      "backuplbmethod"= "ROUNDROBIN";
-      "tolerance"=0;
-      "edr"="ENABLED";
-      "ecs"="ENABLED";
-      "appflowlog"="DISABLED"
+      "backupvserver"="gslb_vsvr_nsg_vpn_backup";
+      "comment"="updated with a backup vserver";
         }
     } | ConvertTo-Json -Depth 5
 
@@ -249,7 +452,7 @@ Write-Host "--------------------------------------------------------------- " -F
     Write-Host $payload -ForegroundColor Green
 
     # Method #1: Making the REST API call to the NetScaler
-    Invoke-RestMethod -Uri $strURI -Method Post -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
+    Invoke-RestMethod -Uri $strURI -Method Put -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
 #endregion Add GSLB vServer
 
 # Note: You need to perform an update to specify a backup vserver for this gslb vserver.
@@ -277,7 +480,7 @@ Write-Host "--------------------------------------------------------------- " -F
     Invoke-RestMethod -Uri $strURI -Method Post -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
 #endregion Add GSLB vServer binding domain name
 
-#region Add GSLB vServer binding service
+#region Add GSLB vServer binding service (bulk)
     # Specifying the correct URL 
     $strURI = "http://$NSIP/nitro/v1/config/gslbvserver_gslbservice_binding"
 
@@ -285,12 +488,20 @@ Write-Host "--------------------------------------------------------------- " -F
     # bind gslb vserver gslb_vsvr_SFStore -serviceName gslb_svc_SFStore_Site1
 
     $payload = @{
-    "gslbvserver_gslbservice_binding"= @{
-      "name"="gslb_vsvr_nsg_vpn_test";
-      "servicename"="gslb_svc_nsg_vpn_test_site1"
-#      "weight":<Double_value>;
-#      "domainname":<String_value>
-        }
+    "gslbvserver_gslbservice_binding"= @(
+            @{
+              "name"="gslb_vsvr_nsg_vpn_test";
+              "servicename"="gslb_svc_nsg_vpn_test_site1"
+        #      "weight":<Double_value>;
+        #      "domainname":<String_value>
+            },
+            @{
+              "name"="gslb_vsvr_nsg_vpn_backup";
+              "servicename"="gslb_svc_nsg_vpn_test_site2"
+        #      "weight":<Double_value>;
+        #      "domainname":<String_value>
+            }
+        )
     } | ConvertTo-Json -Depth 5
 
     # Logging NetScaler Instance payload formatting
@@ -298,15 +509,11 @@ Write-Host "--------------------------------------------------------------- " -F
     Write-Host $payload -ForegroundColor Green
 
     # Method #1: Making the REST API call to the NetScaler
-    Invoke-RestMethod -Uri $strURI -Method Post -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
+    $response = Invoke-RestMethod -Uri $strURI -Method Post -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
 #endregion Add GSLB vServer binding service
 
 
 #TODO:
-
-# Create DNS Name Server records
-# Create DNS SOA record
-# Creeate DNS A Record
 
 
 #region End NetScaler NITRO Session
