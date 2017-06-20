@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<link href="../../rdx/css/rdx.css" rel="stylesheet" type="text/css" />
+	<link href="../../index.css" rel="stylesheet" type="text/css" />
+	<title>appfw_sig_updates</title>
+</head>
+<body class="ns_body">
+<p class="ns_wp_header">appfw_sig_updates</p>
+<P>Configuration for App Flow Signature Update resource.</P>
+<p class="heading">Read/write properties</p>
+	<p class="property_name">id<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Id is system generated key for all the appflow updates..</p>
+<p class="heading">Read only properties</p>
+	<p class="property_name">last_updated<span class="property_type">&lt;Double&gt;</span></p><p class="property_description">Last Updated..</p>
+	<p class="property_name">version<span class="property_type">&lt;String&gt;</span></p><p class="property_description">NetScaler Version.</p>
+	<p class="property_name">release<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Release of the NetScaler..</p>
+	<p class="property_name">build<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Build Number of NetScaler.</p>
+	<p class="property_name">filename<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Filename..</p>
+	<p class="property_name">sshfilecontent<span class="property_type">&lt;String&gt;</span></p><p class="property_description">SSH File Content..</p>
+	<p class="property_name">md5<span class="property_type">&lt;String&gt;</span></p><p class="property_description">MD5 of File Content..</p>
+	<p class="property_name">schema_version<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Schema Version of NetScaler.</p>
+	<p class="property_name">filecontent<span class="property_type">&lt;String&gt;</span></p><p class="property_description">File Content..</p>
+<p class="heading">Operations</p><p class="property_name">NOTE: In request payload, Mandatory parameters are marked red and bold.<br /><br />The following parameters can be used in the nitro request :</p>
+<p class="property_name">onerror<span class=\"property_type\">&nbsp;&nbsp;&nbsp;&lt;String_value&gt;</span></p><p class="property_description"> Use this parameter to set the onerror status for nitro request. Applicable only for bulk requests.<br />Default value: EXIT<br />Possible values = EXIT, CONTINUE</p><a href="#get_all" class="operation">get (all)</a><p class="heading"><a name="get_all">get (all)</a></p><p class="key">URL:<span class="url_value">http://&lt;MGMT-IP&gt;/nitro/v1/config/appfw_sig_updates<p class="key">Query-parameters:<span class="url_value"><p class="key"><b>filter</b></p><p class="key"><span class="value">http://&lt;MGMT-IP&gt;/nitro/v1/config/appfw_sig_updates<b>?filter=property-name1:property-value1,property-name2:property-value2</b></span></p><p class="key"><span class="value">Use this query-parameter to get the filtered set of appfw_sig_updates resources configured on the system. You can set a filter on any property of the resource.</span></p><p class="key"><b>pagesize=#no&pageno=#no</b></p><p class="key"><span class="value">http://&lt;MGMT-IP&gt;/nitro/v1/config/appfw_sig_updates<b>?pagesize=#no&pageno=#no</b></span></p><p class="key"><span class="value">Use this query-parameter to get the appfw_sig_updates resources in chunks.</span></p><p class="key"><b>count</b></p><p class="key"><span class="value">http://&lt;MGMT-IP&gt;/nitro/v1/config/appfw_sig_updates<b>?count=yes</b></span></p><p class="key"><span class="value">Use this query-parameter to get the count of appfw_sig_updates resources.</span></p></span></p><p class="key">HTTP Method:<span class="value">GET</span></p><p class="key">Response Payload:<span class="value">JSON</span></p><p class="payload">{ "errorcode": 0, "message": "Done", "severity": &ltString_value&gt, "appfw_sig_updates":[{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"last_updated":&lt;Double_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"version":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"release":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"build":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"filename":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"sshfilecontent":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"id":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"md5":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"schema_version":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"filecontent":&lt;String_value&gt;</font>}]}</p>
+</body>
+</html>

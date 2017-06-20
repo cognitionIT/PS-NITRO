@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<link href="../../rdx/css/rdx.css" rel="stylesheet" type="text/css" />
+	<link href="../../index.css" rel="stylesheet" type="text/css" />
+	<title>parameter</title>
+</head>
+<body class="ns_body">
+<p class="ns_wp_header">parameter</p>
+<P>Configuration for Parameter used in formation schema resource.</P>
+<p class="heading">Read/write properties</p>
+	<p class="property_name">parent_name<span class="property_type">&lt;String&gt;</span></p><p class="property_description">.</p>
+	<p class="property_name">value<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Parameter Value.</p>
+	<p class="property_name">name<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Parameter Name.<br> Minimum length =  1<br> Maximum length =  128</p>
+	<p class="property_name">description<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Parameter description.<br> Maximum length =  512</p>
+	<p class="property_name">network_service_name<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Network Service Name.<br> Maximum length =  128</p>
+	<p class="property_name">parent_id<span class="property_type">&lt;String&gt;</span></p><p class="property_description">.</p>
+	<p class="property_name">id<span class="property_type">&lt;String&gt;</span></p><p class="property_description">.</p>
+	<p class="property_name">type<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Paramter Type IPAddress/String etc..</p>
+<p class="heading">Read only properties</p>
+<p class="heading">Operations</p><p class="property_name">NOTE: In request payload, Mandatory parameters are marked red and bold.<br /><br />The following parameters can be used in the nitro request :</p>
+<p class="property_name">onerror<span class=\"property_type\">&nbsp;&nbsp;&nbsp;&lt;String_value&gt;</span></p><p class="property_description"> Use this parameter to set the onerror status for nitro request. Applicable only for bulk requests.<br />Default value: EXIT<br />Possible values = EXIT, CONTINUE</p><a href="#get_all" class="operation">get (all)</a><p class="heading"><a name="get_all">get (all)</a></p><p class="key">URL:<span class="url_value">http://&lt;MGMT-IP&gt;/nitro/v1/config/parameter<p class="key">Query-parameters:<span class="url_value"><p class="key"><b>filter</b></p><p class="key"><span class="value">http://&lt;MGMT-IP&gt;/nitro/v1/config/parameter<b>?filter=property-name1:property-value1,property-name2:property-value2</b></span></p><p class="key"><span class="value">Use this query-parameter to get the filtered set of parameter resources configured on the system. You can set a filter on any property of the resource.</span></p><p class="key"><b>pagesize=#no&pageno=#no</b></p><p class="key"><span class="value">http://&lt;MGMT-IP&gt;/nitro/v1/config/parameter<b>?pagesize=#no&pageno=#no</b></span></p><p class="key"><span class="value">Use this query-parameter to get the parameter resources in chunks.</span></p><p class="key"><b>count</b></p><p class="key"><span class="value">http://&lt;MGMT-IP&gt;/nitro/v1/config/parameter<b>?count=yes</b></span></p><p class="key"><span class="value">Use this query-parameter to get the count of parameter resources.</span></p></span></p><p class="key">HTTP Method:<span class="value">GET</span></p><p class="key">Response Payload:<span class="value">JSON</span></p><p class="payload">{ "errorcode": 0, "message": "Done", "severity": &ltString_value&gt, "parameter":[{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"parent_name":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"value":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"name":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"description":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"network_service_name":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"parent_id":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"id":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"type":&lt;String_value&gt;</font>}]}</p>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<link href="../../rdx/css/rdx.css" rel="stylesheet" type="text/css" />
+	<link href="../../index.css" rel="stylesheet" type="text/css" />
+	<title>allowed_clients</title>
+</head>
+<body class="ns_body">
+<p class="ns_wp_header">allowed_clients</p>
+<P>Configuration for Filter Traffic in Management Service resource.</P>
+<p class="heading">Read/write properties</p>
+	<p class="property_name">redirect_ip<span class="property_type">&lt;String&gt;</span></p><p class="property_description">CB IP to redirect.</p>
+	<p class="property_name">id<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Id is system generated key.</p>
+	<p class="property_name">accept_ips<span class="property_type">&lt;String[]&gt;</span></p><p class="property_description">List of IPs to allow for NITRO requests.</p>
+<p class="heading">Read only properties</p>
+<p class="heading">Operations</p><p class="property_name">NOTE: In request payload, Mandatory parameters are marked red and bold.<br /><br />The following parameters can be used in the nitro request :</p>
+<p class="property_name">onerror<span class=\"property_type\">&nbsp;&nbsp;&nbsp;&lt;String_value&gt;</span></p><p class="property_description"> Use this parameter to set the onerror status for nitro request. Applicable only for bulk requests.<br />Default value: EXIT<br />Possible values = EXIT, CONTINUE</p><a href="#add" class="operation">add</a><a href="#get" class="operation">get</a><p class="heading"><a name="add">add</a></p><p class="key">URL:<span class="url_value">http://&lt;MGMT-IP&gt;/nitro/v1/config/allowed_clients</span></p><p class="key">HTTP Method:<span class="value">POST</span></p><p class="key">Request Payload:<span class="value">JSON</span></p><p class="payload">object={<br>"params":{<br><font color=#000000>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"onerror":&lt;String_value&gt;</font><br>},allowed_clients: {<br><font color=#000000>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"redirect_ip":&lt;String_value&gt;</font>,<br><font color=#000000>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"id":&lt;String_value&gt;</font>,<br><font color=#000000>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"accept_ips":&lt;String_value[]&gt;</font>}}</p><p class="key">Response Payload:<span class="value">JSON</span></p><p class="payload">{ "errorcode": 0, "message": "Done", "severity": &ltString_value&gt, "allowed_clients":[{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"redirect_ip":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"accept_ips_db":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"id":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"accept_ips":&lt;String_value&gt;</font>}]}</p><p class="heading"><a name="get">get</a></p><p class="key">URL:<span class="url_value">http://&lt;MGMT-IP&gt;/nitro/v1/config/allowed_clients</span></p><p class="key">HTTP Method:<span class="value">GET</span></p><p class="key">Response Payload:<span class="value">JSON</span></p><p class="payload">{ "errorcode": 0, "message": "Done", "severity": &ltString_value&gt, "allowed_clients":[{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"redirect_ip":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"accept_ips_db":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"id":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"accept_ips":&lt;String_value&gt;</font>}]}</p>
+</body>
+</html>

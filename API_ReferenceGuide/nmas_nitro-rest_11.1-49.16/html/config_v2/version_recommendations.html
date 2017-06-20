@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<link href="../../rdx/css/rdx.css" rel="stylesheet" type="text/css" />
+	<link href="../../index.css" rel="stylesheet" type="text/css" />
+	<title>version_recommendations</title>
+</head>
+<body class="ns_body">
+<p class="ns_wp_header">version_recommendations</p>
+<P>Configuration for Recommendation For Version Matrix resource.</P>
+<p class="heading">Read/write properties</p>
+<p class="heading">Read only properties</p>
+	<p class="property_name">xen_hotfix_recommendation<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Recommendations for Xen HotFix.</p>
+	<p class="property_name">xen_hotfix<span class="property_type">&lt;String&gt;</span></p><p class="property_description">xen hotfix is applied or not.</p>
+	<p class="property_name">xen_recommendation<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Recommendations for XenServer.</p>
+	<p class="property_name">suggestion<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Suggestion for user regarding version matrix.</p>
+	<p class="property_name">xen_version<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Xen Version.</p>
+	<p class="property_name">br_version<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Branch Repeater Version: All Branch Repeater Instances of this formation should be of same verison.</p>
+	<p class="property_name">ns_recommendation<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Recommendations for NetScaler.</p>
+	<p class="property_name">svm_version<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Service Management Version.</p>
+	<p class="property_name">ns_version<span class="property_type">&lt;String&gt;</span></p><p class="property_description">NetScaler Version: All NetScaler's Instances of this formation should be of same verison.</p>
+	<p class="property_name">xen_supplemental_pack_recommendation<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Recommendations for Xen Supplemantal Pack.</p>
+	<p class="property_name">xen_supplemental_pack_version<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Xen Supplemental Pack Version.</p>
+	<p class="property_name">br_recommendation<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Recommendations for Repeater.</p>
+	<p class="property_name">svm_recommendation<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Recommendations for Management Service.</p>
+<p class="heading">Operations</p><p class="property_name">NOTE: In request payload, Mandatory parameters are marked red and bold.<br /><br />The following parameters can be used in the nitro request :</p>
+<p class="property_name">onerror<span class=\"property_type\">&nbsp;&nbsp;&nbsp;&lt;String_value&gt;</span></p><p class="property_description"> Use this parameter to set the onerror status for nitro request. Applicable only for bulk requests.<br />Default value: EXIT<br />Possible values = EXIT, CONTINUE</p><a href="#get_all" class="operation">get (all)</a><p class="heading"><a name="get_all">get (all)</a></p><p class="key">URL:<span class="url_value">http://&lt;MGMT-IP&gt;/nitro/v2/config/version_recommendations<p class="key">Query-parameters:<span class="url_value"><p class="key"><b>filter</b></p><p class="key"><span class="value">http://&lt;MGMT-IP&gt;/nitro/v2/config/version_recommendations<b>?filter=property-name1:property-value1,property-name2:property-value2</b></span></p><p class="key"><span class="value">Use this query-parameter to get the filtered set of version_recommendations resources configured on the system. You can set a filter on any property of the resource.</span></p><p class="key"><b>pagesize=#no&pageno=#no</b></p><p class="key"><span class="value">http://&lt;MGMT-IP&gt;/nitro/v2/config/version_recommendations<b>?pagesize=#no&pageno=#no</b></span></p><p class="key"><span class="value">Use this query-parameter to get the version_recommendations resources in chunks.</span></p><p class="key"><b>count</b></p><p class="key"><span class="value">http://&lt;MGMT-IP&gt;/nitro/v2/config/version_recommendations<b>?count=yes</b></span></p><p class="key"><span class="value">Use this query-parameter to get the count of version_recommendations resources.</span></p></span></p><p class="key">HTTP Method:<span class="value">GET</span></p><p class="key">Response Payload:<span class="value">JSON</span></p><p class="payload">{ "errorcode": 0, "message": "Done", "severity": &ltString_value&gt, "version_recommendations":[{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"xen_hotfix_recommendation":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"xen_hotfix":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"xen_recommendation":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"suggestion":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"xen_version":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"br_version":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"ns_recommendation":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"svm_version":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"ns_version":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"xen_supplemental_pack_recommendation":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"xen_supplemental_pack_version":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"br_recommendation":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"svm_recommendation":&lt;String_value&gt;</font>}]}</p>
+</body>
+</html>

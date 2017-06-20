@@ -50,19 +50,19 @@ Write-Host "-------------------------------- " -ForegroundColor Yellow
 
 #region Open webbrowsers to test the container websites
     Write-Host "Checking the Blue webserver ..." -ForegroundColor Green
-    Start-sleep -Seconds 5
+    Start-sleep -Seconds 2
     Invoke-Expression "cmd.exe /C start http://$DockerHostIP`:$WebServerBluePort/index.html"
 
     Write-Host "Checking the Green webserver ..." -ForegroundColor Green
-    Start-sleep -Seconds 5
+    Start-sleep -Seconds 2
     Invoke-Expression "cmd.exe /C start http://$DockerHostIP`:$WebServerGreenPort/index.html"
 
     Write-Host "Checking the CPX NSIP ..." -ForegroundColor Green
-    Start-sleep -Seconds 5
+    Start-sleep -Seconds 2
     Invoke-Expression "cmd.exe /C start http://$DockerHostIP`:$CPXPortNSIP"
 
     Write-Host "Checking the CPX VIP ..." -ForegroundColor Green
-    Start-sleep -Seconds 5
+    Start-sleep -Seconds 2
     Invoke-Expression "cmd.exe /C start http://$DockerHostIP`:$CPXPortVIP"
 #endregion Open webbrowsers
 
@@ -70,7 +70,7 @@ Write-Host "------------------------------------------------------------- " -For
 Write-Host "| Pushing the LB configuration to NetScaler CPX with NITRO: | " -ForegroundColor Yellow
 Write-Host "------------------------------------------------------------- " -ForegroundColor Yellow
 
-Start-Sleep -Seconds 5
+Start-Sleep -Seconds 2
 
 # ----------------------------------------
 # | Method #1: Using the SessionVariable |

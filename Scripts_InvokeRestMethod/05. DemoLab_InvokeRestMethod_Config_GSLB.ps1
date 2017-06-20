@@ -13,9 +13,28 @@
 #>
 
 #region NITRO settings
+    #region Test Environment variables
+        $TestEnvironment = "demo"
+
+        Switch ($TestEnvironment)
+        {
+            "Elektra" 
+            {
+                $RootFolder = "H:\PSModules\NITRO\Scripts"
+                $SubnetIP = "192.168.59"
+            }
+            default
+            {
+                $RootFolder = "C:\Scripts\NITRO"
+                $SubnetIP = "192.168.0"
+            }
+        }
+        $NSLicFile = $RootFolder + "\NSVPX-ESX_PLT_201609.lic"
+
+        # What to install (for script testing purposes)
+        $ConfigNSGSettings = $true
+    #endregion Test Environment variables
     $ContentType = "application/json"
-#    $SubNetIP = "192.168.59"
-    $SubNetIP = "192.168.0"
     $NSIP = $SubNetIP + ".2"
     # Build my own credentials variable, based on password string
     $PW = ConvertTo-SecureString "nsroot" -AsPlainText -Force

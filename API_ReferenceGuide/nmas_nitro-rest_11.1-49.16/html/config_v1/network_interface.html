@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<link href="../../rdx/css/rdx.css" rel="stylesheet" type="text/css" />
+	<link href="../../index.css" rel="stylesheet" type="text/css" />
+	<title>network_interface</title>
+</head>
+<body class="ns_body">
+<p class="ns_wp_header">network_interface</p>
+<P>Configuration for VM device network interface resource.</P>
+<p class="heading">Read/write properties</p>
+	<p class="property_name">is_mgmt_ifc<span class="property_type">&lt;Boolean&gt;</span></p><p class="property_description">True if this is the management interface.</p>
+	<p class="property_name">name_server<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Name Server.<br> Minimum length =  1<br> Maximum length =  64</p>
+	<p class="property_name">vrid_list_ipv6<span class="property_type">&lt;String&gt;</span></p><p class="property_description">VRID List for Interface/Channel for IPV6 VMAC Generation.</p>
+	<p class="property_name">gateway<span class="property_type">&lt;String&gt;</span></p><p class="property_description">gateway.<br> Minimum length =  1<br> Maximum length =  64</p>
+	<p class="property_name">parent_id<span class="property_type">&lt;String&gt;</span></p><p class="property_description">.</p>
+	<p class="property_name">vrid_list_ipv4<span class="property_type">&lt;String&gt;</span></p><p class="property_description">VRID List for Interface/Channel for IPV4 VMAC Generation.</p>
+	<p class="property_name">is_member_ifc<span class="property_type">&lt;Boolean&gt;</span></p><p class="property_description">True if this interface is member of a channel.</p>
+	<p class="property_name">mac_address<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Mac Address.<br> Minimum length =  1<br> Maximum length =  32</p>
+	<p class="property_name">l2_enabled<span class="property_type">&lt;Boolean&gt;</span></p><p class="property_description">L2 mode status of Interface.</p>
+	<p class="property_name">id<span class="property_type">&lt;String&gt;</span></p><p class="property_description">.</p>
+	<p class="property_name">ip_address<span class="property_type">&lt;String&gt;</span></p><p class="property_description">IP Address.<br> Minimum length =  1<br> Maximum length =  64</p>
+	<p class="property_name">netmask<span class="property_type">&lt;String&gt;</span></p><p class="property_description">netmask.<br> Minimum length =  1<br> Maximum length =  64</p>
+	<p class="property_name">port_name<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Port name of the interface on the host machine.<br> Minimum length =  1<br> Maximum length =  128</p>
+	<p class="property_name">parent_name<span class="property_type">&lt;String&gt;</span></p><p class="property_description">.</p>
+	<p class="property_name">mac_mode<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Mac Mode, default for XenServer generated, generated for SVM generated, custom for User assigned.<br> Minimum length =  1<br> Maximum length =  255</p>
+	<p class="property_name">managed_device_id<span class="property_type">&lt;String&gt;</span></p><p class="property_description">managed_device_id.</p>
+	<p class="property_name">vlan<span class="property_type">&lt;Integer&gt;</span></p><p class="property_description">This property is not supported.Use vlan_whitelist for vlan configuration&ltbr&gtVLAN Id.<br> Maximum value =  </p>
+	<p class="property_name">receiveuntagged<span class="property_type">&lt;Boolean&gt;</span></p><p class="property_description">Receive Untagged Packets on Interface/Channel.</p>
+	<p class="property_name">sdx_formation_network_id<span class="property_type">&lt;String&gt;</span></p><p class="property_description">SDX Formation Network Id of which this Interface is part of.<br> Minimum length =  1<br> Maximum length =  128</p>
+	<p class="property_name">vlan_whitelist<span class="property_type">&lt;String&gt;</span></p><p class="property_description">VLAN Whitelist for Interface/Channel on VM Instance.</p>
+	<p class="property_name">interface_name<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Name of this interface.</p>
+	<p class="property_name">vrid_list_ipv4_array<span class="property_type">&lt;String[]&gt;</span></p><p class="property_description">VRID List for Interface for IPV4 VMAC Generation.</p>
+	<p class="property_name">vrid_list_ipv6_array<span class="property_type">&lt;String[]&gt;</span></p><p class="property_description">VRID List for Interface for IPV6 VMAC Generation.</p>
+	<p class="property_name">vlan_whitelist_array<span class="property_type">&lt;String[]&gt;</span></p><p class="property_description">VLAN Whitelist for Interface on VM Instance.</p>
+	<p class="property_name">is_vlan_applied<span class="property_type">&lt;Boolean&gt;</span></p><p class="property_description">Is VLAN added on NetworkInterface of VM Instance.</p>
+<p class="heading">Read only properties</p>
+	<p class="property_name">device_channel_name<span class="property_type">&lt;String&gt;</span></p><p class="property_description">LA Name on the actual VM.</p>
+	<p class="property_name">xen_vf_index<span class="property_type">&lt;Integer&gt;</span></p><p class="property_description">Index given by Xen when assigning free virtual function.</p>
+<p class="heading">Operations</p><p class="property_name">NOTE: In request payload, Mandatory parameters are marked red and bold.<br /><br />The following parameters can be used in the nitro request :</p>
+<p class="property_name">onerror<span class=\"property_type\">&nbsp;&nbsp;&nbsp;&lt;String_value&gt;</span></p><p class="property_description"> Use this parameter to set the onerror status for nitro request. Applicable only for bulk requests.<br />Default value: EXIT<br />Possible values = EXIT, CONTINUE</p>
+</body>
+</html>

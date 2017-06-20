@@ -1,0 +1,24 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<link href="../../rdx/css/rdx.css" rel="stylesheet" type="text/css" />
+	<link href="../../index.css" rel="stylesheet" type="text/css" />
+	<title>device_generic_resrc</title>
+</head>
+<body class="ns_body">
+<p class="ns_wp_header">device_generic_resrc</p>
+<P>Configuration for Device generic utility resource.</P>
+<p class="heading">Read/write properties</p>
+	<p class="property_name">failure_action<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Action taken on failure .</p>
+	<p class="property_name">sync<span class="property_type">&lt;Boolean&gt;</span></p><p class="property_description">Ping SVM to check its status.</p>
+	<p class="property_name">payload<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Payload/Body Request .</p>
+	<p class="property_name">device_family_type<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Device family type.<br> Minimum length =  1</p>
+	<p class="property_name">ipaddress<span class="property_type">&lt;String[]&gt;</span></p><p class="property_description">List of SVM IP Address.<br> Minimum length =  1<br> Maximum length =  64</p>
+	<p class="property_name">resource_type<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Type of resource.<br> Minimum length =  1</p>
+<p class="heading">Read only properties</p>
+	<p class="property_name">act_id<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Activity Id.</p>
+<p class="heading">Operations</p><p class="property_name">NOTE: In request payload, Mandatory parameters are marked red and bold.<br /><br />The following parameters can be used in the nitro request :</p>
+<p class="property_name">onerror<span class=\"property_type\">&nbsp;&nbsp;&nbsp;&lt;String_value&gt;</span></p><p class="property_description"> Use this parameter to set the onerror status for nitro request. Applicable only for bulk requests.<br />Default value: EXIT<br />Possible values = EXIT, CONTINUE</p><a href="#add" class="operation">add</a><p class="heading"><a name="add">add</a></p><p class="key">URL:<span class="url_value">http://&lt;MGMT-IP&gt;/nitro/v1/config/device_generic_resrc</span></p><p class="key">HTTP Method:<span class="value">POST</span></p><p class="key">Request Payload:<span class="value">JSON</span></p><p class="payload">object={<br>"params":{<br><font color=#000000>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"onerror":&lt;String_value&gt;</font><br>},device_generic_resrc: {<br><font color=#000000>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"failure_action":&lt;String_value&gt;</font>,<br><font color=#000000>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"sync":&lt;Boolean_value&gt;</font>,<br><font color=#FF0000><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"payload":&lt;String_value&gt;</b></font>,<br><font color=#FF0000><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"device_family_type":&lt;String_value&gt;</b></font>,<br><font color=#FF0000><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"ipaddress":&lt;String_value[]&gt;</b></font>,<br><font color=#FF0000><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"resource_type":&lt;String_value&gt;</b></font>}}</p><p class="key">Response Payload:<span class="value">JSON</span></p><p class="payload">{ "errorcode": 0, "message": "Done", "severity": &ltString_value&gt, "device_generic_resrc":[{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"act_id":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"failure_action":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"sync":&lt;Boolean_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"payload":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"device_family_type":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"ipaddress":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"resource_type":&lt;String_value&gt;</font>}]}</p>
+</body>
+</html>

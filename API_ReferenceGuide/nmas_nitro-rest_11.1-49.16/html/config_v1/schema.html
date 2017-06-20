@@ -1,0 +1,20 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<link href="../../rdx/css/rdx.css" rel="stylesheet" type="text/css" />
+	<link href="../../index.css" rel="stylesheet" type="text/css" />
+	<title>schema</title>
+</head>
+<body class="ns_body">
+<p class="ns_wp_header">schema</p>
+<P>Configuration for Schema resource.</P>
+<p class="heading">Read/write properties</p>
+	<p class="property_name">parameters<span class="property_type">&lt;Object&gt;</span></p><p class="property_description">Parameters of the StyleBook.</p>
+	<p class="property_name">namespace<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Namespace of the StyleBook.<br> Minimum length =  1<br> Maximum length =  32</p>
+	<p class="property_name">version<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Version of the StyleBook.<br> Minimum length =  1<br> Maximum length =  32</p>
+	<p class="property_name">name<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Name of the StyleBook.</p>
+<p class="heading">Read only properties</p>
+<a href="#get" class="operation">get</a><p class="heading"><a name="get">get</a></p><p class="key">URL:<span class="url_value">http://&lt;MGMT-IP&gt;/stylebook/nitro/v1/config/stylebooks/&lt;namespace_value&gt;/&lt;version_value&gt;/&lt;name_value&gt;/schema</span></p><p class="key">HTTP Method:<span class="value">GET</span></p><p class="key">Response Payload:<span class="value">JSON</span></p><p class="payload">{ "schema":{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"parameters":&lt;Object_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"namespace":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"version":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"name":&lt;String_value&gt;</font>}}</p>
+</body>
+</html>

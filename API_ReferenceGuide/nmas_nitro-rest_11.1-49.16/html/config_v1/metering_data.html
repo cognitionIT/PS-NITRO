@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<link href="../../rdx/css/rdx.css" rel="stylesheet" type="text/css" />
+	<link href="../../index.css" rel="stylesheet" type="text/css" />
+	<title>metering_data</title>
+</head>
+<body class="ns_body">
+<p class="ns_wp_header">metering_data</p>
+<P>Configuration for Metering Data for VM Devices resource.</P>
+<p class="heading">Read/write properties</p>
+	<p class="property_name">id<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Id is system generated key for all the metering data points.</p>
+	<p class="property_name">ip_address<span class="property_type">&lt;String&gt;</span></p><p class="property_description">IP Address for this VM device for which data is recorded.<br> Minimum length =  1<br> Maximum length =  64</p>
+<p class="heading">Read only properties</p>
+	<p class="property_name">interval_txmbits<span class="property_type">&lt;Double&gt;</span></p><p class="property_description">Out Tx of VM Instance for Interval in Mbits.</p>
+	<p class="property_name">burst_thpt<span class="property_type">&lt;Double&gt;</span></p><p class="property_description">Burst Throughput of VM Instance in Mbps.</p>
+	<p class="property_name">tx<span class="property_type">&lt;Double&gt;</span></p><p class="property_description">Out Throughput of VM Instance in Mbps.</p>
+	<p class="property_name">rx<span class="property_type">&lt;Double&gt;</span></p><p class="property_description">In Throughput of VM Instance in Mbps.</p>
+	<p class="property_name">start_time<span class="property_type">&lt;Double&gt;</span></p><p class="property_description">Start Time of Interval for which data was recorded.</p>
+	<p class="property_name">min_thpt<span class="property_type">&lt;Double&gt;</span></p><p class="property_description">Minimum Throughput allocated to Instance in Mbps.</p>
+	<p class="property_name">interval_rxmbits<span class="property_type">&lt;Double&gt;</span></p><p class="property_description">In Rx of VM Instance for Interval in Mbits.</p>
+	<p class="property_name">poll_time<span class="property_type">&lt;Double&gt;</span></p><p class="property_description">Poll Time at which data was recorded.</p>
+	<p class="property_name">max_thpt_limit<span class="property_type">&lt;Double&gt;</span></p><p class="property_description">Maximum Throughput Limit allowed for VM Instance in Mbps.</p>
+	<p class="property_name">total_txmbits<span class="property_type">&lt;Double&gt;</span></p><p class="property_description">Out Total Rx of VM Instance in Mbits.</p>
+	<p class="property_name">thpt_limit<span class="property_type">&lt;Double&gt;</span></p><p class="property_description">Throughput Limit configured for VM Instance in Mbps.</p>
+	<p class="property_name">total_rxmbits<span class="property_type">&lt;Double&gt;</span></p><p class="property_description">In Total Rx of VM Instance in Mbits.</p>
+<p class="heading">Operations</p><p class="property_name">NOTE: In request payload, Mandatory parameters are marked red and bold.<br /><br />The following parameters can be used in the nitro request :</p>
+<p class="property_name">onerror<span class=\"property_type\">&nbsp;&nbsp;&nbsp;&lt;String_value&gt;</span></p><p class="property_description"> Use this parameter to set the onerror status for nitro request. Applicable only for bulk requests.<br />Default value: EXIT<br />Possible values = EXIT, CONTINUE</p><a href="#get_all" class="operation">get (all)</a><p class="heading"><a name="get_all">get (all)</a></p><p class="key">URL:<span class="url_value">http://&lt;MGMT-IP&gt;/nitro/v1/config/metering_data<p class="key">Query-parameters:<span class="url_value"><p class="key"><b>filter</b></p><p class="key"><span class="value">http://&lt;MGMT-IP&gt;/nitro/v1/config/metering_data<b>?filter=property-name1:property-value1,property-name2:property-value2</b></span></p><p class="key"><span class="value">Use this query-parameter to get the filtered set of metering_data resources configured on the system. You can set a filter on any property of the resource.</span></p><p class="key"><b>pagesize=#no&pageno=#no</b></p><p class="key"><span class="value">http://&lt;MGMT-IP&gt;/nitro/v1/config/metering_data<b>?pagesize=#no&pageno=#no</b></span></p><p class="key"><span class="value">Use this query-parameter to get the metering_data resources in chunks.</span></p><p class="key"><b>count</b></p><p class="key"><span class="value">http://&lt;MGMT-IP&gt;/nitro/v1/config/metering_data<b>?count=yes</b></span></p><p class="key"><span class="value">Use this query-parameter to get the count of metering_data resources.</span></p></span></p><p class="key">HTTP Method:<span class="value">GET</span></p><p class="key">Response Payload:<span class="value">JSON</span></p><p class="payload">{ "errorcode": 0, "message": "Done", "severity": &ltString_value&gt, "metering_data":[{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"interval_txmbits":&lt;Double_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"burst_thpt":&lt;Double_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"tx":&lt;Double_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"rx":&lt;Double_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"start_time":&lt;Double_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"min_thpt":&lt;Double_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"interval_rxmbits":&lt;Double_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"poll_time":&lt;Double_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"max_thpt_limit":&lt;Double_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"total_txmbits":&lt;Double_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"thpt_limit":&lt;Double_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"total_rxmbits":&lt;Double_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"id":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"ip_address":&lt;String_value&gt;</font>}]}</p>
+</body>
+</html>

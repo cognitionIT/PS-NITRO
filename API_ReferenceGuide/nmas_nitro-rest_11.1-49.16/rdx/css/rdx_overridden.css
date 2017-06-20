@@ -1,0 +1,31 @@
+.ns_header 
+{
+	background: url("header_gradient.png") no-repeat scroll -155px 0 #01212D;
+}
+
+.header_info
+{
+  background: url("header_overlay_square_pattern.png") repeat scroll 0 0 rgba(0, 0, 0, 0);
+  border-bottom: 3px solid #3852A4;
+}
+
+.header_info li.citrix_logo a
+{
+	background: url("company_logo.png") no-repeat scroll center center rgba(0, 0, 0, 0);
+}
+
+.header_info .ns_logo div 
+{
+  font-size: 20px;
+}
+
+.ns_logo_version
+{
+	background:	url("product_brand.png") no-repeat scroll left -1px rgba(0, 0, 0, 0);
+	padding-left: 30px;
+}
+
+.ns_footer
+{
+	display: none;
+}

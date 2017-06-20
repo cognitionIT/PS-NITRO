@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<link href="../../rdx/css/rdx.css" rel="stylesheet" type="text/css" />
+	<link href="../../index.css" rel="stylesheet" type="text/css" />
+	<title>trigger_detail</title>
+</head>
+<body class="ns_body">
+<p class="ns_wp_header">trigger_detail</p>
+<P>Configuration for Trigger Detail resource.</P>
+<p class="heading">Read/write properties</p>
+	<p class="property_name">expiry<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Time at which the trigger should end.Format:YY:MM:DD:HH:MM.Applicable for trigger of type fixed.</p>
+	<p class="property_name">parent_name<span class="property_type">&lt;String&gt;</span></p><p class="property_description">.</p>
+	<p class="property_name">daily_time<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Time of the day.Format is HH:MM where HH is hours and MM is minutes.Applicable for trigger of type daily.</p>
+	<p class="property_name">trigger_type<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Trigger type.Possible values: fixed,daily,weekly,monthly.<br> Minimum length =  1<br> Maximum length =  128</p>
+	<p class="property_name">recur_hr<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Recur interval in hours. Applicable for trigger of type fixed.</p>
+	<p class="property_name">duration<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Duration in days for which the trigger should last. Applicable for trigger of type fixed.</p>
+	<p class="property_name">description<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Trigger description.</p>
+	<p class="property_name">parent_id<span class="property_type">&lt;String&gt;</span></p><p class="property_description">.</p>
+	<p class="property_name">monthday_time<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Days of the month.Format is DD:HH:MM where DD is either 1-31 or "last" for days of the month,HH is hours and MM is minutes.Applicable for trigger of type monthly..</p>
+	<p class="property_name">id<span class="property_type">&lt;String&gt;</span></p><p class="property_description">.</p>
+	<p class="property_name">weekday_time<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Days of the week.Format is Day:HH:MM where Day is 0-6 for sunday-saturday,HH is hours and MM is minutes.Applicable for trigger of type weekly.</p>
+	<p class="property_name">recur_min<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Recur interval in minutes. Applicable for trigger of type fixed.</p>
+	<p class="property_name">start<span class="property_type">&lt;String&gt;</span></p><p class="property_description">Time at which the trigger should start.Format:YY:MM:DD:HH:MM.</p>
+<p class="heading">Read only properties</p>
+<p class="heading">Operations</p><p class="property_name">NOTE: In request payload, Mandatory parameters are marked red and bold.<br /><br />The following parameters can be used in the nitro request :</p>
+<p class="property_name">onerror<span class=\"property_type\">&nbsp;&nbsp;&nbsp;&lt;String_value&gt;</span></p><p class="property_description"> Use this parameter to set the onerror status for nitro request. Applicable only for bulk requests.<br />Default value: EXIT<br />Possible values = EXIT, CONTINUE</p>
+</body>
+</html>

@@ -1,0 +1,176 @@
+/*Framework overridden styles*/
+.ns_body
+{
+    padding: 0px;
+	position: relative;
+	top: -10px;
+	left: -2px;
+}
+
+.ns_body p
+{
+	padding-left: 5px;
+}
+
+.ns_header
+{
+    left: 0px;
+}
+
+.ns_content
+{
+    left: 0px;
+}
+
+.content
+{
+    padding: 10px;
+}
+
+.ns_home_page_title
+{
+    padding: 4px 0px 0px 45px;
+}
+
+.ns_wp_header
+{
+    font-size: 16px;
+    font-weight: normal;
+	width: auto;
+	background: #F2F2F2;
+	font-weight: bold;
+	text-shadow: 1px 1px 1px #FFFFFF;
+	padding-top: 5px;
+	-moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+    border-radius: 0px;
+}
+
+.ns_st_body
+{
+    width: 100%;
+}
+
+.ns_st_body a:link, .ns_st_body a:visited
+{
+    font-weight: normal;
+    color: #1F6C88;
+}
+
+.ns_st_body th
+{
+	font-weight: normal;
+    white-space: nowrap;
+    padding: 2px;
+    border-top: 1px solid #9B9EA0;
+    border-bottom: 1px solid #DBDCDD;
+    height: 28px; 
+    background: url("listheader_lite.png") repeat-x;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    padding-left: 4px;
+    color: #000;
+	border-color:#95A2AC #95A2AC #95A2AC #FAFAFA;
+	border-style:solid;
+	border-width:1px;
+}
+
+.ns_st_body td, th
+{
+    height: 25px;
+}
+
+.ns_st_body th:first-child
+{
+    border-left: 1px solid #95A2AC;
+}
+
+.ns_st_body td
+{
+    white-space: normal;
+    border-top: none;
+    border-right: 1px solid #E5E5E5;
+    border-bottom: 1px solid #E5E5E5;
+    border-left: none;
+    padding: 2px;
+}
+
+.ns_st_body td:first-child
+{
+    border-left: 1px solid #E5E5E5;
+}
+
+.ns_st_body tr:first-child td
+{
+    border-top: 1px solid #E5E5E5;
+}
+
+.ns_st_body_alternate_row_color
+{
+	background-color: transparent;;
+}
+
+/*Application's own styles*/
+.heading
+{
+    font-weight: bold;
+}
+
+.property_name
+{
+    font-style: italic;
+    margin-left: 30px;
+}
+
+.property_type
+{
+    font-style: italic;
+    margin-left: 15px;
+}
+
+.property_description
+{
+    margin-left: 45px;
+}
+
+.operation
+{
+    margin-left: 30px;
+}
+
+.key
+{
+    margin-left: 30px;
+}
+
+.value
+{
+    margin-left: 15px;
+}
+
+.url_value
+{
+    font-style: italic;
+    margin-left: 15px;
+}
+
+.payload
+{
+    margin-left: 45px;
+    font-style: italic;
+}
+
+.view_div_decorator
+{
+	height: 105% !important;
+	margin: 0px;
+	padding: 0px;
+}
+
+.build_version
+{
+	font-size:12px;
+	padding-left:15px;
+}

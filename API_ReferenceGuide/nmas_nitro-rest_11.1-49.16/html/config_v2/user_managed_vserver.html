@@ -1,0 +1,18 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<link href="../../rdx/css/rdx.css" rel="stylesheet" type="text/css" />
+	<link href="../../index.css" rel="stylesheet" type="text/css" />
+	<title>user_managed_vserver</title>
+</head>
+<body class="ns_body">
+<p class="ns_wp_header">user_managed_vserver</p>
+<P>Configuration for Managed Vserver Information resource.</P>
+<p class="heading">Read/write properties</p>
+	<p class="property_name">managed_vserver_list<span class="property_type">&lt;managed_vserver[]&gt;</span></p><p class="property_description">Managed/Unmanaged Vserver list.</p>
+<p class="heading">Read only properties</p>
+<p class="heading">Operations</p><p class="property_name">NOTE: In request payload, Mandatory parameters are marked red and bold.<br /><br />The following parameters can be used in the nitro request :</p>
+<p class="property_name">onerror<span class=\"property_type\">&nbsp;&nbsp;&nbsp;&lt;String_value&gt;</span></p><p class="property_description"> Use this parameter to set the onerror status for nitro request. Applicable only for bulk requests.<br />Default value: EXIT<br />Possible values = EXIT, CONTINUE</p><a href="#add" class="operation">add</a><p class="heading"><a name="add">add</a></p><p class="key">URL:<span class="url_value">http://&lt;MGMT-IP&gt;/nitro/v2/config/user_managed_vserver?action=add&onerror=&lt;String_value&gt;</span></p><p class="key">HTTP Method:<span class="value">POST</span></p><p class="key">Request Payload:<span class="value">JSON</span></p><p class="payload">{user_managed_vserver: {<br><font color=#000000>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"managed_vserver_list":[{<br><font color=#000000>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"managed":&lt;Boolean_value&gt;</font>,<br><font color=#000000>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"id":&lt;String_value&gt;</font>}]</font>}}</p><p class="key">Response Payload:<span class="value">JSON</span></p><p class="payload">{ "errorcode": 0, "message": "Done", "severity": &ltString_value&gt, "user_managed_vserver":[{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"managed_vserver_list":[{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"managed":&lt;Boolean_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"type":&lt;String_value&gt;</font>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"id":&lt;String_value&gt;</font>}]}]}</p>
+</body>
+</html>

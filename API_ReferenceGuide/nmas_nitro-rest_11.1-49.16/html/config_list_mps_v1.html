@@ -1,0 +1,554 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Citrix NetScaler MAS NITRO API Documentation - Error Messages</title>
+<link href="../rdx/css/rdx.css" rel="stylesheet" type="text/css" />
+<link href="../index.css" rel="stylesheet" type="text/css" />
+</head>
+<body class="ns_body">
+<p class="ns_wp_header">Configuration</p>
+<p><a href="config_v1/ntp_server.html">ntp_server</a></p>
+<p>NTP Server</p>
+<p><a href="config_v1/ntp_sync.html">ntp_sync</a></p>
+<p>NTP Sync</p>
+<p><a href="config_v1/ntp_param.html">ntp_param</a></p>
+<p>NTP Parameters</p>
+<p><a href="config_v1/syslog_server.html">syslog_server</a></p>
+<p>Syslog Server</p>
+<p><a href="config_v1/syslog_params.html">syslog_params</a></p>
+<p>Syslog Parameters</p>
+<p><a href="config_v1/tenant.html">tenant</a></p>
+<p>Tenant on SDX Platform</p>
+<p><a href="config_v1/tenant_auth_server.html">tenant_auth_server</a></p>
+<p>Authentication Server for the Tenant</p>
+<p><a href="config_v1/tenant_company_info.html">tenant_company_info</a></p>
+<p>Company Information of Tenant</p>
+<p><a href="config_v1/tenant_network_pool.html">tenant_network_pool</a></p>
+<p>Tenant Network Pools</p>
+<p><a href="config_v1/tenant_system_resource.html">tenant_system_resource</a></p>
+<p>System Resources available for a tenant</p>
+<p><a href="config_v1/snmp_trap.html">snmp_trap</a></p>
+<p>SNMP Trap Destinations</p>
+<p><a href="config_v1/cb_sb_image.html">cb_sb_image</a></p>
+<p>CBSDX Single Bundle Build File</p>
+<p><a href="config_v1/cb_sb_upgrade.html">cb_sb_upgrade</a></p>
+<p>CBSDX Single Bundle Upgrade</p>
+<p><a href="config_v1/cb_sb_upgrade_monitor.html">cb_sb_upgrade_monitor</a></p>
+<p>CBSDX Single Bundle Upgrade Status</p>
+<p><a href="config_v1/allowed_clients.html">allowed_clients</a></p>
+<p>Filter Traffic in Management Service</p>
+<p><a href="config_v1/mps_ssl_certkey.html">mps_ssl_certkey</a></p>
+<p>Install SSL certificate on Management Service</p>
+<p><a href="config_v1/sdx_network_config.html">sdx_network_config</a></p>
+<p>SDX Network Configuration</p>
+<p><a href="config_v1/sdx_license.html">sdx_license</a></p>
+<p>License Information</p>
+<p><a href="config_v1/mas_license.html">mas_license</a></p>
+<p>MAS License Information</p>
+<p><a href="config_v1/license_info.html">license_info</a></p>
+<p>License Information</p>
+<p><a href="config_v1/license_user_detail.html">license_user_detail</a></p>
+<p>License User Information</p>
+<p><a href="config_v1/license_file.html">license_file</a></p>
+<p>License File</p>
+<p><a href="config_v1/formation_template.html">formation_template</a></p>
+<p>Formation Template</p>
+<p><a href="config_v1/formation_deployment.html">formation_deployment</a></p>
+<p>Formation Deployment</p>
+<p><a href="config_v1/formation_instance.html">formation_instance</a></p>
+<p>Formation Instance</p>
+<p><a href="config_v1/formation_topology.html">formation_topology</a></p>
+<p>Formation Topology</p>
+<p><a href="config_v1/formation_network.html">formation_network</a></p>
+<p>Formation Network</p>
+<p><a href="config_v1/formation_network_dpl.html">formation_network_dpl</a></p>
+<p>Formation Network Deployment</p>
+<p><a href="config_v1/firstbootconfig_property.html">firstbootconfig_property</a></p>
+<p>Service First Boot Config Property</p>
+<p><a href="config_v1/network_service.html">network_service</a></p>
+<p>Network Service</p>
+<p><a href="config_v1/network_service_dpl.html">network_service_dpl</a></p>
+<p>Netowork Service Deployment</p>
+<p><a href="config_v1/network_service_lb_config.html">network_service_lb_config</a></p>
+<p>Network Service LB Config</p>
+<p><a href="config_v1/network_service_resource_profile.html">network_service_resource_profile</a></p>
+<p>Network Service Resource Profile</p>
+<p><a href="config_v1/network_service_configsets.html">network_service_configsets</a></p>
+<p>Network Service Config Sets</p>
+<p><a href="config_v1/network_service_firstbootconfig.html">network_service_firstbootconfig</a></p>
+<p>Network Service First Boot Config</p>
+<p><a href="config_v1/network_service_instance.html">network_service_instance</a></p>
+<p>Network Service Instance</p>
+<p><a href="config_v1/network_service_interface.html">network_service_interface</a></p>
+<p>Network Service Interface</p>
+<p><a href="config_v1/sdx_network_service.html">sdx_network_service</a></p>
+<p>SDX Network Service</p>
+<p><a href="config_v1/parameter.html">parameter</a></p>
+<p>Parameter used in formation schema</p>
+<p><a href="config_v1/networkpool.html">networkpool</a></p>
+<p>Network Pool</p>
+<p><a href="config_v1/sdx_formation_network.html">sdx_formation_network</a></p>
+<p>SDX Formation Network</p>
+<p><a href="config_v1/sdx_network_mapping.html">sdx_network_mapping</a></p>
+<p>SDX Formation Network Mapping</p>
+<p><a href="config_v1/mps.html">mps</a></p>
+<p>System Status</p>
+<p><a href="config_v1/device_profile.html">device_profile</a></p>
+<p>Device Profile</p>
+<p><a href="config_v1/audit_log.html">audit_log</a></p>
+<p>Audit Log</p>
+<p><a href="config_v1/mpsuser.html">mpsuser</a></p>
+<p>System User</p>
+<p><a href="config_v1/notification_digest_settings.html">notification_digest_settings</a></p>
+<p>Notification Digest Settings</p>
+<p><a href="config_v1/eventHistory.html">eventHistory</a></p>
+<p>Event History</p>
+<p><a href="config_v1/user_lockout_policy.html">user_lockout_policy</a></p>
+<p>User Lockout Policy configuration</p>
+<p><a href="config_v1/password_policy.html">password_policy</a></p>
+<p>Password Policy configuration</p>
+<p><a href="config_v1/login.html">login</a></p>
+<p>Login/Logout</p>
+<p><a href="config_v1/mpssession.html">mpssession</a></p>
+<p>Client Session</p>
+<p><a href="config_v1/vm_template.html">vm_template</a></p>
+<p>VM Template</p>
+<p><a href="config_v1/entity_tags.html">entity_tags</a></p>
+<p>Entity Tags</p>
+<p><a href="config_v1/tag.html">tag</a></p>
+<p>tags configuration</p>
+<p><a href="config_v1/managed_device.html">managed_device</a></p>
+<p>Managed Device</p>
+<p><a href="config_v1/vm_device.html">vm_device</a></p>
+<p>VM Device</p>
+<p><a href="config_v1/host_device.html">host_device</a></p>
+<p>host</p>
+<p><a href="config_v1/event.html">event</a></p>
+<p>Event</p>
+<p><a href="config_v1/task_log.html">task_log</a></p>
+<p>Task Log</p>
+<p><a href="config_v1/task_device_log.html">task_device_log</a></p>
+<p>Task Device Log</p>
+<p><a href="config_v1/task_command_log.html">task_command_log</a></p>
+<p>Task Command Log</p>
+<p><a href="config_v1/mps_image.html">mps_image</a></p>
+<p>System Build File</p>
+<p><a href="config_v1/mps_doc_image.html">mps_doc_image</a></p>
+<p>Management Service Documentation File</p>
+<p><a href="config_v1/mps_upgrade.html">mps_upgrade</a></p>
+<p>System Upgrade</p>
+<p><a href="config_v1/mps_health.html">mps_health</a></p>
+<p>Health Monitoring Stats</p>
+<p><a href="config_v1/mps_disk_usage.html">mps_disk_usage</a></p>
+<p>Available Disks Usage</p>
+<p><a href="config_v1/ssl_cert.html">ssl_cert</a></p>
+<p>SSL certificate File</p>
+<p><a href="config_v1/ssl_key.html">ssl_key</a></p>
+<p>SSL key File</p>
+<p><a href="config_v1/backup_external_storage.html">backup_external_storage</a></p>
+<p>Backup File External storage</p>
+<p><a href="config_v1/backup_policy.html">backup_policy</a></p>
+<p>Backup Policy</p>
+<p><a href="config_v1/prune_policy.html">prune_policy</a></p>
+<p>Prune Policy</p>
+<p><a href="config_v1/ping.html">ping</a></p>
+<p>Ping</p>
+<p><a href="config_v1/traceroute.html">traceroute</a></p>
+<p>Traceroute</p>
+<p><a href="config_v1/inventory.html">inventory</a></p>
+<p>Inventory</p>
+<p><a href="config_v1/techsupport.html">techsupport</a></p>
+<p>Technical Support</p>
+<p><a href="config_v1/metering_data.html">metering_data</a></p>
+<p>Metering Data for VM Devices</p>
+<p><a href="config_v1/metering_summary.html">metering_summary</a></p>
+<p>Metering Data Summary</p>
+<p><a href="config_v1/metering_export.html">metering_export</a></p>
+<p>Metering Data Export</p>
+<p><a href="config_v1/current_timezone.html">current_timezone</a></p>
+<p>Current timezone</p>
+<p><a href="config_v1/current_hostname.html">current_hostname</a></p>
+<p>System Hostname</p>
+<p><a href="config_v1/timezone_enum.html">timezone_enum</a></p>
+<p>Time zones</p>
+<p><a href="config_v1/activity_status.html">activity_status</a></p>
+<p>Activity Status</p>
+<p><a href="config_v1/af_config_info.html">af_config_info</a></p>
+<p>This table holds generic config info to be persisted across reboots for appflow feature.</p>
+<p><a href="config_v1/af_persistant_stat_info.html">af_persistant_stat_info</a></p>
+<p>This table holds stat info to be persistant across reboots for appflow feature.</p>
+<p><a href="config_v1/backup_file.html">backup_file</a></p>
+<p>Backup files</p>
+<p><a href="config_v1/sdx_backup_restore.html">sdx_backup_restore</a></p>
+<p>Backup</p>
+<p><a href="config_v1/smtp_server.html">smtp_server</a></p>
+<p>SMTP server properties </p>
+<p><a href="config_v1/mail_profile.html">mail_profile</a></p>
+<p>Mail profile</p>
+<p><a href="config_v1/sent_mails.html">sent_mails</a></p>
+<p>Sent mail record item keeping.</p>
+<p><a href="config_v1/sms_server.html">sms_server</a></p>
+<p>SMS server properties </p>
+<p><a href="config_v1/sms_profile.html">sms_profile</a></p>
+<p>SMS profile</p>
+<p><a href="config_v1/sent_sms.html">sent_sms</a></p>
+<p>Sent sms record item keeping.</p>
+<p><a href="config_v1/syslog_generic.html">syslog_generic</a></p>
+<p>Syslog generic table</p>
+<p><a href="config_v1/syslog_snmp.html">syslog_snmp</a></p>
+<p>Syslog generic table</p>
+<p><a href="config_v1/syslog_sslvpn.html">syslog_sslvpn</a></p>
+<p>Syslog SSL VPN table</p>
+<p><a href="config_v1/syslog_aaa.html">syslog_aaa</a></p>
+<p>Syslog aaa table</p>
+<p><a href="config_v1/syslog_ui_cmd.html">syslog_ui_cmd</a></p>
+<p>Syslog UI command table</p>
+<p><a href="config_v1/mps_network_config.html">mps_network_config</a></p>
+<p>MPS Network Configuration</p>
+<p><a href="config_v1/snmp_manager.html">snmp_manager</a></p>
+<p>SNMP Agent Manager configuration</p>
+<p><a href="config_v1/snmp_alarm_config.html">snmp_alarm_config</a></p>
+<p>SNMP Alarm Configurations</p>
+<p><a href="config_v1/snmp_user.html">snmp_user</a></p>
+<p>SNMP User</p>
+<p><a href="config_v1/snmp_view.html">snmp_view</a></p>
+<p>SNMP view</p>
+<p><a href="config_v1/snmp_mib.html">snmp_mib</a></p>
+<p>SNMP MIB Information</p>
+<p><a href="config_v1/network_interface.html">network_interface</a></p>
+<p>VM device network interface</p>
+<p><a href="config_v1/version_matrix_file.html">version_matrix_file</a></p>
+<p>Version Matrix Manifest File</p>
+<p><a href="config_v1/version_recommendations.html">version_recommendations</a></p>
+<p>Recommendation For Version Matrix</p>
+<p><a href="config_v1/version_matrix_status.html">version_matrix_status</a></p>
+<p>Current Verisons</p>
+<p><a href="config_v1/trigger_detail.html">trigger_detail</a></p>
+<p>Trigger Detail</p>
+<p><a href="config_v1/inventory_status.html">inventory_status</a></p>
+<p>Inventory Status</p>
+<p><a href="config_v1/jazz_license.html">jazz_license</a></p>
+<p>Jazz License Information</p>
+<p><a href="config_v1/sdxtools_upgrade.html">sdxtools_upgrade</a></p>
+<p>Upgrade SDXTools of GuestVM - Applicable only for GuestVM's that support SDXTools</p>
+<p><a href="config_v1/sdxtools_image.html">sdxtools_image</a></p>
+<p>SDXTools Build File</p>
+<p><a href="config_v1/radius_server.html">radius_server</a></p>
+<p>Radius Server configuration</p>
+<p><a href="config_v1/ldap_server.html">ldap_server</a></p>
+<p>LDAP Server</p>
+<p><a href="config_v1/tacacs_server.html">tacacs_server</a></p>
+<p>TACACS Server configuration</p>
+<p><a href="config_v1/appfw_sig_updates.html">appfw_sig_updates</a></p>
+<p>App Flow Signature Update</p>
+<p><a href="config_v1/aaa_server.html">aaa_server</a></p>
+<p>AAA Server configuration</p>
+<p><a href="config_v1/mpsgroup.html">mpsgroup</a></p>
+<p>System Groups</p>
+<p><a href="config_v1/authorized_scope.html">authorized_scope</a></p>
+<p>Authorized Scope</p>
+<p><a href="config_v1/event_severity_report.html">event_severity_report</a></p>
+<p>Event Mgmt Severity Based Report</p>
+<p><a href="config_v1/event_device_report.html">event_device_report</a></p>
+<p>Event Mgmt Device Instability Report</p>
+<p><a href="config_v1/event_ns_device_report.html">event_ns_device_report</a></p>
+<p>Event Mgmt Device Instability Report for NetScalers</p>
+<p><a href="config_v1/event_nssdx_device_report.html">event_nssdx_device_report</a></p>
+<p>Event Mgmt Device Instability Report for NSSDX</p>
+<p><a href="config_v1/event_cb_device_report.html">event_cb_device_report</a></p>
+<p>Event Mgmt Device Instability Reportfor Cloud Bridge Devices</p>
+<p><a href="config_v1/event_cbsdx_device_report.html">event_cbsdx_device_report</a></p>
+<p>Event Mgmt Device Instability Report for CBSDX</p>
+<p><a href="config_v1/event_config_changes_report.html">event_config_changes_report</a></p>
+<p>Event Mgmt Config Changes Report</p>
+<p><a href="config_v1/event_login_failure_report.html">event_login_failure_report</a></p>
+<p>Event Mgmt Login Failure Report</p>
+<p><a href="config_v1/event_entity_state_changes_report.html">event_entity_state_changes_report</a></p>
+<p>Event Mgmt Entity State Changes Report</p>
+<p><a href="config_v1/event_filter.html">event_filter</a></p>
+<p>event filter criteria properties</p>
+<p><a href="config_v1/filter_criteria.html">filter_criteria</a></p>
+<p>event filter criteria properties</p>
+<p><a href="config_v1/filter_action.html">filter_action</a></p>
+<p>event filter action properties</p>
+<p><a href="config_v1/filter_action_props.html">filter_action_props</a></p>
+<p>event filter action properties</p>
+<p><a href="config_v1/trap_settings.html">trap_settings</a></p>
+<p>trap severities</p>
+<p><a href="config_v1/fault_category.html">fault_category</a></p>
+<p>Fault category details</p>
+<p><a href="config_v1/fault_severity.html">fault_severity</a></p>
+<p>Fault severity details</p>
+<p><a href="config_v1/fault_failure_object.html">fault_failure_object</a></p>
+<p>Fault failure object details</p>
+<p><a href="config_v1/event_resrc_threshold_violation_report.html">event_resrc_threshold_violation_report</a></p>
+<p>Event Mgmt Resrc Threshold Violation Report</p>
+<p><a href="config_v1/event_hardware_failure_report.html">event_hardware_failure_report</a></p>
+<p>Event Mgmt Hardware Failure Report</p>
+<p><a href="config_v1/event_nssdx_resrc_threshold_violation_report.html">event_nssdx_resrc_threshold_violation_report</a></p>
+<p>Event Mgmt Resrc Threshold Violation Report for NSSDX</p>
+<p><a href="config_v1/event_cbsdx_resrc_threshold_violation_report.html">event_cbsdx_resrc_threshold_violation_report</a></p>
+<p>Event Mgmt Resrc Threshold Violation Report for CBSDX</p>
+<p><a href="config_v1/adaptive_threshold.html">adaptive_threshold</a></p>
+<p>Af report sys log for adaptive threshold</p>
+<p><a href="config_v1/geodb_file.html">geodb_file</a></p>
+<p>Geolocation binary DB File</p>
+<p><a href="config_v1/ica_session_timeout.html">ica_session_timeout</a></p>
+<p>ICA session timeout</p>
+<p><a href="config_v1/active_event.html">active_event</a></p>
+<p>Active Event</p>
+<p><a href="config_v1/keystone_server.html">keystone_server</a></p>
+<p>KEYSTONE Server configuration</p>
+<p><a href="config_v1/event_persistant_stat_info.html">event_persistant_stat_info</a></p>
+<p>This table holds stat info to be persistant across reboots for event feature.</p>
+<p><a href="config_v1/export_report.html">export_report</a></p>
+<p>Export report</p>
+<p><a href="config_v1/export_report_job.html">export_report_job</a></p>
+<p>Scheduled export report job</p>
+<p><a href="config_v1/ns_event.html">ns_event</a></p>
+<p>NetScalerEvent</p>
+<p><a href="config_v1/log_datarecord.html">log_datarecord</a></p>
+<p>Af datarecord logging enable or disable</p>
+<p><a href="config_v1/url_parameter.html">url_parameter</a></p>
+<p>Af URL Parameter remove</p>
+<p><a href="config_v1/vlan_summary.html">vlan_summary</a></p>
+<p>VLAN summary</p>
+<p><a href="config_v1/vlan_details.html">vlan_details</a></p>
+<p>VLAN details</p>
+<p><a href="config_v1/af_database_index.html">af_database_index</a></p>
+<p>AF Database Index</p>
+<p><a href="config_v1/af_database_cleanup.html">af_database_cleanup</a></p>
+<p>AF Database cleanup</p>
+<p><a href="config_v1/adaptive_threshold_feature.html">adaptive_threshold_feature</a></p>
+<p>AF Adaptive Threashold Feature enable or disable.</p>
+<p><a href="config_v1/enable_ipv6_traffic.html">enable_ipv6_traffic</a></p>
+<p>Enable IPv6 Traffic</p>
+<p><a href="config_v1/multihop_feature.html">multihop_feature</a></p>
+<p>Multi Hop Feature enable or disable</p>
+<p><a href="config_v1/device_values_map.html">device_values_map</a></p>
+<p>Map of Device and value to be used for it</p>
+<p><a href="config_v1/config_command.html">config_command</a></p>
+<p>Configuration Commands for use in configuration template</p>
+<p><a href="config_v1/config_variable.html">config_variable</a></p>
+<p>Configuration Variables for use in configuration template</p>
+<p><a href="config_v1/variable_values.html">variable_values</a></p>
+<p>Variable Values required for config template execution</p>
+<p><a href="config_v1/configuration_template.html">configuration_template</a></p>
+<p>Configuration Template</p>
+<p><a href="config_v1/config_job.html">config_job</a></p>
+<p>Configuration Job</p>
+<p><a href="config_v1/config_job_details.html">config_job_details</a></p>
+<p>Configuration Job Details</p>
+<p><a href="config_v1/device_generic_resrc.html">device_generic_resrc</a></p>
+<p>Device generic utility</p>
+<p><a href="config_v1/syslog_persistant_stat_info.html">syslog_persistant_stat_info</a></p>
+<p>This table holds stat info to be persistant across reboots for event feature.</p>
+<p><a href="config_v1/tenant_info.html">tenant_info</a></p>
+<p>Administrative Domain Information</p>
+<p><a href="config_v1/sslv3_setting.html">sslv3_setting</a></p>
+<p>SSLV3 Setting</p>
+<p><a href="config_v1/ssl_settings.html">ssl_settings</a></p>
+<p>SSL Settings</p>
+<p><a href="config_v1/snmp_info.html">snmp_info</a></p>
+<p>SNMP Information</p>
+<p><a href="config_v1/af_database_duration.html">af_database_duration</a></p>
+<p>AF Database duration to keep DB data</p>
+<p><a href="config_v1/af_url_collection.html">af_url_collection</a></p>
+<p>AF URL Collection</p>
+<p><a href="config_v1/sb_info.html">sb_info</a></p>
+<p>Single Bundle File Info</p>
+<p><a href="config_v1/ip_block.html">ip_block</a></p>
+<p>This collection holds private ip block information.</p>
+<p><a href="config_v1/mas_health.html">mas_health</a></p>
+<p>Current MAS health information</p>
+<p><a href="config_v1/license_server.html">license_server</a></p>
+<p>License server information</p>
+<p><a href="config_v1/capacity.html">capacity</a></p>
+<p>License pool capacity of appliance</p>
+<p><a href="config_v1/license_server_pool.html">license_server_pool</a></p>
+<p>License pool capacity of license server</p>
+<p><a href="config_v1/license_proxy_server.html">license_proxy_server</a></p>
+<p>License proxy configuration</p>
+<p><a href="config_v1/central_management_server.html">central_management_server</a></p>
+<p>Central managment server</p>
+<p><a href="config_v1/csv_export.html">csv_export</a></p>
+<p>CSV Export</p>
+<p><a href="config_v1/backup_component.html">backup_component</a></p>
+<p>backup components</p>
+<p><a href="config_v1/clean_install_info.html">clean_install_info</a></p>
+<p>Single Bundle File Info For Clean Install</p>
+<p><a href="config_v1/backup.html">backup</a></p>
+<p>backup</p>
+<p><a href="config_v1/restore.html">restore</a></p>
+<p>Restore</p>
+<p><a href="config_v1/threshold.html">threshold</a></p>
+<p>Thresholds</p>
+<p><a href="config_v1/threshold_expression.html">threshold_expression</a></p>
+<p>Threshold Expression</p>
+<p><a href="config_v1/insight_threshold.html">insight_threshold</a></p>
+<p>Thresholds</p>
+<p><a href="config_v1/threshold_group_list.html">threshold_group_list</a></p>
+<p>Group List e.g. HDX, WEB, WAN</p>
+<p><a href="config_v1/threshold_resource_list.html">threshold_resource_list</a></p>
+<p>Resource List</p>
+<p><a href="config_v1/threshold_metric_list.html">threshold_metric_list</a></p>
+<p>metric list</p>
+<p><a href="config_v1/threshold_key_list.html">threshold_key_list</a></p>
+<p>reference key list</p>
+<p><a href="config_v1/ace_to_ns.html">ace_to_ns</a></p>
+<p>Ace To NS Conversion</p>
+<p><a href="config_v1/ace_conf_file.html">ace_conf_file</a></p>
+<p>Ace Configuration File</p>
+<p><a href="config_v1/ace_context_conf_file.html">ace_context_conf_file</a></p>
+<p>Ace Context Configuration File</p>
+<p><a href="config_v1/ace_result_file.html">ace_result_file</a></p>
+<p>Ace Result File</p>
+<p><a href="config_v1/f5_to_ns.html">f5_to_ns</a></p>
+<p>f5 To NS Conversion</p>
+<p><a href="config_v1/f5_conf_file.html">f5_conf_file</a></p>
+<p>f5 Configuration File</p>
+<p><a href="config_v1/f5_result_file.html">f5_result_file</a></p>
+<p>f5 Result File</p>
+<p><a href="config_v1/pe_to_pi.html">pe_to_pi</a></p>
+<p>pe_to_pi To NS Conversion</p>
+<p><a href="config_v1/pe_to_pi_conf_file.html">pe_to_pi_conf_file</a></p>
+<p>pe_to_pi Configuration File</p>
+<p><a href="config_v1/pe_to_pi_result_file.html">pe_to_pi_result_file</a></p>
+<p>pe_to_pi Result File</p>
+<p><a href="config_v1/pe_to_pi_comparison.html">pe_to_pi_comparison</a></p>
+<p>Comparison Table for PE and PI</p>
+<p><a href="config_v1/config_advice_file.html">config_advice_file</a></p>
+<p>Config Advice File</p>
+<p><a href="config_v1/config_advice.html">config_advice</a></p>
+<p>Config Advice</p>
+<p><a href="config_v1/config_advice_result.html">config_advice_result</a></p>
+<p>Activity Status</p>
+<p><a href="config_v1/app_template_info.html">app_template_info</a></p>
+<p>App Template Info</p>
+<p><a href="config_v1/agent_queue.html">agent_queue</a></p>
+<p>Agent Queue</p>
+<p><a href="config_v1/agent_http.html">agent_http</a></p>
+<p>Agent HTTP </p>
+<p><a href="config_v1/agent_icmp.html">agent_icmp</a></p>
+<p>ICMP Ping</p>
+<p><a href="config_v1/agent_ssh.html">agent_ssh</a></p>
+<p>Agent SSH</p>
+<p><a href="config_v1/agent_scp.html">agent_scp</a></p>
+<p>Agent SCP</p>
+<p><a href="config_v1/agent_sftp.html">agent_sftp</a></p>
+<p>Agent SFTP </p>
+<p><a href="config_v1/agent_traceroute.html">agent_traceroute</a></p>
+<p>Agent Trace Route</p>
+<p><a href="config_v1/visualizer_conf_file.html">visualizer_conf_file</a></p>
+<p>ns Configuration File</p>
+<p><a href="config_v1/tenant_system_info.html">tenant_system_info</a></p>
+<p>This provides the FTU state of the user</p>
+<p><a href="config_v1/device_registration.html">device_registration</a></p>
+<p>Register Device</p>
+<p><a href="config_v1/device_license_info.html">device_license_info</a></p>
+<p>Device License Info</p>
+<p><a href="config_v1/license_server_info.html">license_server_info</a></p>
+<p>License server information</p>
+<p><a href="config_v1/mas_agent_image.html">mas_agent_image</a></p>
+<p>MAS Agent Image</p>
+<p><a href="config_v1/license_threshold.html">license_threshold</a></p>
+<p>License Threshold configuration</p>
+<p><a href="config_v1/failure_obj.html">failure_obj</a></p>
+<p>distinct failure objects from ns_event</p>
+<p><a href="config_v1/event_category.html">event_category</a></p>
+<p>event category</p>
+<p><a href="config_v1/system_threshold.html">system_threshold</a></p>
+<p>System Thresholds</p>
+<p><a href="config_v1/ssl_cert_threshold.html">ssl_cert_threshold</a></p>
+<p>SSL certificate Threshold configuration</p>
+<p><a href="config_v1/sla_collection_enable.html">sla_collection_enable</a></p>
+<p>AF SLA Record Collection</p>
+<p><a href="config_v1/ns_event_summary.html">ns_event_summary</a></p>
+<p>Ns event devices summary</p>
+<p><a href="config_v1/device_summary.html">device_summary</a></p>
+<p>City wise devices summary</p>
+<p><a href="config_v1/device_group.html">device_group</a></p>
+<p>Device Group</p>
+<p><a href="config_v1/service.html">service</a></p>
+<p>Service used in application container</p>
+<p><a href="config_v1/app_device.html">app_device</a></p>
+<p>Details of the device used by managed app</p>
+<p><a href="config_v1/managed_app.html">managed_app</a></p>
+<p>Managed Application</p>
+<p><a href="config_v1/triton_config.html">triton_config</a></p>
+<p>Configuration details for Triton module</p>
+<p><a href="config_v1/ns_event_message.html">ns_event_message</a></p>
+<p>NetScalerEvent</p>
+<p><a href="config_v1/devicewise_detail_summary.html">devicewise_detail_summary</a></p>
+<p>Ns event devices summary</p>
+<p><a href="config_v1/cipher_suite.html">cipher_suite</a></p>
+<p>Cipher Suite</p>
+<p><a href="config_v1/cipher_group.html">cipher_group</a></p>
+<p>Cipher Group</p>
+<p><a href="config_v1/cipher_config.html">cipher_config</a></p>
+<p>SSL Cipher Config</p>
+<p><a href="config_v1/perf_device_counters.html">perf_device_counters</a></p>
+<p>Device Counter Table</p>
+<p><a href="config_v1/mps_geolocation_country.html">mps_geolocation_country</a></p>
+<p>Geolocation Country Information</p>
+<p><a href="config_v1/mps_geolocation_region.html">mps_geolocation_region</a></p>
+<p>Geolocation Region Information</p>
+<p><a href="config_v1/device_backup_policy.html">device_backup_policy</a></p>
+<p>Device Backup  Policy</p>
+<p><a href="config_v1/device_backup.html">device_backup</a></p>
+<p>Device Backup</p>
+<p><a href="config_v1/af_cpx_support.html">af_cpx_support</a></p>
+<p>AF CPX Support</p>
+<p><a href="config_v1/cli_prompt.html">cli_prompt</a></p>
+<p>CLI Prompt string</p>
+<p><a href="config_v1/app_info.html">app_info</a></p>
+<p>app_info Resource</p>
+<p><a href="config_v1/server_info.html">server_info</a></p>
+<p>server_info Resource</p>
+<p><a href="config_v1/device_info.html">device_info</a></p>
+<p>device_info Resource</p>
+<p><a href="config_v1/anomaly_item.html">anomaly_item</a></p>
+<p>anomaly_item Resource</p>
+<p><a href="config_v1/device_version_update.html">device_version_update</a></p>
+<p></p>
+<p><a href="config_v1/system_settings.html">system_settings</a></p>
+<p>System Settings</p>
+<p><a href="config_v1/counter_info.html">counter_info</a></p>
+<p>counter_info Resource</p>
+<p><a href="config_v1/counter_item.html">counter_item</a></p>
+<p>counter_item Resource</p>
+<p><a href="config_v1/external_server.html">external_server</a></p>
+<p>External Server configuration</p>
+<p><a href="config_v1/managed_device_summary.html">managed_device_summary</a></p>
+<p>Managed Device Summary</p>
+<p><a href="config_v1/trap_forward_profile.html">trap_forward_profile</a></p>
+<p>Trap Forward Profile</p>
+<p><a href="config_v1/application.html">application</a></p>
+<p>Applications Managed by Management System</p>
+<p><a href="config_v1/authorized_scope_app.html">authorized_scope_app</a></p>
+<p>Authorized applications</p>
+<p><a href="config_v1/criteria.html">criteria</a></p>
+<p>criteria</p>
+<p><a href="config_v1/dns_param.html">dns_param</a></p>
+<p>Dns params used in triton config</p>
+<p><a href="config_v1/networking_param.html">networking_param</a></p>
+<p>Networking params used in triton config</p>
+<p><a href="config_v1/marathon_param.html">marathon_param</a></p>
+<p>Marathon params used in triton config</p>
+<p><a href="config_v1/network_function_config.html">network_function_config</a></p>
+<p>Network function related config for the application</p>
+<p><a href="config_v1/network_function_param.html">network_function_param</a></p>
+<p>Parameters for the Network function config for the application</p>
+<p><a href="config_v1/start_stat.html">start_stat</a></p>
+<p>Start Stat</p>
+<p><a href="config_v1/vwan_event.html">vwan_event</a></p>
+<p>VWAN EVENT</p>
+<p><a href="config_v1/device_event_summary.html">device_event_summary</a></p>
+<p>devices events summary</p>
+<p><a href="config_v1/config_audit_notification.html">config_audit_notification</a></p>
+<p>Config Audit Notification configuration</p>
+<p><a href="config_v1/license_expiry_info.html">license_expiry_info</a></p>
+<p>MAS License Expiry Information</p>
+</body>
+</html>
