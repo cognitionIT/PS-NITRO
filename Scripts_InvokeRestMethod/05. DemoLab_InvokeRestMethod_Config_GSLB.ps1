@@ -22,11 +22,13 @@
             {
                 $RootFolder = "H:\PSModules\NITRO\Scripts"
                 $SubnetIP = "192.168.59"
+                $RemoteSubnetIP = "192.168.58"
             }
             default
             {
                 $RootFolder = "C:\Scripts\NITRO"
                 $SubnetIP = "192.168.0"
+                $RemoteSubnetIP = "192.168.10"
             }
         }
         $NSLicFile = $RootFolder + "\NSVPX-ESX_PLT_201609.lic"
@@ -382,10 +384,10 @@ Write-Host "--------------------------------------------------------------- " -F
             },
             @{
               "servicename"= "gslb_svc_nsg_vpn_test_site2";
-              "ip"="192.168.10.9";
+              "ip"=($RemoteSubnetIP + ".9");
               "servicetype"="SSL";
               "port"=443;
-              "publicip"="192.168.10.9";
+              "publicip"=($RemoteSubnetIP + ".9");
               "publicport"=443;
               "maxclient"=0;
               "sitename"="Site2";
