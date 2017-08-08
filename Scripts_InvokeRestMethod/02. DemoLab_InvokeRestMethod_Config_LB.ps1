@@ -4,10 +4,12 @@
 .DESCRIPTION
   Configure Basic Load Balancing Settings (SF LB example) on the NetScaler VPX, using the Invoke-RestMethod cmdlet for the REST API calls.
 .NOTES
-  Version:        1.0
-  Author:         Esther Barthel, MSc
+  Version:        1.1
   Creation Date:  2017-05-04
   Purpose:        Created as part of the demo scripts for the PowerShell Conference EU 2017 in Hannover
+  Author:         Esther Barthel, MSc
+  Last Updated:   2017-08-07
+  Purpose:        Adding responder best practice for HTTP to HTTPS redirection, based on https://support.citrix.com/article/CTX120664
 
   Copyright (c) cognition IT. All rights reserved.
 #>
@@ -293,7 +295,8 @@ Write-Host "---------------------------------------------------------------- " -
 
     $payload = @{
         "server"= @(
-            @{"name"="localhost"; "ipaddress"="127.0.0.1"},
+#            @{"name"="localhost"; "ipaddress"="127.0.0.1"},
+            @{"name"="dummy"; "ipaddress"="1.2.3.4"},
             @{"name"="SF1"; "ipaddress"=($SubNetIP + ".21")},
             @{"name"="SF2"; "ipaddress"=($SubNetIP + ".22")}
         )
@@ -370,8 +373,9 @@ Write-Host "---------------------------------------------------------------- " -
     # add 
     $payload = @{
         "service"= @{
-          "name"="svc_local_http";
-          "servername"="localhost";
+          "name"="svc_always_UP";
+#          "servername"="localhost";
+          "servername"="dummy";
           "servicetype"="HTTP";
           "port"=80;
           "comment"="created by PowerShell script";
@@ -500,7 +504,7 @@ Write-Host "---------------------------------------------------------------- " -
     $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
 #endregion Bind Certificate to VServer
 
-#region Add Monitors
+#region Add Monitors (bulk)
 <#
     add
     URL:http://<netscaler-ip-address>/nitro/v1/config/lbmonitor
@@ -617,15 +621,13 @@ Write-Host "---------------------------------------------------------------- " -
     # Specifying the correct URL 
     $strURI = "http://$NSIP/nitro/v1/config/lbmonitor"
 
-    # 
+    # add lb monitor lb_mon_SFStore STOREFRONT -scriptName nssf.pl -dispatcherIP 127.0.0.1 -dispatcherPort 3013 -LRTM ENABLED -storename Store
+    # add lb monitor lb_mon_localhost PING -LRTM DISABLED -destIP 127.0.0.1
     $payload = @{
-    "lbmonitor"= @{
-          "monitorname"="lb_mon_SFStore";
-          "type"="STOREFRONT";
-          "scriptname"="nssf.pl";
-          "lrtm"="ENABLED";
-          "storename"="Store";
-        }
+    "lbmonitor"= @( 
+            @{"monitorname"="lb_mon_SFStore";"type"="STOREFRONT";"scriptname"="nssf.pl";"lrtm"="ENABLED";"storename"="Store"},
+            @{"monitorname"="lb_mon_localhost";"type"="PING";"lrtm"="DISABLED";"destIP"="127.0.0.1"}
+        )
     } | ConvertTo-Json -Depth 5
 
     # Logging NetScaler Instance payload formatting
@@ -665,8 +667,10 @@ Write-Host "---------------------------------------------------------------- " -
     # 
     $payload = @{
     "lbmonitor_service_binding"= @{
-          "monitorname"="ping";
-          "servicename"="svc_local_http";
+#          "monitorname"="ping";
+          "monitorname"="lb_mon_localhost";
+#          "servicename"="svc_local_http";
+          "servicename"="svc_always_UP";
         }
     } | ConvertTo-Json -Depth 5
 
@@ -676,8 +680,7 @@ Write-Host "---------------------------------------------------------------- " -
 
     # Method #1: Making the REST API call to the NetScaler
     # !! Note:ping is binded by default to a service!!
-#    $response = Invoke-RestMethod -Method Put -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
-
+    $response = Invoke-RestMethod -Method Put -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
 #endregion Bind Monitor to Service
 
 #region Bind Monitor to ServiceGroup
@@ -873,7 +876,8 @@ Write-Host "---------------------------------------------------------------- " -
     $payload = @{
     "lbvserver_service_binding"= @{
           "name"="vsvr_SFStore_http_redirect";
-          "servicename"="svc_local_http";
+#          "servicename"="svc_local_http";
+          "servicename"="svc_always_UP";
         }
     } | ConvertTo-Json -Depth 5
 

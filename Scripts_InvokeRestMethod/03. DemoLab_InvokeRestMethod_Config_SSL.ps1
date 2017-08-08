@@ -6,10 +6,12 @@
 .DESCRIPTION
   Configure Basic SSL Settings (SF LB example) on the NetScaler VPX, using the Invoke-RestMethod cmdlet for the REST API calls.
 .NOTES
-  Version:        1.0
+  Version:        1.1
   Author:         Esther Barthel, MSc
   Creation Date:  2017-05-04
   Purpose:        Created as part of the demo scripts for the PowerShell Conference EU 2017 in Hannover
+  Last Updated:   2017-08-07
+  Purpose:        Added Cipher settings configuration
 
   Copyright (c) cognition IT. All rights reserved.
 #>
@@ -245,6 +247,127 @@ Write-Host "---------------------------------------------------------------- " -
     # Method #1: Making the REST API call to the NetScaler
     $response = Invoke-RestMethod -Method Put -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
 #endregion Bind Certificate to VServer
+
+# -------------------------------------------
+# | Create cpiher group and bind to vServer |
+# -------------------------------------------
+
+#region Add cipher group
+    <#
+        add
+        URL:http://<netscaler-ip-address>/nitro/v1/config/sslcipher
+        HTTP Method:POST
+        Request Headers:
+        Cookie:NITRO_AUTH_TOKEN=<tokenvalue>
+        Content-Type:application/json
+        Request Payload:
+        {"sslcipher":{
+              "ciphergroupname":<String_value>,
+              "ciphgrpalias":<String_value>
+        }}
+        Response:
+        HTTP Status Code on Success: 201 Created
+        HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <string> (for NetScaler-specific errors). The response payload provides details of the error
+    #>    
+    # Specifying the correct URL 
+    $strURI = "http://$NSIP/nitro/v1/config/sslcipher"
+
+    # add ssl cipher cg_custom_AES-SHA
+    $payload = @{
+    "sslcipher"= @{
+        "ciphergroupname"="cg_custom_AES-SHA";
+        }
+    } | ConvertTo-Json -Depth 5
+
+    # Logging NetScaler Instance payload formatting
+    Write-Host "payload: " -ForegroundColor Yellow
+    Write-Host $payload -ForegroundColor Green
+
+    # Method #1: Making the REST API call to the NetScaler
+    $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
+#endregion Add cipher group
+
+#region Bind ciphers to group (bulk)
+    <#
+        add:
+        URL:http://<netscaler-ip-address/nitro/v1/config/sslcipher_sslciphersuite_binding
+        HTTP Method:PUT
+        Request Headers:
+        Cookie:NITRO_AUTH_TOKEN=<tokenvalue>
+        Content-Type:application/json
+        Request Payload:
+        {
+        "sslcipher_sslciphersuite_binding":{
+              "ciphergroupname":<String_value>,
+              "cipheroperation":<String_value>,
+              "ciphgrpals":<String_value>,
+              "ciphername":<String_value>,
+              "cipherpriority":<Double_value>
+        }}
+        Response:
+        HTTP Status Code on Success: 201 Created
+        HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <string> (for NetScaler-specific errors). The response payload provides details of the error
+    #>    
+    # Specifying the correct URL 
+    $strURI = "http://$NSIP/nitro/v1/config/sslcipher_sslciphersuite_binding"
+
+    # bind ssl cipher cg_custom_AES-SHA -cipherName TLS1-AES-256-CBC-SHA
+    # bind ssl cipher cg_custom_AES-SHA -cipherName TLS1-AES-128-CBC-SHA
+    # bind ssl cipher cg_custom_AES-SHA -cipherName TLS1.2-AES-256-SHA256
+    $payload = @{
+        "sslcipher_sslciphersuite_binding"= @(
+            @{"ciphergroupname"="cg_custom_AES-SHA";"ciphername"="TLS1-AES-256-CBC-SHA"},
+            @{"ciphergroupname"="cg_custom_AES-SHA";"ciphername"="TLS1-AES-128-CBC-SHA"},
+            @{"ciphergroupname"="cg_custom_AES-SHA";"ciphername"="TLS1.2-AES-256-SHA256"}
+        )
+    } | ConvertTo-Json -Depth 5
+
+    # Logging NetScaler Instance payload formatting
+    Write-Host "payload: " -ForegroundColor Yellow
+    Write-Host $payload -ForegroundColor Green
+
+    # Method #1: Making the REST API call to the NetScaler
+    $response = Invoke-RestMethod -Method Put -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
+#endregion Bind ciphers to group
+
+#region Bind Ciphergroup to VServer
+    <#
+        add:
+        URL:http://<netscaler-ip-address/nitro/v1/config/sslvserver_sslciphersuite_binding
+        HTTP Method:PUT
+        Request Headers:
+        Cookie:NITRO_AUTH_TOKEN=<tokenvalue>
+        Content-Type:application/json
+        Request Payload:
+        {
+        "sslvserver_sslciphersuite_binding":{
+              "vservername":<String_value>,
+              "ciphername":<String_value>
+        }}
+        Response:
+        HTTP Status Code on Success: 201 Created
+        HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <string> (for NetScaler-specific errors). The response payload provides details of the error
+    #>
+    # Specifying the correct URL 
+    $strURI = "http://$NSIP/nitro/v1/config/sslvserver_sslciphersuite_binding"
+
+    # bind ssl vserver vsvr_SFStore -cipherName cg_custom_AES-SHA
+    $payload = @{
+    "sslvserver_sslciphersuite_binding"= @{
+        "vservername"="vsvr_SFStore";
+        "ciphername"="cg_custom_AES-SHA";
+        }
+    } | ConvertTo-Json -Depth 5
+
+    # Logging NetScaler Instance payload formatting
+    Write-Host "payload: " -ForegroundColor Yellow
+    Write-Host $payload -ForegroundColor Green
+
+    # Method #1: Making the REST API call to the NetScaler
+    $response = Invoke-RestMethod -Method Put -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
+#endregion Bind Ciphergroup to VServer
+
+
 
 #region End NetScaler NITRO Session
 
