@@ -365,156 +365,91 @@ Write-Host "-------------------------------------------------------------- " -Fo
     $response = Invoke-RestMethod -Method Put -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
 #endregion Bind Certificate to VServer
 
-#region Add LB vServers (bulk)
-<#
+#region Add CS vServer for HTTP to HTTPS redirection
+    <#
     add
-    URL:http://<netscaler-ip-address>/nitro/v1/config/lbvserver
+    URL:http://<netscaler-ip-address>/nitro/v1/config/csvserver
     HTTP Method:POST
     Request Headers:
     Cookie:NITRO_AUTH_TOKEN=<tokenvalue>
     Content-Type:application/json
     Request Payload:
-    {"lbvserver":{
-          "name":<String_value>,
-          "servicetype":<String_value>,
-          "ipv46":<String_value>,
-          "ippattern":<String_value>,
-          "ipmask":<String_value>,
-          "port":<Integer_value>,
-          "range":<Double_value>,
-          "persistencetype":<String_value>,
-          "timeout":<Double_value>,
-          "persistencebackup":<String_value>,
-          "backuppersistencetimeout":<Double_value>,
-          "lbmethod":<String_value>,
-          "hashlength":<Double_value>,
-          "netmask":<String_value>,
-          "v6netmasklen":<Double_value>,
-          "backuplbmethod":<String_value>,
-          "cookiename":<String_value>,
-          "rule":<String_value>,
-          "listenpolicy":<String_value>,
-          "listenpriority":<Double_value>,
-          "resrule":<String_value>,
-          "persistmask":<String_value>,
-          "v6persistmasklen":<Double_value>,
-          "pq":<String_value>,
-          "sc":<String_value>,
-          "rtspnat":<String_value>,
-          "m":<String_value>,
-          "tosid":<Double_value>,
-          "datalength":<Double_value>,
-          "dataoffset":<Double_value>,
-          "sessionless":<String_value>,
-          "state":<String_value>,
-          "connfailover":<String_value>,
-          "redirurl":<String_value>,
-          "cacheable":<String_value>,
-          "clttimeout":<Double_value>,
-          "somethod":<String_value>,
-          "sopersistence":<String_value>,
-          "sopersistencetimeout":<Double_value>,
-          "healththreshold":<Double_value>,
-          "sothreshold":<Double_value>,
-          "sobackupaction":<String_value>,
-          "redirectportrewrite":<String_value>,
-          "downstateflush":<String_value>,
-          "backupvserver":<String_value>,
-          "disableprimaryondown":<String_value>,
-          "insertvserveripport":<String_value>,
-          "vipheader":<String_value>,
-          "authenticationhost":<String_value>,
-          "authentication":<String_value>,
-          "authn401":<String_value>,
-          "authnvsname":<String_value>,
-          "push":<String_value>,
-          "pushvserver":<String_value>,
-          "pushlabel":<String_value>,
-          "pushmulticlients":<String_value>,
-          "tcpprofilename":<String_value>,
-          "httpprofilename":<String_value>,
-          "dbprofilename":<String_value>,
-          "comment":<String_value>,
-          "l2conn":<String_value>,
-          "oracleserverversion":<String_value>,
-          "mssqlserverversion":<String_value>,
-          "mysqlprotocolversion":<Double_value>,
-          "mysqlserverversion":<String_value>,
-          "mysqlcharacterset":<Double_value>,
-          "mysqlservercapabilities":<Double_value>,
-          "appflowlog":<String_value>,
-          "netprofile":<String_value>,
-          "icmpvsrresponse":<String_value>,
-          "rhistate":<String_value>,
-          "newservicerequest":<Double_value>,
-          "newservicerequestunit":<String_value>,
-          "newservicerequestincrementinterval":<Double_value>,
-          "minautoscalemembers":<Double_value>,
-          "maxautoscalemembers":<Double_value>,
-          "persistavpno":<Double[]_value>,
-          "skippersistency":<String_value>,
-          "td":<Double_value>,
-          "authnprofile":<String_value>,
-          "macmoderetainvlan":<String_value>,
-          "dbslb":<String_value>,
-          "dns64":<String_value>,
-          "bypassaaaa":<String_value>,
-          "recursionavailable":<String_value>,
-          "processlocal":<String_value>,
-          "dnsprofilename":<String_value>,
-          "lbprofilename":<String_value>,
-          "redirectfromport":<Integer_value>,
-          "httpsredirecturl":<String_value>
+    {"csvserver":{
+          "name":<String_value>,
+          "td":<Double_value>,
+          "servicetype":<String_value>,
+          "ipv46":<String_value>,
+          "targettype":<String_value>,
+          "dnsrecordtype":<String_value>,
+          "persistenceid":<Double_value>,
+          "ippattern":<String_value>,
+          "ipmask":<String_value>,
+          "range":<Double_value>,
+          "port":<Integer_value>,
+          "state":<String_value>,
+          "stateupdate":<String_value>,
+          "cacheable":<String_value>,
+          "redirecturl":<String_value>,
+          "clttimeout":<Double_value>,
+          "precedence":<String_value>,
+          "casesensitive":<String_value>,
+          "somethod":<String_value>,
+          "sopersistence":<String_value>,
+          "sopersistencetimeout":<Double_value>,
+          "sothreshold":<Double_value>,
+          "sobackupaction":<String_value>,
+          "redirectportrewrite":<String_value>,
+          "downstateflush":<String_value>,
+          "backupvserver":<String_value>,
+          "disableprimaryondown":<String_value>,
+          "insertvserveripport":<String_value>,
+          "vipheader":<String_value>,
+          "rtspnat":<String_value>,
+          "authenticationhost":<String_value>,
+          "authentication":<String_value>,
+          "listenpolicy":<String_value>,
+          "listenpriority":<Double_value>,
+          "authn401":<String_value>,
+          "authnvsname":<String_value>,
+          "push":<String_value>,
+          "pushvserver":<String_value>,
+          "pushlabel":<String_value>,
+          "pushmulticlients":<String_value>,
+          "tcpprofilename":<String_value>,
+          "httpprofilename":<String_value>,
+          "dbprofilename":<String_value>,
+          "oracleserverversion":<String_value>,
+          "comment":<String_value>,
+          "mssqlserverversion":<String_value>,
+          "l2conn":<String_value>,
+          "mysqlprotocolversion":<Double_value>,
+          "mysqlserverversion":<String_value>,
+          "mysqlcharacterset":<Double_value>,
+          "mysqlservercapabilities":<Double_value>,
+          "appflowlog":<String_value>,
+          "netprofile":<String_value>,
+          "icmpvsrresponse":<String_value>,
+          "rhistate":<String_value>,
+          "authnprofile":<String_value>,
+          "dnsprofilename":<String_value>
     }}
+
     Response:
     HTTP Status Code on Success: 201 Created
     HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <string> (for NetScaler-specific errors). The response payload provides details of the error
-#>
+    #>
     # Specifying the correct URL 
-    $strURI = "http://$NSIP/nitro/v1/config/lbvserver"
+    $strURI = "http://$NSIP/nitro/v1/config/csvserver"
 
-    # 
+    # add cs vserver cs_vsvr_http_https_redirection HTTP 192.168.0.13 80 -cltTimeout 180
     $payload = @{
-    "lbvserver"= @(
-            @{"name"="vsvr_CS_http_redirect";"servicetype"="HTTP";"ipv46"=($SubNetIP + ".13");"port"=80;"lbmethod"="ROUNDROBIN"}
-        )
-    } | ConvertTo-Json -Depth 5
-
-    # Logging NetScaler Instance payload formatting
-    Write-Host "payload: " -ForegroundColor Yellow
-    Write-Host $payload -ForegroundColor Green
-
-    # Method #1: Making the REST API call to the NetScaler
-    $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
-#endregion Add LB vServers
-#region Bind Service to vServer
-<#
-    add:
-    URL:http://<netscaler-ip-address/nitro/v1/config/lbvserver_service_binding
-    HTTP Method:PUT
-    Request Headers:
-    Cookie:NITRO_AUTH_TOKEN=<tokenvalue>
-    Content-Type:application/json
-    Request Payload:
-    {
-    "lbvserver_service_binding":{
-          "name":<String_value>,
-          "servicename":<String_value>,
-          "weight":<Double_value>,
-          "servicegroupname":<String_value>
-    }}
-    Response:
-    HTTP Status Code on Success: 201 Created
-    HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <string> (for NetScaler-specific errors). The response payload provides details of the error
-#>
-    # Specifying the correct URL 
-    $strURI = "http://$NSIP/nitro/v1/config/lbvserver_service_binding"
-
-    # 
-    $payload = @{
-    "lbvserver_service_binding"= @{
-          "name"="vsvr_CS_http_redirect";
-          "servicename"="svc_always_UP";
+        "csvserver"= @{
+            "name"="cs_vsvr_http_https_redirection"; 
+            "servicetype"="HTTP"; 
+            "ipv46"="192.168.0.13";
+            "port"=80;
+            "clttimeout"=180;
+            "comment"="Carsten Bruns' tip for http to https redirection best practice";
         }
     } | ConvertTo-Json -Depth 5
 
@@ -523,42 +458,45 @@ Write-Host "-------------------------------------------------------------- " -Fo
     Write-Host $payload -ForegroundColor Green
 
     # Method #1: Making the REST API call to the NetScaler
-    $response = Invoke-RestMethod -Method Put -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
-#endregion Bind Service to vServer
-#region Bind Responder Policy to vServer
+    $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
+#endregion Add CS Actions
+#region Bind Responder Policy to CS vServer
 <#
     add:
-    URL:http://<netscaler-ip-address/nitro/v1/config/lbvserver_responderpolicy_binding
+    URL:http://<netscaler-ip-address/nitro/v1/config/csvserver_responderpolicy_binding
     HTTP Method:PUT
     Request Headers:
     Cookie:NITRO_AUTH_TOKEN=<tokenvalue>
     Content-Type:application/json
     Request Payload:
     {
-    "lbvserver_responderpolicy_binding":{
-          "name":<String_value>,
-          "policyname":<String_value>,
-          "priority":<Double_value>,
-          "gotopriorityexpression":<String_value>,
-          "bindpoint":<String_value>,
-          "invoke":<Boolean_value>,
-          "labeltype":<String_value>,
-          "labelname":<String_value>
+    "csvserver_responderpolicy_binding":{
+          "name":<String_value>,
+          "policyname":<String_value>,
+          "targetlbvserver":<String_value>,
+          "priority":<Double_value>,
+          "gotopriorityexpression":<String_value>,
+          "bindpoint":<String_value>,
+          "invoke":<Boolean_value>,
+          "labeltype":<String_value>,
+          "labelname":<String_value>
     }}
+
     Response:
     HTTP Status Code on Success: 201 Created
     HTTP Status Code on Failure: 4xx <string> (for general HTTP errors) or 5xx <string> (for NetScaler-specific errors). The response payload provides details of the error
 #>
     # Specifying the correct URL 
-    $strURI = "http://$NSIP/nitro/v1/config/lbvserver_responderpolicy_binding"
+    $strURI = "http://$NSIP/nitro/v1/config/csvserver_responderpolicy_binding"
 
     # 
     $payload = @{
-    "lbvserver_responderpolicy_binding"= @{
-          "name"="vsvr_CS_http_redirect";
+    "csvserver_responderpolicy_binding"= @{
+          "name"="cs_vsvr_http_https_redirection";
           "policyname"="rspp_http_https_redirect";
           "priority"=100;
           "gotopriorityexpression"="END";
+          "bindpoint"="REQUEST";
         }
     } | ConvertTo-Json -Depth 5
 

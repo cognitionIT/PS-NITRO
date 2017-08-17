@@ -73,7 +73,7 @@
 		'Get-NSMgmtProtocol',
 		'Connect-NSAppliance',
 		'Disconnect-NSAppliance',
-		'Invoke-NSNitroRestApi',
+#		'Invoke-NSNitroRestApi',
 		'Set-NSHostName',
 		'Get-NSHostName',
 		'Restart-NSAppliance',

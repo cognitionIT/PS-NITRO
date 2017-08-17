@@ -296,7 +296,7 @@ Write-Host "---------------------------------------------------------------- " -
     $payload = @{
         "server"= @(
 #            @{"name"="localhost"; "ipaddress"="127.0.0.1"},
-            @{"name"="dummy"; "ipaddress"="1.2.3.4"},
+            @{"name"="lb_svr_alwaysUP"; "ipaddress"="1.1.1.1"},
             @{"name"="SF1"; "ipaddress"=($SubNetIP + ".21")},
             @{"name"="SF2"; "ipaddress"=($SubNetIP + ".22")}
         )
@@ -373,9 +373,9 @@ Write-Host "---------------------------------------------------------------- " -
     # add 
     $payload = @{
         "service"= @{
-          "name"="svc_always_UP";
+          "name"="svc_alwaysUP";
 #          "servername"="localhost";
-          "servername"="dummy";
+          "servername"="lb_svr_alwaysUP";
           "servicetype"="HTTP";
           "port"=80;
           "comment"="created by PowerShell script";
@@ -460,7 +460,7 @@ Write-Host "---------------------------------------------------------------- " -
     $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
 #endregion Add ServiceGroups
 
-#region Add ServiceGroup Bindings (bulk)
+#region Add Servers to ServiceGroup (bulk)
 <#
     add:
     URL:http://<netscaler-ip-address/nitro/v1/config/servicegroup_servicegroupmember_binding
@@ -502,7 +502,7 @@ Write-Host "---------------------------------------------------------------- " -
 
     # Method #1: Making the REST API call to the NetScaler
     $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
-#endregion Bind Certificate to VServer
+#endregion Add Servers to ServiceGroup
 
 #region Add Monitors (bulk)
 <#
@@ -670,7 +670,7 @@ Write-Host "---------------------------------------------------------------- " -
 #          "monitorname"="ping";
           "monitorname"="lb_mon_localhost";
 #          "servicename"="svc_local_http";
-          "servicename"="svc_always_UP";
+          "servicename"="svc_alwaysUP";
         }
     } | ConvertTo-Json -Depth 5
 
@@ -877,7 +877,7 @@ Write-Host "---------------------------------------------------------------- " -
     "lbvserver_service_binding"= @{
           "name"="vsvr_SFStore_http_redirect";
 #          "servicename"="svc_local_http";
-          "servicename"="svc_always_UP";
+          "servicename"="svc_alwaysUP";
         }
     } | ConvertTo-Json -Depth 5
 

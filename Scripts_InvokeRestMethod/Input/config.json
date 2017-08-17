@@ -1,0 +1,31 @@
+{
+    "params":
+    {
+        "warning":"yes",
+        "onerror":"continue"
+    },
+	"nsfeature":
+	{
+		"feature":
+		[
+            "LB",
+            "REWRITE",
+            "RESPONDER"
+        ]
+    },
+    "server":
+	[
+        {
+            "name":  "localhost",
+            "ipaddress":  "127.0.0.1"
+        },
+        {
+            "name":  "SF1",
+            "ipaddress":  ".21"
+        },
+        {
+            "name":  "SF2",
+            "ipaddress":  ".22"
+        }
+    ]
+}
