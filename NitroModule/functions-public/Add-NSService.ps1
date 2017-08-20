@@ -1,4 +1,5 @@
-﻿        # UPDATED Add-NSService is part of the Citrix NITRO Module
+﻿        #
+        # UPDATED Add-NSService is part of the Citrix NITRO Module
         # Copied from Citrix's Module to ensure correct scoping of variables and functions
         function Add-NSService {
             <#
@@ -19,6 +20,8 @@
                 Protocol in which data is exchanged with the service
             .PARAMETER Port
                 Port number of the service
+            .PARAMETER HealthMonitoring
+                Monitor the health of this service. Available settings function as follows: YES - Send probes to check the health of the service. NO - Do not send probes to check the health of the service. With the NO option, the appliance shows the service as UP at all times. Default value: YES. Possible values = YES, NO
             .PARAMETER InsertClientIPHeader
                 Before forwarding a request to the service, insert an HTTP header with the client's IPv4 or IPv6 address as its value
                 Used if the server needs the client's IP address for security, accounting, or other purposes, and setting the Use Source IP parameter is not a viable option
@@ -31,6 +34,7 @@
                 Add-NSService -NSSession $Session -Name "Server1_Service" -ServerName "Server1" -ServerIPAddress "10.108.151.3" -Type "HTTP" -Port 80
             .NOTES
                 Copyright (c) Citrix Systems, Inc. All rights reserved.
+                Update 2018-08-20: Added the Healthmonitor parameter
             #>
             [CmdletBinding()]
             param (
@@ -43,6 +47,7 @@
                 "ANY","SIP_UDP","DNS_TCP","ADNS_TCP","MYSQL","MSSQL","ORACLE","RADIUS","RDP","DIAMETER","SSL_DIAMETER","TFTP"
                 )] [string]$Protocol,
                 [Parameter(Mandatory=$true)] [ValidateRange(1,65535)] [int]$Port,
+                [Parameter(Mandatory=$false)] [ValidateSet("YES", "NO")] [string]$HealthMonitoring,
                 [Parameter(Mandatory=$false)] [switch]$InsertClientIPHeader,
                 [Parameter(Mandatory=$false)] [string]$ClientIPHeader
             )
@@ -51,6 +56,10 @@
     
             $cip = if ($InsertClientIPHeader) { "ENABLED" } else { "DISABLED" }
             $payload = @{name=$Name;servicetype=$Protocol;port=$Port;cip=$cip}
+            If (!([string]::IsNullOrEmpty($HealthMonitoring)))
+            {
+                $payload.Add("healthmonitor",$HealthMonitoring)
+            }
             if ($ClientIPHeader) {
                 $payload.Add("cipheader",$ClientIPHeader)
             }

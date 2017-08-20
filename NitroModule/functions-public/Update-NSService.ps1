@@ -17,6 +17,8 @@
                 Protocol in which data is exchanged with the service
             .PARAMETER Port
                 Port number of the service
+            .PARAMETER HealthMonitoring
+                Monitor the health of this service. Available settings function as follows: YES - Send probes to check the health of the service. NO - Do not send probes to check the health of the service. With the NO option, the appliance shows the service as UP at all times. Default value: YES. Possible values = YES, NO
             .PARAMETER InsertClientIPHeader
                 Before forwarding a request to the service, insert an HTTP header with the client's IPv4 or IPv6 address as its value
                 Used if the server needs the client's IP address for security, accounting, or other purposes, and setting the Use Source IP parameter is not a viable option
@@ -31,12 +33,14 @@
                 Add-NSService -NSSession $Session -Name "Server1_Service" -ServerName "Server1" -ServerIPAddress "10.108.151.3" -Type "HTTP" -Port 80
             .NOTES
                 Copyright (c) Citrix Systems, Inc. All rights reserved.
+                Update 2018-08-20: Added the Healthmonitor parameter
             #>
             [CmdletBinding()]
             param (
                 [Parameter(Mandatory=$true)] [PSObject]$NSSession,
                 [Parameter(Mandatory=$true)] [string]$Name,
                 [Parameter(Mandatory=$false,ParameterSetName='By Address')] [string]$ServerIPAddress,
+                [Parameter(Mandatory=$false)] [ValidateSet("YES", "NO")] [string]$HealthMonitoring,
                 [Parameter(Mandatory=$false)] [switch]$InsertClientIPHeader,
                 [Parameter(Mandatory=$false)] [string]$ClientIPHeader,
                 [Parameter(Mandatory=$false)][ValidateNotNullOrEmpty()] [string]$Comment
@@ -46,6 +50,10 @@
     
             $cip = if ($InsertClientIPHeader) { "ENABLED" } else { "DISABLED" }
             $payload = @{name=$Name;cip=$cip}
+            If (!([string]::IsNullOrEmpty($HealthMonitoring)))
+            {
+                $payload.Add("healthmonitor",$HealthMonitoring)
+            }
             if ($ClientIPHeader) {
                 $payload.Add("cipheader",$ClientIPHeader)
             }

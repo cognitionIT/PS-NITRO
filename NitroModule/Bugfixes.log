@@ -1,0 +1,7 @@
+This file traces the bugfixes for the NitroModule
+
+Copyright (c) cognition IT. All rights reserved.
+
+
+2018-08-20: Added the Get-NSFeature function to the public functions as it was missing
+2018-08-20: Added the HealthMonitor parameter to the Add-NSService function

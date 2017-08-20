@@ -12,60 +12,139 @@
   Copyright (c) cognition IT. All rights reserved.
 #>
 
-#region NITRO settings
-    #region Test Environment variables
-        $TestEnvironment = "demo"
+#--------------------#
+# MAJOR TESTING AREA #
+#--------------------#
 
-        Switch ($TestEnvironment)
+#region Testing area
+
+    # Specifying the input file
+    $ConfigFile = "C:\Input\Config\PSNITROConfig.json"
+
+<#
+    # Creating a payload (checking formatting)
+    $payload=@{
+        "Settings"=@{
+           "Environment"="Elektra";
+	        "RootFolder"="C:\Input";
+	        "ScriptFolder"="G:\GitHub\PSNITRO";
+	        "SubNetIP"="192.168.59";
+	        "NSLicenseFile"="C:\Input\Licenses\NSVPX-ESX_PLT_201709.lic"
+        };
+        "server"=@(
+                @{"name"="lb_svr_one";"ip-address"="192.168.0.101"},
+                @{"name"="lb_svr_two";"ip-address"="192.168.0.102"}
+            )
+    } | ConvertTo-Json
+    $payload
+#>
+
+    # -----------------------
+    # | Read the JSON Config file |
+    # ------------------------
+    #region Read JSON input file
+        # Read JSON content from input file and convert to PS Object (Array)
+        $JSONConfigInput = Get-Content -Raw -Path $ConfigFile | ConvertFrom-Json
+    #endregion Read JSON input file
+
+    #source: https://blogs.msdn.microsoft.com/powershell/2009/12/04/new-object-psobject-property-hashtable/
+    # New-Object PSObject –Property [HashTable]
+
+    #region Retrieve the Settings section from the JSON object
+    $objSettings = $JSONConfigInput.PSObject.Properties.Item("Settings").Value
+
+    #a PSObject is an array, so you should use Count to check if it is $null or not
+        If ($objSettings.Count -eq 0)
         {
-            "Elektra" 
-            {
-                $RootFolder = "H:\PSModules\NITRO\Scripts"
-                $SubnetIP = "192.168.59"
-            }
-            default
-            {
-                $RootFolder = "C:\Scripts\NITRO"
-                $SubnetIP = "192.168.0"
-            }
+            Write-Host "Warning: Empty PSObject" -ForegroundColor Yellow
         }
-        $NSLicFile = $RootFolder + "\NSVPX-ESX_PLT_201609.lic"
+        $objSettings.environment.Count
 
-        # What to install (for script testing purposes)
-        $ConfigNSGSettings = $true
-    #endregion Test Environment variables
-    $ContentType = "application/json"
-    $NSIP = $SubNetIP + ".2"
-    # Build my own credentials variable, based on password string
-    $PW = ConvertTo-SecureString "nsroot" -AsPlainText -Force
-    $MyCreds = New-Object System.Management.Automation.PSCredential ("nsroot", $PW)
-#    $FileRoot = "C:\GitHub\PS-NITRO_v20170509\Scripts_InvokeRestMethod"
-    $FileRoot = "C:\GitHub\PS-NITRO\Scripts_InvokeRestMethod"
+        #region NITRO settings
+            $ContentType = "application/json"
+            $SubNetIP = $objSettings.SubNetIP
+            $NSIP = $SubNetIP + ".2"
+            # Build my own credentials variable, based on password string
+            $FileRoot = $objSettings.ScriptFolder
 
-    $NSUserName = "nsroot"
-    $NSUserPW = "nsroot"
+            If ($objSettings.NSUsername -eq $null)
+            {
+                $NSUserName = Read-Host "Enter the NetScaler username to use: "
+            }
+            Else
+            {
+                $NSUserName = $objSettings.NSUsername
+            }
+            If ($objSettings.NSPassword -eq $null)
+            {
+                $NSPassword = Read-Host "Enter the NetScaler password to use: " -AsSecureString
+                # Create my own Credential object to decrypt the password secure string back to a unencoded string
+                $MyCreds = New-Object System.Management.Automation.PSCredential ($NSUserName, $NSPassword)
+                # Create a Windows PowerShell Credentials Request popup to get user credentials 
+                #$MyCreds = Get-Credential
+                # Show the entered Username
+                #Write-Host ("Username: " + $MyCreds.UserName) -ForegroundColor Yellow
+                # Show the enetered password
+                #Write-Host ("Password: " + $MyCreds.GetNetworkCredential().Password) -ForegroundColor Yellow
+                $NSUserPW = $MyCreds.GetNetworkCredential().Password
+            }
+            Else
+            {
+                $NSUserPW = $objSettings.NSPassword
+            }
+            $strDate = Get-Date -Format yyyyMMddHHmmss
+        #endregion NITRO settings
 
-    $strDate = Get-Date -Format yyyyMMddHHmmss
-#endregion NITRO settings
+    #endregion Retrieve Settings
 
-Write-Host "--------------------------------------------------------------- " -ForegroundColor Yellow
-Write-Host "| Pushing the FAS configuration for NetScaler with NITRO:     | " -ForegroundColor Yellow
-Write-Host "--------------------------------------------------------------- " -ForegroundColor Yellow
 
-    #region !! Adding a presentation demo break !!
-    # ********************************************
-        Read-Host 'Press Enter to continue…' | Out-Null
-        Write-Host
-    #endregion
+# ---------------------------------------------------------
+# | Login to NITRO - Method #1: Using the SessionVariable |
+# ---------------------------------------------------------
+    #region Start NetScaler NITRO Session
+        #Connect to the NetScaler VPX
+        $Login = @{"login" = @{"username"=$NSUserName;"password"=$NSUserPW;"timeout"=”900”}} | ConvertTo-Json
+        $dummy = Invoke-RestMethod -Uri "http://$NSIP/nitro/v1/config/login" -Body $Login -Method POST -SessionVariable NetScalerSession -ContentType $ContentType -Verbose:$VerbosePreference -ErrorAction SilentlyContinue
+    #endregion Start NetScaler NITRO Session
 
-# ----------------------------------------
-# | Method #1: Using the SessionVariable |
-# ----------------------------------------
-#region Start NetScaler NITRO Session
-    #Connect to the NetScaler VPX
-    $Login = @{"login" = @{"username"=$NSUserName;"password"=$NSUserPW;"timeout"=”900”}} | ConvertTo-Json
-    $dummy = Invoke-RestMethod -Uri "http://$NSIP/nitro/v1/config/login" -Body $Login -Method POST -SessionVariable NetScalerSession -ContentType $ContentType -Verbose:$VerbosePreference -ErrorAction SilentlyContinue
-#endregion Start NetScaler NITRO Session
+
+
+    #region Retrieve the nsservers section from the JSON object
+        $servers = $JSONConfigInput.PSObject.Properties.Item("nsservers").Value
+        If ($servers[0] -eq $null)
+        {
+            Write-Host "No servers found in the configuration file" -ForegroundColor DarkYellow
+        }
+        Else
+        {
+            # Retrieve the payload from the JSON input file
+            $payload = ConvertTo-Json -InputObject $servers -Depth 100
+            Write-Host "payload: " -ForegroundColor Yellow
+            Write-Host $payload -ForegroundColor Green
+            # Specifying the correct URL 
+            $strURI = "http://$NSIP/nitro/v1/config/server"
+            # Method #1: Making the REST API call to the NetScaler
+            $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
+        }
+    #endregion Retrieve nsserver
+
+
+
+
+    #region End NetScaler NITRO Session
+        #Disconnect from the NetScaler VPX
+        $LogOut = @{"logout" = @{}} | ConvertTo-Json
+        $dummy = Invoke-RestMethod -Uri "http://$NSIP/nitro/v1/config/logout" -Body $LogOut -Method POST -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorAction SilentlyContinue
+    #endregion End NetScaler NITRO Session
+
+#endregion Testing Area
+
+
+
+
+
+
+
 
 
 # NITRO NOTES:
@@ -96,56 +175,4 @@ Write-Host "--------------------------------------------------------------- " -F
      }
 #>
 
-
-# ------------------------
-# | Read JSON Input file |
-# ------------------------
-#region Read JSON input file
-    # Read JSON content from input file and convert to PS Object (Array)
-    $JSONInput = Get-Content -Raw -Path "$FileRoot\Input\config.json" | ConvertFrom-Json
-
-#source: https://blogs.msdn.microsoft.com/powershell/2009/12/04/new-object-psobject-property-hashtable/
-# New-Object PSObject –Property [HashTable]
-
-$JSONInput.PSObject
-
-$JSONInput.PSObject.Properties.Item("params").Value
-
-$JSONInput | Measure-Object PSObject
-
-$JSONInput.psobject.properties.name
-
-#endregion Read JSON input file
-
-# ----------------------------------------
-# | Actions to NetScaler |
-# ----------------------------------------
-#region Add certificate - key pairs
-    <#
-    #>
-    # Specifying the correct URL 
-    $strURI = "http://$NSIP/nitro/v1/config/sslcertkey"
-
-    # add ssl certKey RootCA -cert "/nsconfig/ssl/rootCA.cer" -inform DER -expiryMonitor ENABLED -notificationPeriod 25
-    $payload = @{
-        "sslcertkey"= @(
-            @{"certkey"="idp_root_ca"; "cert"="/nsconfig/ssl/IDPCAroot.cer"; "inform"="PEM"; "expirymonitor"="ENABLED"; "notificationperiod"=25},
-            @{"certkey"="idp_demo_lab"; "cert"="/nsconfig/ssl/IDPcert.cer"; "inform"="PEM"; "expirymonitor"="ENABLED"; "notificationperiod"=25}
-        )
-    } | ConvertTo-Json -Depth 5
-
-    # Method #1: Making the REST API call to the NetScaler
-#    $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference
-#endregion Add certificate - key pairs
-
-
-
-#TODO:
-
-
-#region End NetScaler NITRO Session
-    #Disconnect from the NetScaler VPX
-    $LogOut = @{"logout" = @{}} | ConvertTo-Json
-    $dummy = Invoke-RestMethod -Uri "http://$NSIP/nitro/v1/config/logout" -Body $LogOut -Method POST -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorAction SilentlyContinue
-#endregion End NetScaler NITRO Session
 

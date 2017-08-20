@@ -4,11 +4,12 @@
 .DESCRIPTION
   Remove Demo Configuration Settings on the NetScaler VPX, using the PS-NITRO Module.
 .NOTES
-  Version:        1.0
+  Version:        2.0
   Author:         Esther Barthel, MSc
   Creation Date:  2017-05-04
   Purpose:        Created as part of the demo scripts for the PowerShell Conference EU 2017 in Hannover
-
+  Updated:        2017-08-20
+  Purpose:        Using the new NITRO Module
   Copyright (c) cognition IT. All rights reserved.
 #>
 [CmdletBinding()]
@@ -41,7 +42,7 @@ Param()
     #region Import My PowerShell NITRO Module 
     If ((Get-Module -Name NitroConfigurationFunctions -ErrorAction SilentlyContinue) -eq $null)
     {
-        Import-Module "$RootFolder\NitroConfigurationFunctions" -Force
+        Import-Module "$RootFolder\NitroModule" -Force
     #    Write-Verbose -Message "Adding the cognitionIT developed NetScaler NITRO Configuration Functions PowerShell Module ..."
     }
     #endregion

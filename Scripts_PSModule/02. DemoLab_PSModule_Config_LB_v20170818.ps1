@@ -4,11 +4,12 @@
 .DESCRIPTION
   Configure Basic Load Balancing Settings (SF LB example) on the NetScaler VPX, using the PS-NITRO Module.
 .NOTES
-  Version:        1.0
+  Version:        1.1
   Author:         Esther Barthel, MSc
   Creation Date:  2017-05-04
   Purpose:        Created as part of the demo scripts for the PowerShell Conference EU 2017 in Hannover
-
+  Updated:        2017-08-18
+  Purpose:        Added improved svc_alwaysUP configuration for HTTP to HTTPS redirection
   Copyright (c) cognition IT. All rights reserved.
 #>
 [CmdletBinding()]
@@ -124,7 +125,7 @@ If ($ConfigTrafficManagementSettings)
     #endregion
 
     #region Configure Load Balancing - Servers
-        Add-NSServer -NSSession $NSSession -Name "localhost" -IPAddress "127.0.0.1" -ErrorAction SilentlyContinue
+        Add-NSServer -NSSession $NSSession -Name "svr_alwaysUP" -IPAddress "1.1.1.1" -ErrorAction SilentlyContinue
         Add-NSServer -NSSession $NSSession -Name "SF2" -IPAddress ($SubnetIP + ".22") -ErrorAction SilentlyContinue
         Add-NSServer -NSSession $NSSession -Name "SF1" -IPAddress ($SubnetIP + ".21") -ErrorAction SilentlyContinue
         Write-Host "LB Servers: " -ForegroundColor Yellow -NoNewline
@@ -132,9 +133,9 @@ If ($ConfigTrafficManagementSettings)
     #endregion
 
     #region Configure Load Balancing - Services
-        Add-NSService -NSSession $NSSession -Name "svc_local_http" -ServerName "localhost" -Protocol HTTP -Port 80 -ErrorAction SilentlyContinue
+        Add-NSService -NSSession $NSSession -Name "svc_alwaysUP" -ServerName "svr_alwaysUP" -Protocol HTTP -Port 80 -HealthMonitor "NO" -ErrorAction SilentlyContinue
         Write-Host "LB Service: " -ForegroundColor Yellow -NoNewline
-        Get-NSService -NSSession $NSSession -Name "svc_local_http" | Select-Object name,servername,servicetype,port,svrstate | Format-List
+        Get-NSService -NSSession $NSSession -Name "svc_alwaysUP" | Select-Object name,servername,servicetype,port,healthmonitor,svrstate | Format-List
     #endregion
 
     #region Configure Load Balancing - Service Groups
@@ -149,10 +150,6 @@ If ($ConfigTrafficManagementSettings)
         Add-NSLBMonitor -NSSession $NSSession -Name "lb_mon_SFStore" -Type STOREFRONT -State Enabled -ScriptName nssf.pl -LRTM -StoreName Store -ErrorAction SilentlyContinue
         Write-Host "LB Monitors: " -ForegroundColor Yellow -NoNewline
         Get-NSLBMonitor -NSSession $NSSession -Name "lb_mon_SFStore" | Select-Object monitorname,type,state,reverse, scriptname, storename, lrtm | Format-List
-
-        New-NSServiceLBMonitorBinding -NSSession $NSSession -ServiceName "svc_local_http" -MonitorName "ping" -ErrorAction SilentlyContinue
-        Write-Host "LB Service Monitor binding: " -ForegroundColor Yellow -NoNewline
-        Get-NSServiceLBMonitorBinding -NSSession $NSSession -Name "svc_local_http"
 
         New-NSServicegroupLBMonitorBinding -NSSession $NSSession -ServicegroupName "svcgrp_SFStore" -MonitorName "ping" -ErrorAction SilentlyContinue
         New-NSServicegroupLBMonitorBinding -NSSession $NSSession -ServicegroupName "svcgrp_SFStore" -MonitorName "lb_mon_SFStore" -ErrorAction SilentlyContinue
@@ -169,7 +166,7 @@ If ($ConfigTrafficManagementSettings)
         Get-NSLBVServer -NSSession $NSSession | Select-Object name,ipv46, port, servicetype, effectivestate, status | Format-List
 
         New-NSLBVServerServicegroupBinding -NSSession $NSSession -Name "vsvr_SFStore" -ServiceGroupName "svcgrp_SFStore" -ErrorAction SilentlyContinue
-        New-NSLBVServerServiceBinding -NSSession $NSSession -Name "vsvr_SFStore_http_redirect" -ServiceName "svc_local_http" -ErrorAction SilentlyContinue
+        New-NSLBVServerServiceBinding -NSSession $NSSession -Name "vsvr_SFStore_http_redirect" -ServiceName "svc_alwaysUP" -ErrorAction SilentlyContinue
         Write-Host "LB vServer Service Group binding: " -ForegroundColor Yellow -NoNewline
         Get-NSLBVServerServicegroupBinding -NSSession $NSSession -Name "vsvr_SFStore" | Select-Object name, servicename, servicegroupname, ipv46, port, servicetype, curstate | Format-List
         Get-NSLBVServerServiceBinding -NSSession $NSSession -Name "vsvr_SFStore_http_redirect" | Select-Object name, servicename, servicegroupname, ipv46, port, servicetype, curstate | Format-List

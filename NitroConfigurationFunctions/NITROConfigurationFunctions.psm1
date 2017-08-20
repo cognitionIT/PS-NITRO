@@ -274,7 +274,9 @@ Set-StrictMode -Version Latest
             $hashtablePayload = @{}
             $hashtablePayload."params" = @{"warning"=$warning;"onerror"=$OnErrorAction;<#"action"=$Action#>}
             $hashtablePayload.$ResourceType = $Payload
-            $jsonPayload = ConvertTo-Json $hashtablePayload -Depth ([int]::MaxValue)
+            #In recent versions of powershell the max value for the depth on convertto-json is 100
+            #int::maxvalue returned 2147483647 and the max value it can accept is 100.
+            $jsonPayload = ConvertTo-Json $hashtablePayload -Depth 100
             Write-Verbose "JSON Payload:`n$jsonPayload"
         }
 
@@ -4352,6 +4354,8 @@ Set-StrictMode -Version Latest
                 Protocol in which data is exchanged with the service
             .PARAMETER Port
                 Port number of the service
+            .PARAMETER HealthMonitoring
+                Monitor the health of this service. Available settings function as follows: YES - Send probes to check the health of the service. NO - Do not send probes to check the health of the service. With the NO option, the appliance shows the service as UP at all times. Default value: YES. Possible values = YES, NO
             .PARAMETER InsertClientIPHeader
                 Before forwarding a request to the service, insert an HTTP header with the client's IPv4 or IPv6 address as its value
                 Used if the server needs the client's IP address for security, accounting, or other purposes, and setting the Use Source IP parameter is not a viable option
@@ -4376,6 +4380,7 @@ Set-StrictMode -Version Latest
                 "ANY","SIP_UDP","DNS_TCP","ADNS_TCP","MYSQL","MSSQL","ORACLE","RADIUS","RDP","DIAMETER","SSL_DIAMETER","TFTP"
                 )] [string]$Protocol,
                 [Parameter(Mandatory=$true)] [ValidateRange(1,65535)] [int]$Port,
+                [Parameter(Mandatory=$false)] [ValidateSet("YES", "NO")] [string]$HealthMonitoring,
                 [Parameter(Mandatory=$false)] [switch]$InsertClientIPHeader,
                 [Parameter(Mandatory=$false)] [string]$ClientIPHeader
             )
@@ -4384,6 +4389,10 @@ Set-StrictMode -Version Latest
     
             $cip = if ($InsertClientIPHeader) { "ENABLED" } else { "DISABLED" }
             $payload = @{name=$Name;servicetype=$Protocol;port=$Port;cip=$cip}
+            If (!([string]::IsNullOrEmpty($HealthMonitoring)))
+            {
+                $payload.Add("healthmonitor",$HealthMonitoring)
+            }
             if ($ClientIPHeader) {
                 $payload.Add("cipheader",$ClientIPHeader)
             }

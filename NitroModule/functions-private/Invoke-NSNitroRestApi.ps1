@@ -94,7 +94,9 @@
             $hashtablePayload = @{}
             $hashtablePayload."params" = @{"warning"=$warning;"onerror"=$OnErrorAction;<#"action"=$Action#>}
             $hashtablePayload.$ResourceType = $Payload
-            $jsonPayload = ConvertTo-Json $hashtablePayload -Depth ([int]::MaxValue)
+            #In recent versions of powershell the max value for the depth on convertto-json is 100
+            #int::maxvalue returned 2147483647 and the max value it can accept is 100.
+            $jsonPayload = ConvertTo-Json $hashtablePayload -Depth 100
             Write-Verbose "JSON Payload:`n$jsonPayload"
         }
 

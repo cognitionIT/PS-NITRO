@@ -17,13 +17,13 @@ Param()
 
 #region Script settings
     #region Test Environment variables
-        $TestEnvironment = "demo"
+        $TestEnvironment = "Elektra"
 
         Switch ($TestEnvironment)
         {
             "Elektra" 
             {
-                $RootFolder = "H:\PSModules\NITRO\Scripts"
+                $RootFolder = "G:\GitHub\PS-NITRO"
                 $SubnetIP = "192.168.59"
             }
             default
