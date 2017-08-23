@@ -17,7 +17,7 @@ Param()
 
 #region Script settings
     #region Test Environment variables
-        $TestEnvironment = "Elektra"
+        $TestEnvironment = "demo"
 
         Switch ($TestEnvironment)
         {
@@ -89,8 +89,8 @@ If ($ConfigSSLSettings)
         Write-Host "Certificates in /nsconfig/ssl/ folder: " -ForegroundColor Yellow 
         (Get-NSSystemFile -NSSession $NSSession -NetScalerFolder "/nsconfig/ssl/" | Where-Object {((($_.filename -like "*.cert") -or ($_.filename -like "*.cer") -or ($_.filename -like "*.der") -or ($_.filename -like "*.pfx")) -and ($_.filename -notlike "ns-*"))})
 
-        Add-NSSystemFile -NSSession $NSSession -PathToFile "$RootFolder\rootCA.cer" -NetScalerFolder "/nsconfig/ssl/" -ErrorAction SilentlyContinue
-        Add-NSSystemFile -NSSession $NSSession -PathToFile "$RootFolder\Wildcard.pfx" -NetScalerFolder "/nsconfig/ssl/" -ErrorAction SilentlyContinue -Verbose:$true
+        Add-NSSystemFile -NSSession $NSSession -PathToFile "$CertFolder\rootCA.cer" -NetScalerFolder "/nsconfig/ssl/" -ErrorAction SilentlyContinue
+        Add-NSSystemFile -NSSession $NSSession -PathToFile "$CertFolder\Wildcard.pfx" -NetScalerFolder "/nsconfig/ssl/" -ErrorAction SilentlyContinue -Verbose:$true
 
         # keep in mind that the filenames are case-sensitive
         Add-NSSSLCertKey -NSSession $NSSession -CertKeyName "RootCA" -CertPath "/nsconfig/ssl/rootCA.cer" -CertKeyFormat PEM -ExpiryMonitor -NotificationPeriod 25 -ErrorAction SilentlyContinue

@@ -17,7 +17,7 @@ Param()
 
 #region Script Settings
     #region Test Environment variables
-        $TestEnvironment = "Elektra"
+        $TestEnvironment = "demo"
 
         Switch ($TestEnvironment)
         {
@@ -153,7 +153,7 @@ If ($ConfigBasicSettings)
     #endregion
 
     #region Configure NetScaler Basic & Advanced Features to be enabled (NS - nsfeature)
-        Enable-NSFeature -NSSession $NSSession -Feature "lb ssl sslvpn rewrite responder"
+        Enable-NSFeature -NSSession $NSSession -Feature "lb ssl sslvpn rewrite responder cs"
         Write-Host "Enabled Features: " -ForegroundColor Yellow
         (Get-NSFeature -NSSession $NSSession).feature
     #endregion

@@ -29,7 +29,8 @@
                 $SubnetIP = "192.168.0"
             }
         }
-        $NSLicFile = $RootFolder + "\NSVPX-ESX_PLT_201609.lic"
+        $CertFolder = "C:\Input\Certificates"
+        $NSLicFile = "C:\Input\LicenseFiles\NSVPX-ESX_PLT_201609.lic"
 
         # What to install (for script testing purposes)
         $ConfigNSGSettings = $true
@@ -136,12 +137,12 @@ Write-Host "--------------------------------------------------------------- " -F
     # Creating the right payload formatting (mind the Depth for the nested arrays)
 
     # Get FileName, Content and Base64 String from the FilePath, Keep in mind that the filenames are case-sensitive
-    $PathToFile = $FileRoot + "\Certificates\IDPCAroot.cer"
+    $PathToFile = $CertFolder + "\IDPCAroot.cer"
     $FileRootName = Split-Path -Path $PathToFile -Leaf                                                 # Parameter explained: -Leaf     => Indicates that this cmdlet returns only the last item or container in the path. For example, in the path C:\Test\Logs\Pass1.log, it returns only Pass1.log.
     $FileRootContent = Get-Content $PathToFile -Encoding "Byte"
     $FileRootContentBase64 = [System.Convert]::ToBase64String($FileRootContent)
 
-    $PathToFile = $FileRoot + "\Certificates\IDPcert.cer"
+    $PathToFile = $CertFolder + "\IDPcert.cer"
     $FileCertName = Split-Path -Path $PathToFile -Leaf                                                 # Parameter explained: -Leaf     => Indicates that this cmdlet returns only the last item or container in the path. For example, in the path C:\Test\Logs\Pass1.log, it returns only Pass1.log.
     $FileCertContent = Get-Content $PathToFile -Encoding "Byte"
     $FileCertContentBase64 = [System.Convert]::ToBase64String($FileCertContent)
@@ -158,7 +159,7 @@ Write-Host "--------------------------------------------------------------- " -F
     Write-Host $payload -ForegroundColor Green
 
     # Method #1: Making the REST API call to the NetScaler
-#    $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorVariable restError
+    $response = Invoke-RestMethod -Method Post -Uri $strURI -Body $payload -ContentType $ContentType -WebSession $NetScalerSession -Verbose:$VerbosePreference -ErrorVariable restError
 #endregion Upload certificate
 
 #region Add certificate - key pairs

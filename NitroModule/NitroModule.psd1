@@ -237,7 +237,14 @@
 		'Add-NSVPNSessionPolicy',
 		'New-NSVPNVServerSessionPolicyBinding',
 		'New-NSVPNVServerSTAServerBinding',
-		'Set-NSSFStore'
+		'Set-NSSFStore',
+		'Add-NSCSVServer',
+		'Update-NSCSVServer',
+		'Remove-NSCSVServer',
+		'Get-NSCSVServer',
+		'Enable-NSCSVServer',
+		'Disable-NSCSVServer',
+		'Rename-NSCSVServer'
 	)
 	
 	# Cmdlets to export from this module
