@@ -4354,7 +4354,7 @@ Set-StrictMode -Version Latest
                 Protocol in which data is exchanged with the service
             .PARAMETER Port
                 Port number of the service
-            .PARAMETER HealthMonitor
+            .PARAMETER HealthMonitoring
                 Monitor the health of this service. Available settings function as follows: YES - Send probes to check the health of the service. NO - Do not send probes to check the health of the service. With the NO option, the appliance shows the service as UP at all times. Default value: YES. Possible values = YES, NO
             .PARAMETER InsertClientIPHeader
                 Before forwarding a request to the service, insert an HTTP header with the client's IPv4 or IPv6 address as its value
@@ -4380,7 +4380,7 @@ Set-StrictMode -Version Latest
                 "ANY","SIP_UDP","DNS_TCP","ADNS_TCP","MYSQL","MSSQL","ORACLE","RADIUS","RDP","DIAMETER","SSL_DIAMETER","TFTP"
                 )] [string]$Protocol,
                 [Parameter(Mandatory=$true)] [ValidateRange(1,65535)] [int]$Port,
-                [Parameter(Mandatory=$false)] [ValidateSet("YES","NO")] [string]$HealthMonitor="YES",
+                [Parameter(Mandatory=$false)] [ValidateSet("YES","NO")] [string]$HealthMonitoring="YES",
                 [Parameter(Mandatory=$false)] [switch]$InsertClientIPHeader,
                 [Parameter(Mandatory=$false)] [string]$ClientIPHeader
             )
@@ -4389,9 +4389,9 @@ Set-StrictMode -Version Latest
     
             $cip = if ($InsertClientIPHeader) { "ENABLED" } else { "DISABLED" }
             $payload = @{name=$Name;servicetype=$Protocol;port=$Port;cip=$cip}
-            If (!([string]::IsNullOrEmpty($HealthMonitor)))
+            If (!([string]::IsNullOrEmpty($HealthMonitoring)))
             {
-                $payload.Add("healthmonitor",$HealthMonitor)
+                $payload.Add("healthmonitor",$HealthMonitoring)
             }
             if ($ClientIPHeader) {
                 $payload.Add("cipheader",$ClientIPHeader)
@@ -4630,7 +4630,7 @@ Set-StrictMode -Version Latest
                 Auto scale option for a servicegroup. Default value: DISABLED. Possible values = DISABLED, DNS, POLICY
             .PARAMETER Cacheable
                 Use the transparent cache redirection virtual server to forward the request to the cache server. Note: Do not set this parameter if you set the Cache Type. Default value: NO. Possible values = YES, NO
-            .PARAMETER HealthMonitor
+            .PARAMETER HealthMonitoring
                 Monitor the health of this service. Available settings function as follows: YES - Send probes to check the health of the service. NO - Do not send probes to check the health of the service. With the NO option, the appliance shows the service as UP at all times. Default value: YES. Possible values = YES, NO
             .SWITCH ApplfowLogging
                 Enable logging of AppFlow information for the specified service group. Default value: ENABLED. Possible values = ENABLED, DISABLED
@@ -4651,7 +4651,7 @@ Set-StrictMode -Version Latest
                 [Parameter(Mandatory=$true)] [ValidateSet("DISABLED", "DNS", "POLICY")] [string]$AutoscaleMode,
                 [Parameter(Mandatory=$false)] [ValidateScript({($CacheType -eq "SERVER")})][switch]$Cacheable,
                 [Parameter(Mandatory=$false)] [ValidateSet("ENABLED", "DISABLED")] [string]$State="ENABLED",
-                [Parameter(Mandatory=$false)] [ValidateSet("YES","NO")] [string]$HealthMonitor="YES",
+                [Parameter(Mandatory=$false)] [ValidateSet("YES","NO")] [string]$HealthMonitoring="YES",
                 [Parameter(Mandatory=$false)] [switch]$AppflowLogging
             )
 
@@ -4669,9 +4669,9 @@ Set-StrictMode -Version Latest
             {
                 $payload.Add("cachetype", $CacheType)
             }
-            If (!([string]::IsNullOrEmpty($HealthMonitor)))
+            If (!([string]::IsNullOrEmpty($HealthMonitoring)))
             {
-                $payload.Add("healthmonitor",$HealthMonitor)
+                $payload.Add("healthmonitor",$HealthMonitoring)
             }
             $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod POST -ResourceType servicegroup -Payload $payload  -Verbose:$VerbosePreference
    

@@ -133,17 +133,17 @@ If ($ConfigTrafficManagementSettings)
     #endregion
 
     #region Configure Load Balancing - Services
-        Add-NSService -NSSession $NSSession -Name "svc_alwaysUP" -ServerName "svr_alwaysUP" -Protocol HTTP -Port 80 -HealthMonitor NO -ErrorAction SilentlyContinue
+        Add-NSService -NSSession $NSSession -Name "svc_alwaysUP" -ServerName "svr_alwaysUP" -Protocol HTTP -Port 80 -HealthMonitoring NO -ErrorAction SilentlyContinue
         Write-Host "LB Service: " -ForegroundColor Yellow -NoNewline
-        Get-NSService -NSSession $NSSession -Name "svc_alwaysUP" | Select-Object name,servername,servicetype,port,healthmonitor,svrstate | Format-List
+        Get-NSService -NSSession $NSSession -Name "svc_alwaysUP" | Select-Object name,servername,servicetype,port,healthmonitoring,svrstate | Format-List
     #endregion
 
     #region Configure Load Balancing - Service Groups
-        Add-NSServiceGroup -NSSession $NSSession -Name "svcgrp_SFStore" -Protocol HTTP -CacheType SERVER -Cacheable -State ENABLED -HealthMonitor YES -AppflowLogging -AutoscaleMode DISABLED -ErrorAction SilentlyContinue
+        Add-NSServiceGroup -NSSession $NSSession -Name "svcgrp_SFStore" -Protocol HTTP -CacheType SERVER -Cacheable -State ENABLED -HealthMonitoring YES -AppflowLogging -AutoscaleMode DISABLED -ErrorAction SilentlyContinue
         New-NSServicegroupServicegroupmemberBinding -NSSession $NSSession -Name "svcgrp_SFStore" -ServerName "SF2" -Port 80 -State ENABLED -Weight 2 -ErrorAction SilentlyContinue
         New-NSServicegroupServicegroupmemberBinding -NSSession $NSSession -Name "svcgrp_SFStore" -ServerName "SF1" -Port 80 -State ENABLED -Weight 1 -ErrorAction SilentlyContinue
         Write-Host "LB Service Group: " -ForegroundColor Yellow -NoNewline
-        Get-NSServicegroupServicegroupmemberBinding -NSSession $NSSession -Name "svcgrp_SFStore" | Select-Object servicegroupname,ip,port,svrstate,weight,servername,state
+        Get-NSServicegroupServicegroupmemberBinding -NSSession $NSSession -Name "svcgrp_SFStore" | Select-Object servicegroupname,ip,port,svrstate,weight,servername,state,healthmonitoring
     #endregion
         
     #region Load Balancing - Monitors

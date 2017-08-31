@@ -1,4 +1,4 @@
-﻿    function Update-NSCSVServer {
+﻿    function Set-NSCSVServer {
         <#
         .SYNOPSIS
             Update a existing CS virtual server

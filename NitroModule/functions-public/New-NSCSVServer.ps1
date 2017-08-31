@@ -1,4 +1,4 @@
-﻿    function Add-NSCSVServer {
+﻿    function New-NSCSVServer {
         <#
         .SYNOPSIS
             Add a new CS virtual server

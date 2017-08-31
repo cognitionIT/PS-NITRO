@@ -1,19 +1,19 @@
-﻿    function Get-NSCSVServer {
+﻿    function Get-NSCSPolicy {
         <#
         .SYNOPSIS
-            Retrieve NetScaler CS vServer information
+            Retrieve NetScaler CS policy information
         .DESCRIPTION
-            Retrieve NetScaler CS vServer information
+            Retrieve NetScaler CS policy information
         .PARAMETER NSSession
             An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
         .PARAMETER Name
-            Name of the CS vServer to retrieve.
+            Name of the CS policy to retrieve.
         .EXAMPLE
-            Get-NSCSVServer -NSSession $Session -Name cs_vsvr_unifiedgateway
+            Get-NSCSPolicy -NSSession $Session -Name cs_pol_unifiedgateway
         .NOTES
             Version:        1.0
             Author:         Esther Barthel, MSc
-            Creation Date:  2017-08-21
+            Creation Date:  2017-08-30
 
             Copyright (c) cognition IT. All rights reserved.
         #>
@@ -27,17 +27,17 @@
         }
         Process {
             If ($Name){
-                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType csvserver -ResourceName $Name
+                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType cspolicy -ResourceName $Name
             }
             Else {
-                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType csvserver
+                $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType cspolicy
             }
         }
         End {
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
-            If ($response.PSObject.Properties['csvserver'])
+            If ($response.PSObject.Properties['cspolicy'])
             {
-                return $response.csvserver
+                return $response.cspolicy
             }
             else
             {
