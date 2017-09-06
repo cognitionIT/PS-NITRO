@@ -9,7 +9,8 @@ function Get-NSCurrentTime {
     .EXAMPLE
         Get-NSCurrentTime -NSSession $Session
     .NOTES
-        Added Ryan Butler 08-06-17
+        Author: Ryan Butler - Citrix CTA
+        Date Created: 06/09/2017
     #>
     [CmdletBinding()]
     param (
