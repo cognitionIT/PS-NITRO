@@ -257,7 +257,8 @@
 		'Get-NSCSPolicy',
 		'Rename-NSCSPolicy',
 		'Get-NSCurrentTime',
-		'Get-NSLicenseExp'
+		'Get-NSLicenseExp',
+		'Update-NSAppliance'
 	)
 	
 	# Cmdlets to export from this module
