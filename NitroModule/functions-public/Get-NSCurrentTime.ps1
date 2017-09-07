@@ -19,8 +19,10 @@ function Get-NSCurrentTime {
 
     Write-Verbose "$($MyInvocation.MyCommand): Enter"
     $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod GET -ResourceType nsconfig -Verbose:$VerbosePreference
-    $currentdatestr = ($response.nsconfig.currentsytemtime) -replace "  "," 0"
-    $nsdate = [DateTime]::ParseExact($currentdatestr,"ddd MMM dd HH:mm:ss yyyy",$null)
+    $currentdatestr = $response.nsconfig.systemtime
+    Write-Verbose $currentdatestr
+    $date = get-date "1/1/1970"
+    $nsdate = $date.AddSeconds($currentdatestr)
     Write-Verbose "$($MyInvocation.MyCommand): Exit"
        
     return $nsdate
