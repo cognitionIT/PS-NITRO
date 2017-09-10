@@ -12,7 +12,7 @@
         .PARAMETER Protocol
             Protocol, acceptable values are "http" and "https"
         .EXAMPLE
-            Set-Protocol -Protocol https
+            Set-NSMgmtProtocol -Protocol https
         .NOTES
             Copyright (c) Citrix Systems, Inc. All rights reserved.
         #>
