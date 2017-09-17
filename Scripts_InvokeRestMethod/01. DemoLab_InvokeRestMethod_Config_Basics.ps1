@@ -2,7 +2,8 @@
 .SYNOPSIS
   Configure Basic System Settings on the NetScaler VPX.
 .DESCRIPTION
-  Configure Basic System Settings (First Logon Wizard, Modes, Features) on the NetScaler VPX, using the Invoke-RestMethod cmdlet for the REST API calls.
+  Configure Basic System Settings (First Logon Wizard, Modes, Features) on the NetScaler VPX, 
+  using the Invoke-RestMethod cmdlet for the REST API calls.
 .NOTES
   Version:        1.0
   Author:         Esther Barthel, MSc
@@ -15,7 +16,7 @@
 #region NITRO settings
     $ContentType = "application/json"
     $SubNetIP = "192.168.0"
-    $NSIP = $SubNetIP + ".2"
+    $NSIP = $SubNetIP + ".202"
     # Build my own credentials variable, based on password string
     $PW = ConvertTo-SecureString "nsroot" -AsPlainText -Force
     $MyCreds = New-Object System.Management.Automation.PSCredential ("nsroot", $PW)
