@@ -18,7 +18,7 @@
             Timeout in seconds for the wait after reboot
         .EXAMPLE
             Save NetScaler Config file and restart NetScaler VPX
-            Restart-NSAppliance -NSIP 10.108.151.1 -SaveNSConfig -WebSession $session
+            Restart-NSAppliance -NSSession $Session -SaveNSConfig
         .NOTES
             Copyright (c) Citrix Systems, Inc. All rights reserved.
         #>

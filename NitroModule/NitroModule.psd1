@@ -256,12 +256,18 @@
 		'Remove-NSCSPolicy',
 		'Get-NSCSPolicy',
 		'Rename-NSCSPolicy',
+<<<<<<< HEAD
 		'New-NSCSVServerCSPolicyBinding',
 		'Remove-NSCSVServerCSPolicyBinding',
 		'Get-NSCSVServerCSPolicyBinding',
 		'New-NSCSVServerResponderPolicyBinding',
 		'Remove-NSCSVServerResponderPolicyBinding',
 		'Get-NSCSVServerResponderPolicyBinding'
+=======
+		'Get-NSCurrentTime',
+		'Get-NSLicenseExp',
+		'Update-NSAppliance'
+>>>>>>> origin/NewModuleStructure
 	)
 	
 	# Cmdlets to export from this module
