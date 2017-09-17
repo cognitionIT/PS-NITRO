@@ -16,7 +16,7 @@
 #region NITRO settings
     $ContentType = "application/json"
     $SubNetIP = "192.168.0"
-    $NSIP = $SubNetIP + ".202"
+    $NSIP = $SubNetIP + ".2"
     # Build my own credentials variable, based on password string
     $PW = ConvertTo-SecureString "nsroot" -AsPlainText -Force
     $MyCreds = New-Object System.Management.Automation.PSCredential ("nsroot", $PW)
@@ -290,9 +290,9 @@ Write-Host "------------------------------------------------------------------ "
 
         $payload = @{
         "nsconfig"= @{
-#            "timezone"="GMT+01:00-CET-Europe/Amsterdam";
+            "timezone"="GMT+01:00-CET-Europe/Amsterdam";
             # New timezones in NetScaler 12
-            "timezone"="GMT+02:00-CEST-Europe/Amsterdam";
+#            "timezone"="GMT+02:00-CEST-Europe/Amsterdam";
             }
         } | ConvertTo-Json -Depth 5
 

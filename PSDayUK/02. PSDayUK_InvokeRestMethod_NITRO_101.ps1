@@ -39,11 +39,11 @@ The first step towards using NITRO is to establish a session with the NetScaler 
     Write-Host $JSONPayload -ForegroundColor Green
 
 # 1b. Make the REST API call
-    $dummy = Invoke-RestMethod -Uri "http://$NSIP/nitro/v1/config/login" -Body $JSONPayload -Method POST -SessionVariable NetScalerSession -ContentType $ContentType -Verbose:$true
+    $results = Invoke-RestMethod -Uri "http://$NSIP/nitro/v1/config/login" -Body $JSONPayload -Method POST -SessionVariable NetScalerSession -ContentType $ContentType -Verbose:$true
 
 # Show the results of the REST API call
     Write-Host "Results:" -ForegroundColor Yellow
-    Write-Host $dummy -ForegroundColor Green
+    Write-Host $results -ForegroundColor Green
 
 # Show the Session Variable
     Write-Host "Session Variable:" -ForegroundColor Yellow
