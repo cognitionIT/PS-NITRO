@@ -20,7 +20,7 @@ Param()
 
 #region Script Settings
     #region Test Environment variables
-        $TestEnvironment = "Elektra"
+        $TestEnvironment = "demo"
 
         Switch ($TestEnvironment)
         {
@@ -31,7 +31,7 @@ Param()
             }
             default
             {
-                $RootFolder = "C:\Scripts\NITRO"
+                $RootFolder = "C:\GitHub\PS-NITRO"
                 $SubnetIP = "192.168.0"
             }
         }

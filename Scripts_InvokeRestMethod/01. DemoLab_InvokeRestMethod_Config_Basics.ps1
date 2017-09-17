@@ -289,7 +289,9 @@ Write-Host "------------------------------------------------------------------ "
 
         $payload = @{
         "nsconfig"= @{
-            "timezone"="GMT+01:00-CET-Europe/Amsterdam";
+#            "timezone"="GMT+01:00-CET-Europe/Amsterdam";
+            # New timezones in NetScaler 12
+            "timezone"="GMT+02:00-CEST-Europe/Amsterdam";
             }
         } | ConvertTo-Json -Depth 5
 

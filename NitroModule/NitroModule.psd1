@@ -255,7 +255,13 @@
 		'Set-NSCSPolicy',
 		'Remove-NSCSPolicy',
 		'Get-NSCSPolicy',
-		'Rename-NSCSPolicy'
+		'Rename-NSCSPolicy',
+		'New-NSCSVServerCSPolicyBinding',
+		'Remove-NSCSVServerCSPolicyBinding',
+		'Get-NSCSVServerCSPolicyBinding',
+		'New-NSCSVServerResponderPolicyBinding',
+		'Remove-NSCSVServerResponderPolicyBinding',
+		'Get-NSCSVServerResponderPolicyBinding'
 	)
 	
 	# Cmdlets to export from this module

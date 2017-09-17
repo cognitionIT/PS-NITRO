@@ -1,4 +1,4 @@
-﻿    function New-NSCPolicy {
+﻿    function New-NSCSPolicy {
         <#
         .SYNOPSIS
             Add a new CS Policy

@@ -50,7 +50,7 @@ Param()
 
     #region First session configurational settings and Start a session
         # Protocol to use for the REST API/NITRO call
-        $RESTProtocol = "https"
+        $RESTProtocol = "http"
         # NetScaler information for REST API call
         $NSaddress = ($SubnetIP + ".2") # NSIP
         $NSUsername = "nsroot"
@@ -118,6 +118,7 @@ If ($ConfigFirstLogon)
 
     #region Step 3c. Time Zone (NS - nsconfig)
         Set-NSTimeZone -NSSession $NSSession -TimeZone "GMT+01:00-CET-Europe/Amsterdam"
+#        Set-NSTimeZone -NSSession $NSSession -TimeZone "GMT+02:00-CEST-Europe/Amsterdam"
         Write-Host "Timezone: " -ForegroundColor Yellow -NoNewline
         Write-Host (Get-NSTimeZone -NSSession $NSSession)
     #endregion

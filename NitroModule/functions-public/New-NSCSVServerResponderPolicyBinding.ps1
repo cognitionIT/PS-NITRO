@@ -1,9 +1,9 @@
-﻿    function New-NSCSVServerCSPolicyBinding {
+﻿    function New-NSCSVServerResponderPolicyBinding {
         <#
         .SYNOPSIS
-            Bind a CS Policy to a CS vServer
+            Bind a Responder Policy to a CS vServer
         .DESCRIPTION
-            Bind a CS Policy to a Content Switching vServer
+            Bind a Responder Policy to a Content Switching vServer
         .PARAMETER NSSession
             An existing custom NetScaler Web Request Session object returned by Connect-NSAppliance
         .PARAMETER Name
@@ -28,7 +28,7 @@
         .PARAMETER Labelname
             Name of the label invoked
         .EXAMPLE
-            New-NSCSVServerCSPolicyBinding -NSSession $Session -Name "cs_vsvr_one_url_test" -PolicyName "cs_pol_gateway" -Priority =100
+            New-NSCSVServerCSPolicyBinding -NSSession $Session -Name "cs_vsvr_http_https_redirection" -PolicyName "rspp_http_https_redirect" -Priority 100
         .NOTES
             Version:        1.0
             Author:         Esther Barthel, MSc
@@ -63,7 +63,7 @@
             if ($Priority) {$payload.Add("priority",$Priority)}
             if ($Invoke.ToBool()) {$payload.Add("invoke",$Invoke.ToBool())}
 
-            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType csvserver_cspolicy_binding -Payload $payload 
+            $response = Invoke-NSNitroRestApi -NSSession $NSSession -OperationMethod PUT -ResourceType csvserver_responderpolicy_binding -Payload $payload 
         }
         End {
             Write-Verbose "$($MyInvocation.MyCommand): Exit"
