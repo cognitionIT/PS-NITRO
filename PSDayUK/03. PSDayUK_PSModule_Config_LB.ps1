@@ -18,11 +18,12 @@ Param()
 #region Script Settings
     #region Demo Environment variables
         $RootFolder = "C:\GitHub\PS-NITRO"
-        $SubnetIP = "192.168.0"        }
+        $SubnetIP = "192.168.0"
         $NSLicFile = $RootFolder + "\NSVPX-ESX_PLT_201609.lic"
 
 
         # What to install (for script testing purposes)
+        $ConfigAppExpertSettings = $true
         $ConfigTrafficManagementSettings =$true
     #endregion
 
@@ -174,6 +175,19 @@ If ($ConfigTrafficManagementSettings)
 #region Final Step. Close the session to the NetScaler
     # extra cleaning rule for demo purposes
     Remove-NSServicegroupLBMonitorBinding -NSSession $NSSession -ServicegroupName "svcgrp_SFStore" -MonitorName "lb_mon_SFStore"
+
+    #region Add certificate - key pairs
+        Add-NSSSLCertKey -NSSession $NSSession -CertKeyName "RootCA" -CertPath "/nsconfig/ssl/rootCA.cer" -CertKeyFormat PEM -ExpiryMonitor -NotificationPeriod 25 -ErrorAction SilentlyContinue
+        Add-NSSSLCertKey -NSSession $NSSession -CertKeyName "wildcard.demo.lab" -CertPath "/nsconfig/ssl/Wildcard.pfx" -CertKeyFormat PFX -Password "password" -ErrorAction SilentlyContinue
+    #endregion
+
+    #region Add certificate - links
+        Add-NSSSLCertKeyLink -NSSession $NSSession -CertKeyName "wildcard.demo.lab" -LinkCertKeyName "RootCA" -ErrorAction SilentlyContinue
+    #endregion
+
+    #region Bind Certificate to VServer
+        Add-NSSSLVServerCertKeyBinding -NSSession $NSSession -VServerName vsvr_SFStore -CertKeyName "wildcard.demo.lab" -ErrorAction SilentlyContinue
+    #endregion
 
     # restore SSL validation to normal behavior
     If ($RESTProtocol = "https")

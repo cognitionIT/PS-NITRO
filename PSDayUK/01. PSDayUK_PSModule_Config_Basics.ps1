@@ -118,3 +118,5 @@ If ($ConfigFirstLogon)
 #region Disconnect the session to the NetScaler
     Disconnect-NSAppliance -NSSession $NSSession -ErrorAction SilentlyContinue
 #endregion
+
+Clear-Host
