@@ -102,7 +102,8 @@ Set-StrictMode -Version Latest
             [Parameter(Mandatory=$true,ParameterSetName='Name')] [string]$NSName,
             [Parameter(Mandatory=$false)] [string]$NSUserName="nsroot", 
             [Parameter(Mandatory=$false)] [string]$NSPassword="nsroot",
-            [Parameter(Mandatory=$false)] [int]$Timeout=900
+            [Parameter(Mandatory=$false)] [int]$Timeout=900,
+            [Parameter(Mandatory=$false)] [bool]$Insecure=$false
         )
         Write-Verbose "$($MyInvocation.MyCommand): Enter"
 
@@ -117,6 +118,21 @@ Set-StrictMode -Version Latest
             $nsEndpoint = $NSName
         }
 
+        # Skip SSL/TLS certificate validation
+		if ($Insecure) {
+			Add-Type @"
+				using System.Net;
+				using System.Security.Cryptography.X509Certificates;
+				public class TrustAllCertsPolicy : ICertificatePolicy {
+					public bool CheckValidationResult(
+					ServicePoint srvPoint, X509Certificate certificate,
+					WebRequest request, int certificateProblem) {
+						return true;
+					}
+				}
+"@
+			[System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
+		}
 
         $login = @{"login" = @{"username"=$NSUserName;"password"=$NSPassword;"timeout"=$Timeout}}
         $loginJson = ConvertTo-Json $login
